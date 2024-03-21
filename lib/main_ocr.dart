@@ -184,30 +184,56 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   }
 
   Future<void> _scanImage() async {
-    if (_cameraController == null) return;
+  if (_cameraController == null) return;
 
-    final navigator = Navigator.of(context);
+  final navigator = Navigator.of(context);
 
-    try {
-      final pictureFile = await _cameraController!.takePicture();
+  try {
+    final pictureFile = await _cameraController!.takePicture();
 
-      final file = File(pictureFile.path);
+    final file = File(pictureFile.path);
 
-      final inputImage = InputImage.fromFile(file);
-      final recognizedText = await textRecognizer.processImage(inputImage);
+    final inputImage = InputImage.fromFile(file);
+    final recognizedText = await textRecognizer.processImage(inputImage);
 
+    // Filtrar el texto reconocido para detectar si contiene "Pokémon" o "Nintendo"
+    final filteredText = recognizedText.text;
+    final containsPokemon = filteredText.contains('Pokémon');
+    final containsNintendo = filteredText.contains('Nintendo');
+
+    // Si contiene "Pokémon" o "Nintendo", muestra el resultado
+    if (containsPokemon || containsNintendo) {
       await navigator.push(
         MaterialPageRoute(
           builder: (BuildContext context) =>
-              ResultScreen(text: recognizedText.text),
+              ResultScreen(text: filteredText),
         ),
       );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('An error occurred when scanning text'),
-        ),
+    } else {
+      // Mostrar un mensaje de advertencia y solicitar al usuario que escanee una carta de Pokémon
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('No es una carta de Pokémon'),
+            content: Text('Por favor, escanea una carta de Pokémon.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
       );
     }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('An error occurred when scanning text'),
+      ),
+    );
   }
+}
+
 }
