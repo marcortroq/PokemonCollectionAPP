@@ -37,17 +37,28 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void _moverFondo(){
+    print("Hola");
+    setState(() {
+      // Cambiar el color del contenedor
+      _primerContainerColor = Colors.white;
+      _segundoContainerColor= const Color.fromRGBO(136, 136, 136, 1); // Cambia a cualquier color que desees
+    });
+  }
+  Color _primerContainerColor = const Color.fromRGBO(255, 22, 22, 1);
+  Color _segundoContainerColor =  Colors.black;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
           Container(
+            key: Key('primer_container'),
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [Color.fromRGBO(255, 22, 22, 1), Colors.black],
+                colors: [_primerContainerColor, _segundoContainerColor],                
               ),
             ),
           ),
@@ -98,6 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   width: 305,
                   height: 52, // Ancho del TextField
                   child: TextField(
+                    onTap: _moverFondo,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius:
@@ -121,8 +133,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       filled: true, // Habilitar el relleno
                       fillColor: Colors.white,
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
+                      
+                      focusedBorder: OutlineInputBorder(                        
+                        borderSide: BorderSide(                          
                             color: Colors.black,
                             width: 2), // Borde oscuro cuando está seleccionado
                         borderRadius:
