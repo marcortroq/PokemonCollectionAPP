@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 void main() {
   runApp(const MyApp());
@@ -37,16 +38,23 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void _moverFondo(){
+  bool _mostrarTriangulo =
+      true; // Variable para controlar la visibilidad del Triángulo
+  void _moverFondo() {
     print("Hola");
     setState(() {
       // Cambiar el color del contenedor
       _primerContainerColor = Colors.white;
-      _segundoContainerColor= const Color.fromRGBO(136, 136, 136, 1); // Cambia a cualquier color que desees
+      _segundoContainerColor = const Color.fromRGBO(
+          136, 136, 136, 1); // Cambia a cualquier color que desees
+      _mostrarTriangulo = false; // Ocultar el Triángulo
+      _imagenTopPosition = -70; // Cambiar esto a la posición deseada
     });
   }
+
+  double _imagenTopPosition = 220.0; // Posición inicial de la imagen
   Color _primerContainerColor = const Color.fromRGBO(255, 22, 22, 1);
-  Color _segundoContainerColor =  Colors.black;
+  Color _segundoContainerColor = Colors.black;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,40 +66,44 @@ class _MyHomePageState extends State<MyHomePage> {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [_primerContainerColor, _segundoContainerColor],                
+                colors: [_primerContainerColor, _segundoContainerColor],
               ),
             ),
           ),
-          Positioned(
-            left: 0, // Ajusta la posición izquierda según lo necesites
-            top: 60, // Ajusta la posición superior según lo necesites
-            child: Image.asset(
-              'assets/Charizard.png', // Ruta de la imagen
-              width: 420, // Ancho de la imagen
-              height: 420, // Alto de la imagen
-              fit: BoxFit
-                  .contain, // Ajusta el tamaño de la imagen según el contenedor
-            ),
-          ),
-          Positioned(
-            left: 70, // Ajusta la posición izquierda según lo necesites
-            top: 7, // Ajusta la posición superior según lo necesites
-            child: Transform.rotate(
-              angle: 58 * 3.14 / 180, // Convierte grados a radianes
-              child: Container(
-                width: 22, // Ancho del rectángulo
-                height: 900, // Alto del rectángulo
-                color: Color.fromRGBO(29, 30, 29, 1), // Color del rectángulo
+          if (_mostrarTriangulo)
+            Positioned(
+              left: 0, // Ajusta la posición izquierda según lo necesites
+              top: 60, // Ajusta la posición superior según lo necesites
+              child: Image.asset(
+                'assets/Charizard.png', // Ruta de la imagen
+                width: 420, // Ancho de la imagen
+                height: 420, // Alto de la imagen
+                fit: BoxFit
+                    .contain, // Ajusta el tamaño de la imagen según el contenedor
               ),
             ),
-          ),
-          CustomPaint(
-            size: Size.infinite,
-            painter: TrianglePainter(),
-          ),
+          if (_mostrarTriangulo)
+            Positioned(
+              left: 70, // Ajusta la posición izquierda según lo necesites
+              top: 7, // Ajusta la posición superior según lo necesites
+              child: Transform.rotate(
+                angle: 58 * 3.14 / 180, // Convierte grados a radianes
+                child: Container(
+                  width: 22, // Ancho del rectángulo
+                  height: 900, // Alto del rectángulo
+                  color: Color.fromRGBO(29, 30, 29, 1), // Color del rectángulo
+                ),
+              ),
+            ),
+          if (_mostrarTriangulo) // Condición para mostrar el Triángulo
+            CustomPaint(
+              size: Size.infinite,
+              painter: TrianglePainter(),
+            ),
           Positioned(
             left: 0, // Ajusta la posición izquierda según lo necesites
-            top: 220, // Ajusta la posición superior según lo necesites
+            top:
+                _imagenTopPosition, // Ajusta la posición superior según lo necesites
             child: Image.asset(
               'assets/title.png', // Ruta de la segunda imagen
               width: 400, // Ancho de la segunda imagen
@@ -133,9 +145,9 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       filled: true, // Habilitar el relleno
                       fillColor: Colors.white,
-                      
-                      focusedBorder: OutlineInputBorder(                        
-                        borderSide: BorderSide(                          
+
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
                             color: Colors.black,
                             width: 2), // Borde oscuro cuando está seleccionado
                         borderRadius:
