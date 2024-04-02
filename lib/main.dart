@@ -37,8 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  bool _mostrarTriangulo =
-      true; // Variable para controlar la visibilidad del Triángulo
+  bool _mostrarTriangulo =true; // Variable para controlar la visibilidad del Triángulo
 
   void _moverFondo() {
     if (_mostrarTriangulo) {
@@ -47,9 +46,10 @@ class _MyHomePageState extends State<MyHomePage> {
         // Cambiar el color del contenedor
         _primerContainerColor = Colors.white;
         _segundoContainerColor = const Color.fromRGBO(
-            136, 136, 136, 1); // Cambia a cualquier color que desees
-        _mostrarTriangulo = false; // Ocultar el Triángulo
+            136, 136, 136, 1); // Cambia a cualquier color que desees        
         _imagenTopPosition = -70; // Cambiar esto a la posición deseada
+        _mostrarTriangulo = false;
+        _transparentColor = const Color.fromRGBO(255, 22, 22, 0.0);
       });
     }
   }
@@ -62,13 +62,16 @@ class _MyHomePageState extends State<MyHomePage> {
       _segundoContainerColor =
           Colors.black; // Cambia a cualquier color que desees
       _mostrarTriangulo = true; // Ocultar el Triángulo
-      _imagenTopPosition = 220.0; // Cambiar esto a la posición deseada
+      _imagenTopPosition = 220.0; 
+      _transparentColor = Colors.black;// Cambiar esto a la posición deseada
     });
   }
 
   double _imagenTopPosition = 220.0; // Posición inicial de la imagen
   Color _primerContainerColor = const Color.fromRGBO(255, 22, 22, 1);
   Color _segundoContainerColor = Colors.black;
+  Color _transparentColor = Colors.black;
+
   final FocusNode _emailFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
 
@@ -112,8 +115,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   fit: BoxFit
                       .contain, // Ajusta el tamaño de la imagen según el contenedor
                 ),
-              ),
-            if (_mostrarTriangulo)
+              ), 
+                         
               Positioned(
                 left: 70, // Ajusta la posición izquierda según lo necesites
                 top: 7, // Ajusta la posición superior según lo necesites
@@ -124,12 +127,11 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: Container(
                     width: 22, // Ancho del rectángulo
                     height: 900, // Alto del rectángulo
-                    color: Color.fromRGBO(
-                        29, 30, 29, 1), // Color del rectángulo
+                    color: _transparentColor
                   ),
                 ),
-              ),
-            if (_mostrarTriangulo) // Condición para mostrar el Triángulo
+              ),  
+              if(_mostrarTriangulo)           
               CustomPaint(
                 size: Size.infinite,
                 painter: TrianglePainter(),
@@ -170,8 +172,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   SizedBox(
                     width: 305,
                     height: 52, // Ancho del TextField
-                    child: TextField(                      
-                      onChanged: (_) => _moverFondo(),
+                    child: TextField(              
+                      
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius:
