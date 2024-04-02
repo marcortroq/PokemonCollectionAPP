@@ -41,25 +41,18 @@ class _MyHomePageState extends State<MyHomePage> {
       true; // Variable para controlar la visibilidad del Triángulo
 
   void _moverFondo() {
-  if (_mostrarTriangulo) {
-    print("Hola");
-    _abrirTeclado(); // Llama a la función para abrir el teclado
-    setState(() {
-      // Cambiar el color del contenedor
-      _primerContainerColor = Colors.white;
-      _segundoContainerColor = const Color.fromRGBO(
-          136, 136, 136, 1); // Cambia a cualquier color que desees
-      _mostrarTriangulo = false; // Ocultar el Triángulo
-      _imagenTopPosition = -70; // Cambiar esto a la posición deseada
-    });
+    if (_mostrarTriangulo) {
+      print("Hola");
+      setState(() {
+        // Cambiar el color del contenedor
+        _primerContainerColor = Colors.white;
+        _segundoContainerColor = const Color.fromRGBO(
+            136, 136, 136, 1); // Cambia a cualquier color que desees
+        _mostrarTriangulo = false; // Ocultar el Triángulo
+        _imagenTopPosition = -70; // Cambiar esto a la posición deseada
+      });
+    }
   }
-}
-
-void _abrirTeclado() {
-  // Enfoca en un campo de texto para abrir el teclado
-  FocusScope.of(context).requestFocus(FocusNode());
-}
-
 
   void _volverFondo() {
     print("Hola");
