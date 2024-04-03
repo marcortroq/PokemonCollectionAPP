@@ -30,249 +30,188 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  bool _mostrarTriangulo =true; // Variable para controlar la visibilidad del Triángulo
-
-  void _moverFondo() {
-    if (_mostrarTriangulo) {
-      print("Hola");
-      setState(() {
-        // Cambiar el color del contenedor
-        _primerContainerColor = Colors.white;
-        _segundoContainerColor = const Color.fromRGBO(
-            136, 136, 136, 1); // Cambia a cualquier color que desees        
-        _imagenTopPosition = -70; // Cambiar esto a la posición deseada
-        _mostrarTriangulo = false;
-        _transparentColor = const Color.fromRGBO(255, 22, 22, 0.0);
-      });
-    }
-  }
-
-  void _volverFondo() {
-    print("Hola");
-    setState(() {
-      // Cambiar el color del contenedor
-      _primerContainerColor = const Color.fromRGBO(255, 22, 22, 1);
-      _segundoContainerColor =
-          Colors.black; // Cambia a cualquier color que desees
-      _mostrarTriangulo = true; // Ocultar el Triángulo
-      _imagenTopPosition = 220.0; 
-      _transparentColor = Colors.black;// Cambiar esto a la posición deseada
-    });
-  }
-
-  double _imagenTopPosition = 220.0; // Posición inicial de la imagen
-  Color _primerContainerColor = const Color.fromRGBO(255, 22, 22, 1);
-  Color _segundoContainerColor = Colors.black;
-  Color _transparentColor = Colors.black;
-
-  final FocusNode _emailFocus = FocusNode();
-  final FocusNode _passwordFocus = FocusNode();
-
-  @override
-  void dispose() {
-    _emailFocus.dispose();
-    _passwordFocus.dispose();
-    super.dispose();
-  }
+  bool _isKeyboardVisible = false;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: GestureDetector(
-        onTap: () {
-          // Ocultar el teclado cuando se toca en cualquier lugar que no sea TextField
-          FocusScope.of(context).unfocus();
-          print("hola");
-          _volverFondo();
-        },
-        child: Stack(
+    return GestureDetector(
+      onTap: () {
+        // Ocultar el teclado cuando se toca en cualquier lugar que no sea un campo de texto
+        FocusScope.of(context).requestFocus(FocusNode());
+        setState(() {
+          _isKeyboardVisible = false;
+        });
+      },
+      child: Scaffold(
+        body: Stack(
           children: [
-            Container(
-              key: Key('primer_container'),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [_primerContainerColor, _segundoContainerColor],
-                ),
-              ),
+            _buildBackground(),
+            _buildImage('assets/Charizard.png', 400),
+            CustomPaint(
+              size: Size.infinite,
+              painter: RectanguloPainter(),
             ),
-            if (_mostrarTriangulo)
-              Positioned(
-                left: 0, // Ajusta la posición izquierda según lo necesites
-                top: 60, // Ajusta la posición superior según lo necesites
-                child: Image.asset(
-                  'assets/Charizard.png', // Ruta de la imagen
-                  width: 420, // Ancho de la imagen
-                  height: 420, // Alto de la imagen
-                  fit: BoxFit
-                      .contain, // Ajusta el tamaño de la imagen según el contenedor
-                ),
-              ), 
-                         
-              Positioned(
-                left: 70, // Ajusta la posición izquierda según lo necesites
-                top: 7, // Ajusta la posición superior según lo necesites
-                child: Transform.rotate(
-                  angle: 58 *
-                      3.14 /
-                      180, // Convierte grados a radianes
-                  child: Container(
-                    width: 22, // Ancho del rectángulo
-                    height: 900, // Alto del rectángulo
-                    color: _transparentColor
-                  ),
-                ),
-              ),  
-              if(_mostrarTriangulo)           
-              CustomPaint(
-                size: Size.infinite,
-                painter: TrianglePainter(),
-              ),
-            Positioned(
-              left: 0, // Ajusta la posición izquierda según lo necesites
-              top: _imagenTopPosition, // Ajusta la posición superior según lo necesites
-              child: Image.asset(
-                'assets/title.png', // Ruta de la segunda imagen
-                width: 400, // Ancho de la segunda imagen
-                height: 400, // Alto de la segunda imagen
-                fit: BoxFit
-                    .contain, // Ajusta el tamaño de la imagen según el contenedor
-              ),
+            CustomPaint(
+              size: Size.infinite,
+              painter: TrianglePainter(),
             ),
-            Positioned(
-              left: 50, // Ajusta la posición izquierda según lo necesites
-              bottom: 50, // Ajusta la posición inferior según lo necesites
-              child: Column(
-                children: [
-                  SizedBox(
-                    width: 305,
-                    height: 52, // Ancho del TextField
-                    child: TextField(                      
-                      onTap: () => _moverFondo(),
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(13.0), // Bordes redondeados
-                        ),
-                        filled: true, // Habilitar el relleno
-                        fillColor: Colors.white, // Color de fondo
-                        labelText: 'Email Address / Username',
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20), // Espacio entre los TextField
-                  SizedBox(
-                    width: 305,
-                    height: 52, // Ancho del TextField
-                    child: TextField(              
-                      
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius:
-                              BorderRadius.circular(13.0), // Bordes redondeados
-                        ),
-                        filled: true, // Habilitar el relleno
-                        fillColor: Colors.white,
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Colors.black,
-                              width: 2), // Borde oscuro cuando está seleccionado
-                          borderRadius:
-                              BorderRadius.circular(13.0), // Bordes redondeados
-                        ), // Color de fondo
-                        labelText: 'Password',
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 48), // Espacio entre los TextField
-                  SizedBox(
-                    width: 305,
-                    height: 52, // Alto del botón
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Acción a realizar al presionar el botón
-                      },
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(13.0), // Bordes redondeados
-                        ),
-                        padding: EdgeInsets.zero,
-                        elevation: 0,
-                      ),
-                      child: Ink(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              const Color.fromRGBO(66, 9, 9,
-                                  1), // Color oscuro en el lado izquierdo
-                              const Color.fromRGBO(160, 0, 0,
-                                  1), // Color más claro en el lado izquierdo
-                              const Color.fromRGBO(
-                                  221, 19, 19, 1), // Color rojo en el centro
-                              const Color.fromRGBO(160, 0, 0,
-                                  1), // Color más claro en el lado derecho
-                              const Color.fromRGBO(
-                                  66, 9, 9, 1), // Color oscuro en el lado derecho
-                            ],
-                            begin:
-                                Alignment.centerLeft, // Comienza en el centro-izquierda
-                            end: Alignment
-                                .centerRight, // Termina en el centro-derecha
-                          ),
-                          borderRadius:
-                              BorderRadius.circular(13.0), // Bordes redondeados
-                        ),
-                        child: Container(
-                          alignment: Alignment.center,
-                          child: Text(
-                            'Sign In',
-                            style: TextStyle(
-                              color: Colors.white, // Color del texto del botón
-                              fontSize: 20, // Tamaño de la fuente
-                              fontFamily:
-                                  'RubikOne', // Familia de la fuente
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 7), // Espacio entre el botón y el texto
-                  RichText(
-                    text: TextSpan(
-                      text: "I’m a new user. ",
-                      style: TextStyle(
-                        color: Colors.black, // Color del texto principal (negro)
-                        fontSize: 18, // Tamaño de la fuente
-                        fontFamily: 'Roboto', // Familia de la fuente
-                      ),
-                      children: [
-                        TextSpan(
-                          text: "Sign Up",
-                          style: TextStyle(
-                            color: Colors.red, // Color de "Sign Up" (rojo)
-                            fontWeight: FontWeight.bold,
-                            fontFamily:
-                                'Roboto', // Opcional: negrita para enfatizar
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
+            _buildLoginForm(),
+            AnimatedOpacity(
+              opacity: _isKeyboardVisible ? 0.0 : 1.0,
+              duration: Duration(milliseconds: 300),
+              child: Center(
+                 child: _buildTitulo('assets/title.png'),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildBackground() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color.fromRGBO(255, 22, 22, 1), Colors.black],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoginForm() {
+    return Positioned(
+      left: 50,
+      bottom: 70,
+      child: Column(
+        children: [
+          SizedBox(height: 30),
+          _buildTextField('Email Address / Username'),
+          SizedBox(height: 20),
+          _buildTextField('Password'),
+          SizedBox(height: 38),
+          _buildSignInButton(),
+          SizedBox(height: 7),
+          _buildSignUpText(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImage(String imagePath, double size) {
+    return Positioned(
+      top: -30,
+      bottom: size == 200 ? 60 : 240,
+      child: Image.asset(
+        imagePath,
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+      ),
+    );
+  }
+
+  Widget _buildTitulo(String imagePath) {
+    return Positioned(
+      left: 0,
+      top: -150,
+      right: 0,
+      child: Image.asset(
+        imagePath,
+        fit: BoxFit.contain,
+      ),
+    );
+  }
+
+  Widget _buildTextField(String labelText) {
+    return SizedBox(
+      width: 305,
+      height: 52,
+      child: TextField(
+        onTap: () {
+          setState(() {
+            _isKeyboardVisible = true;
+          });
+        },
+        decoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(13.0),
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          labelText: labelText,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSignInButton() {
+    return SizedBox(
+      width: 305,
+      height: 52,
+      child: ElevatedButton(
+        onPressed: () {
+          // Acción a realizar al presionar el botón
+        },
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(13.0),
+          ),
+          padding: EdgeInsets.zero,
+          elevation: 0,
+        ),
+        child: Ink(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                const Color.fromRGBO(66, 9, 9, 1),
+                const Color.fromRGBO(160, 0, 0, 1),
+                const Color.fromRGBO(221, 19, 19, 1),
+                const Color.fromRGBO(160, 0, 0, 1),
+                const Color.fromRGBO(66, 9, 9, 1),
+              ],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+            borderRadius: BorderRadius.circular(13.0),
+          ),
+          child: Container(
+            alignment: Alignment.center,
+            child: Text(
+              'Sign In',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontFamily: 'RubikOne',
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSignUpText() {
+    return RichText(
+      text: TextSpan(
+        text: "I’m a new user. ",
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 18,
+          fontFamily: 'Roboto',
+        ),
+        children: [
+          TextSpan(
+            text: "Sign Up",
+            style: TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Roboto',
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -281,29 +220,71 @@ class _MyHomePageState extends State<MyHomePage> {
 class TrianglePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint();
-    final path = Path();
-    path.moveTo(-560, size.height);
-    path.lineTo(size.width, size.height);
-    path.lineTo(size.width, 260);
-    path.close();
-    paint.shader = LinearGradient(
-      begin: Alignment.centerLeft,
-      end: Alignment.bottomRight,
-      colors: [
-        const Color.fromRGBO(136, 136, 136, 1),
-        const Color.fromRGBO(136, 136, 136, 1),
-        Colors.white,
-        Colors.white,
-      ],
-      stops: [0.2, 0.2, 0.9, 1.0],
-    ).createShader(path.getBounds());
-    paint.style = PaintingStyle.fill;
-    canvas.drawPath(path, paint);
+    Paint paint_fill_0 = Paint()
+      ..color = const Color.fromARGB(255, 255, 255, 255)
+      ..style = PaintingStyle.fill
+      ..strokeWidth = size.width * 0.00
+      ..strokeCap = StrokeCap.butt
+      ..strokeJoin = StrokeJoin.miter;
+
+    Path path_0 = Path();
+    path_0.moveTo(size.width * 0, size.height * 0.59500);
+    path_0.lineTo(size.width * 1, size.height * 0.3);
+    path_0.lineTo(size.width * 1, size.height * 3);
+    path_0.lineTo(size.width * 0, size.height * 3);
+
+    canvas.drawPath(path_0, paint_fill_0);
+
+    Paint paint_stroke_0 = Paint()
+      ..style = PaintingStyle.fill
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          Color.fromRGBO(179, 179, 179, 1), // Rojo
+          Color.fromARGB(255, 255, 255, 255), // Verde
+        ],
+      ).createShader(Rect.fromLTRB(0, 0, size.width, size.height));
+
+    canvas.drawPath(path_0, paint_stroke_0); // Dibujar con el degradado
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
+    return true;
+  }
+}
+
+class RectanguloPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint paint_fill_0 = Paint()
+      ..color = Color.fromRGBO(29, 30, 29, 1)
+      ..style = PaintingStyle.fill
+      ..strokeWidth = size.width * 0.00
+      ..strokeCap = StrokeCap.butt
+      ..strokeJoin = StrokeJoin.miter;
+
+    Path path_0 = Path();
+    path_0.moveTo(size.width * 0, size.height * 0.57);
+    path_0.lineTo(size.width * 1, size.height * 0.275);
+    path_0.lineTo(size.width * 1, size.height * 0.305);
+    path_0.lineTo(size.width * 0, size.height * 0.6);
+
+    canvas.drawPath(path_0, paint_fill_0);
+
+    Paint paint_stroke_0 = Paint()
+      ..color = Color.fromRGBO(29, 30, 29, 1)
+      ..style = PaintingStyle.fill
+      ..strokeWidth = size.width * 0.00
+      ..strokeCap = StrokeCap.butt
+      ..strokeJoin = StrokeJoin.miter;
+
+    canvas.drawPath(path_0, paint_stroke_0); // Dibujar con el degradado
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
   }
 }
