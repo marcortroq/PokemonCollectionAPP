@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ResultScreen extends StatelessWidget {
   final String text;
@@ -24,6 +26,15 @@ class ResultScreen extends StatelessWidget {
     'Dragonair', 'Dragonite', 'Mewtwo', 'Mew'
   ];
 
+  Future<String?> fetchCardImage(String pokemonName) async {
+    final response = await http.get(Uri.parse('http://51.141.92.127/carta/$pokemonName'));
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      throw Exception('Failed to load card image');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final foundPokemon = pokemonNames.firstWhere((pokemon) => text.contains(pokemon), orElse: () => '');
@@ -43,7 +54,22 @@ class ResultScreen extends StatelessWidget {
       body: Container(
         padding: const EdgeInsets.all(30.0),
         child: foundPokemon.isNotEmpty
-            ? Text(foundPokemon)
+            ? FutureBuilder<String?>(
+                future: fetchCardImage(foundPokemon),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else if (snapshot.hasData) {
+                    final cardImageBase64 = snapshot.data!;
+                    final cardImageBytes = base64Decode(cardImageBase64);
+                    return Image.memory(cardImageBytes);
+                  } else {
+                    return Text('No se encontró ninguna imagen de carta para este Pokémon');
+                  }
+                },
+              )
             : Text('No se encontró ningún Pokémon'),
       ),
     );
