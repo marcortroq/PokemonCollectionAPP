@@ -183,57 +183,80 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     setState(() {});
   }
 
-  Future<void> _scanImage() async {
-  if (_cameraController == null) return;
+    Future<void> _scanImage() async {
+    if (_cameraController == null) return;
 
-  final navigator = Navigator.of(context);
+    final navigator = Navigator.of(context);
 
-  try {
-    final pictureFile = await _cameraController!.takePicture();
+    try {
+      final pictureFile = await _cameraController!.takePicture();
 
-    final file = File(pictureFile.path);
+      final file = File(pictureFile.path);
 
-    final inputImage = InputImage.fromFile(file);
-    final recognizedText = await textRecognizer.processImage(inputImage);
+      final inputImage = InputImage.fromFile(file);
+      final recognizedText = await textRecognizer.processImage(inputImage);
 
-    // Filtrar el texto reconocido para detectar si contiene "Pokémon" o "Nintendo"
-    final filteredText = recognizedText.text;
-    final containsPokemon = filteredText.contains('Pokémon');
-    final containsNintendo = filteredText.contains('Nintendo');
+      // Filtrar el texto reconocido para detectar si contiene "Pokémon" o "Nintendo"
+      final filteredText = recognizedText.text;
+      final containsPokemon = filteredText.contains('Pokémon');
+      final containsNintendo = filteredText.contains('Nintendo');
+      final contains2002PokemonNintendo = RegExp(r'2002\s*Pok[eé]mon\s*Nintendo|2002\s*Pok[eé]mon\s*/\s*Nintendo|2002\s*Pok[eé]mon\s*Nintendo|2002\s*Pok[eé]mon\s*Nintendo').hasMatch(filteredText);
 
-    // Si contiene "Pokémon" o "Nintendo", muestra el resultado
-    if (containsPokemon || containsNintendo) {
-      await navigator.push(
-        MaterialPageRoute(
-          builder: (BuildContext context) =>
-              ResultScreen(text: filteredText),
+      // Imprimir el resultado de la verificación con la expresión regular
+      print('Verificación de expresión regular: $contains2002PokemonNintendo');
+
+      // Si contiene "Pokémon" o "Nintendo", y también "2002 Pokemon/Nintendo", muestra el resultado
+      if ((containsPokemon || containsNintendo) && contains2002PokemonNintendo) {
+        await navigator.push(
+          MaterialPageRoute(
+            builder: (BuildContext context) =>
+                ResultScreen(text: filteredText),
+          ),
+        );
+      } else {
+        // Si no contiene "2002 Pokemon/Nintendo", mostrar un mensaje de advertencia
+        if (!contains2002PokemonNintendo) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('No es una carta de Pokémon de la edicion 151'),
+                content: Text('Por favor, escanea una carta de Pokémon de la edicion 151.'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          // Si no contiene "Pokémon" o "Nintendo", mostrar un mensaje de advertencia
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('No es una carta de Pokémon'),
+                content: Text('Por favor, escanea una carta de Pokémon.'),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('An error occurred when scanning text'),
         ),
       );
-    } else {
-      // Mostrar un mensaje de advertencia y solicitar al usuario que escanee una carta de Pokémon
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('No es una carta de Pokémon'),
-            content: Text('Por favor, escanea una carta de Pokémon.'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
     }
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('An error occurred when scanning text'),
-      ),
-    );
   }
-}
 
 }
