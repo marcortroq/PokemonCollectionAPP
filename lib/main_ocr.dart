@@ -17,7 +17,7 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Text Recognition Flutter',
+      title: 'POKÉMON CAPTURE',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -94,7 +94,18 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
               ),
             Scaffold(
               appBar: AppBar(
-                title: const Text('Text Recognition Sample'),
+                title: Center( // Envuelve el Texto con Center
+                  child: Text(
+                    'POKÉMON CAPTURE',
+                    style: TextStyle(
+                      fontFamily: 'Sarpanch', // Usa la tipografía Sarpanch
+                      fontSize: 20.0, // Tamaño del texto
+                      fontWeight: FontWeight.bold, // Negrita
+                      color: Colors.white, // Color del texto en blanco
+                    ),
+                  ),
+                ),
+                backgroundColor: Colors.black, // Color de fondo negro
               ),
               backgroundColor: _isPermissionGranted ? Colors.transparent : null,
               body: _isPermissionGranted
@@ -106,9 +117,9 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
                         Container(
                           padding: const EdgeInsets.only(bottom: 30.0),
                           child: Center(
-                            child: ElevatedButton(
-                              onPressed: _scanImage,
-                              child: const Text('Scan text'),
+                            child: GestureDetector(
+                              onTap: _scanImage,
+                              child: Image.asset('assets/OcrButton.png'), // Ruta de la imagen
                             ),
                           ),
                         ),
@@ -214,7 +225,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
           ),
         );
       } else {
-        // Si no contiene "2002 Pokemon/Nintendo", mostrar un mensaje de advertencia
+        // Si no contiene contains2002PokemonNintendo un ejemplo seria "2002 Pokemon/Nintendo", mostrar un mensaje de advertencia
         if (!contains2002PokemonNintendo) {
           showDialog(
             context: context,
