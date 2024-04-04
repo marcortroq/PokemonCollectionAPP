@@ -43,6 +43,7 @@ class RPSCustomPainter extends CustomPainter {
   }
 }
 
+//Painter
 class RPSCustomPainter2 extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
