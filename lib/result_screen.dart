@@ -26,10 +26,13 @@ class ResultScreen extends StatelessWidget {
     'Dragonair', 'Dragonite', 'Mewtwo', 'Mew'
   ];
 
-  Future<String?> fetchCardImage(String pokemonName) async {
-    final response = await http.get(Uri.parse('http://51.141.92.127/carta/$pokemonName'));
+  Future<String?> fetchCardImage(int pokemonIndex) async {
+    final pokemonName = pokemonNames[pokemonIndex];
+    final response = await http.get(Uri.parse('http://51.141.92.127:5000/carta/${pokemonIndex + 1}'));
     if (response.statusCode == 200) {
-      return response.body;
+      final jsonData = json.decode(response.body); // Convertir la respuesta a JSON
+      final fotoCarta = jsonData['Carta']['FOTO_CARTA']; // Obtener la cadena dentro de FOTO_CARTA
+      return fotoCarta; // Devolver la cadena
     } else {
       throw Exception('Failed to load card image');
     }
@@ -37,7 +40,7 @@ class ResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final foundPokemon = pokemonNames.firstWhere((pokemon) => text.contains(pokemon), orElse: () => '');
+    final foundPokemonIndex = pokemonNames.indexWhere((pokemon) => text.contains(pokemon));
 
     return Scaffold(
       appBar: AppBar(
@@ -53,9 +56,9 @@ class ResultScreen extends StatelessWidget {
       ),
       body: Container(
         padding: const EdgeInsets.all(30.0),
-        child: foundPokemon.isNotEmpty
+        child: foundPokemonIndex != -1
             ? FutureBuilder<String?>(
-                future: fetchCardImage(foundPokemon),
+                future: fetchCardImage(foundPokemonIndex),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return CircularProgressIndicator();
