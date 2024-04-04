@@ -30,9 +30,9 @@ class ResultScreen extends StatelessWidget {
     final pokemonName = pokemonNames[pokemonIndex];
     final response = await http.get(Uri.parse('http://51.141.92.127:5000/carta/${pokemonIndex + 1}'));
     if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body); // Convertir la respuesta a JSON
-      final fotoCarta = jsonData['Carta']['FOTO_CARTA']; // Obtener la cadena dentro de FOTO_CARTA
-      return fotoCarta; // Devolver la cadena
+      final jsonData = json.decode(response.body);
+      final fotoCarta = jsonData['Carta']['FOTO_CARTA'];
+      return fotoCarta;
     } else {
       throw Exception('Failed to load card image');
     }
@@ -67,7 +67,17 @@ class ResultScreen extends StatelessWidget {
                   } else if (snapshot.hasData) {
                     final cardImageBase64 = snapshot.data!;
                     final cardImageBytes = base64Decode(cardImageBase64);
-                    return Image.memory(cardImageBytes);
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Container(
+                            alignment: Alignment.center,
+                            child: Image.memory(cardImageBytes),
+                          ),
+                        ),
+                      ],
+                    );
                   } else {
                     return Text('No se encontró ninguna imagen de carta para este Pokémon');
                   }
