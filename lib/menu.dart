@@ -1,38 +1,70 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
-import 'dart:ui' as ui;
 
 class RPSCustomPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    // Layer 1
+    final gradient = LinearGradient(
+      colors: [Color.fromRGBO(255, 22, 22, 1), Colors.black],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+    );
 
-    Paint paint_fill_0 = Paint()
-      ..color = Color.fromARGB(255, 179, 37, 37)
+    final paintFill = Paint()
+      ..shader =
+          gradient.createShader(Rect.fromLTWH(0, 0, size.width, size.height))
       ..style = PaintingStyle.fill
-      ..strokeWidth = size.width * 0.00
+      ..strokeWidth = 0
       ..strokeCap = StrokeCap.butt
       ..strokeJoin = StrokeJoin.miter;
 
-    Path path_0 = Path();
-    path_0.moveTo(0 * 0.3762500, 0 * 0.3020000);
-    path_0.lineTo(550 * 0.7487500, 0 * 0.3020000);
-    path_0.lineTo(550 * 0.7487500, 450 * 0.7040000);
-    path_0.lineTo(370 * 0.5637500, 450 * 0.9040000);
-    path_0.lineTo(0 * 0.3762500, 450 * 0.7020000);
+    final path = Path()
+      ..moveTo(0 * 0.3762500, 0 * 0.3020000)
+      ..lineTo(550 * 0.7487500, 0 * 0.3020000)
+      ..lineTo(550 * 0.7487500, 450 * 0.7040000)
+      ..lineTo(370 * 0.5637500, 450 * 0.9040000)
+      ..lineTo(0 * 0.3762500, 450 * 0.7020000);
 
-    canvas.drawPath(path_0, paint_fill_0);
+    canvas.drawPath(path, paintFill);
 
-    // Layer 1
-
-    Paint paint_stroke_0 = Paint()
+    final paintStroke = Paint()
       ..color = const Color.fromARGB(255, 33, 150, 243)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = size.width * 0.00
+      ..strokeWidth = 0
       ..strokeCap = StrokeCap.butt
       ..strokeJoin = StrokeJoin.miter;
 
-    canvas.drawPath(path_0, paint_stroke_0);
+    canvas.drawPath(path, paintStroke);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return false;
+  }
+}
+
+class RPSCustomPainter2 extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = Path()
+      ..moveTo(size.width * 0, size.height * 0.3316667)
+      ..lineTo(size.width * 0.4175000, size.height * 0.4166667)
+      ..lineTo(size.width * 1, size.height * 0.3316667)
+      ..lineTo(size.width * 1, size.height * 1.25)
+      ..lineTo(size.width * 0, size.height * 1.25);
+
+    final paintFill = Paint()
+      ..style = PaintingStyle.fill
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          Color.fromRGBO(179, 179, 179, 1),
+          Color.fromARGB(255, 255, 255, 255),
+        ],
+      ).createShader(Rect.fromLTRB(0, 0, size.width, size.height));
+
+    canvas.drawPath(path, paintFill);
   }
 
   @override
@@ -47,63 +79,169 @@ class Menu extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          Positioned(
-            top: 300, // Ajusta la posición del rectángulo como desees
-            left: 0, // Ajusta la posición del rectángulo como desees
-            child: Container(
-              width: 500, // Ancho del rectángulo
-              height: 5750, // Altura del rectángulo
-              color: Colors.green, // Color del rectángulo
-            ),
-          ),
-
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
+          Positioned.fill(
             child: CustomPaint(
-              size: Size(400, 500), // Tamaño del pentágono
               painter: RPSCustomPainter(),
             ),
           ),
           Positioned(
-            left: 290, // Ajusta la posición izquierda según lo necesites
-            top: 227, // Ajusta la posición superior según lo necesites
-            child: Transform.rotate(
-              angle: 65 * 3.14 / 180, // Convierte grados a radianes
-              child: Container(
-                width: 30, // Ancho del rectángulo
-                height: 270, // Alto del rectángulo
-                color: Color.fromRGBO(29, 30, 29, 1), // Color del rectángulo
-              ),
-            ),
-          ),
-          Positioned(
-            left: 60, // Ajusta la posición izquierda según lo necesites
-            top: 215, // Ajusta la posición superior según lo necesites
-            child: Transform.rotate(
-              angle: 295 * 3.14 / 180, // Convierte grados a radianes
-              child: Container(
-                width: 30, // Ancho del rectángulo
-                height: 270, // Alto del rectángulo
-                color: Color.fromRGBO(29, 30, 29, 1), // Color del rectángulo
-              ),
-            ),
-          ),
-          Positioned(
-            left: 0, // Ajusta la posición izquierda según lo necesites
-            top: 60, // Ajusta la posición superior según lo necesites
+            left: -20,
+            top: 30,
             child: Image.asset(
-              'assets/hexMedallas.png', // Ruta de la imagen
-              width: 420, // Ancho de la imagen
-              height: 420, // Alto de la imagen
-              fit: BoxFit
-                  .contain, // Ajusta el tamaño de la imagen según el contenedor
+              'assets/grow.png',
+              width: 500,
+              height: 500,
+              fit: BoxFit.contain,
             ),
           ),
-          // Agrega aquí el resto de tu contenido de la pantalla Menu
+          Positioned(
+            left: 0,
+            top: 125,
+            child: CustomPaint(
+              size: Size(MediaQuery.of(context).size.width,
+                  MediaQuery.of(context).size.width * 1.5),
+              painter: RPSCustomPainter2(),
+            ),
+          ),
+          Positioned(
+            left: 290,
+            top: 233,
+            child: Transform.rotate(
+              angle: 65 * math.pi / 180,
+              child: Container(
+                width: 30,
+                height: 270,
+                color: Color.fromRGBO(29, 30, 29, 1),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 60,
+            top: 215,
+            child: Transform.rotate(
+              angle: -65 * math.pi / 180,
+              child: Container(
+                width: 30,
+                height: 270,
+                color: Color.fromRGBO(29, 30, 29, 1),
+              ),
+            ),
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 569),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          top:
+                              90), // Ajusta la posición vertical del botón "COLLECT"
+                      child: _buildButton('PACKS', 'assets/pack.png'),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          bottom:
+                              70), // Ajusta la posición vertical del botón "COLLECT"
+                      child: _buildButton('COLLECT', 'assets/incubadora.png'),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          top:
+                              90), // Ajusta la posición vertical del botón "COLLECT"
+                      child: _buildButton('POKEDEX', 'assets/pokeball.png'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          Positioned(
+            left: (MediaQuery.of(context).size.width - 240) / 2,
+            top: (MediaQuery.of(context).size.height - 320) / 2,
+            child: Image.asset(
+              'assets/hexMedallas.png',
+              width: 240,
+              height: 240,
+              fit: BoxFit.contain,
+            ),
+          ),
         ],
       ),
+    );
+  }
+
+  Widget _buildButton(String text, String imagePath) {
+    return Stack(
+      children: [
+        Container(
+          width: 110,
+          height: 148,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topRight: Radius.circular(25),
+              bottomLeft: Radius.circular(25),
+            ),
+            gradient: LinearGradient(
+              colors: [
+                Color.fromRGBO(207, 72, 72, 1),
+                Color.fromRGBO(224, 17, 17, 1),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Positioned(
+                top: 113,
+                left: 10,
+                right: 10,
+                height: 1,
+                child: Container(
+                  width: double.infinity,
+                  color: Colors.white,
+                ),
+              ),
+              Positioned(
+                bottom: 4,
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 35,
+                child: Image.asset(
+                  imagePath,
+                  width: 67,
+                  height: 90,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Positioned.fill(
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(25),
+                bottomLeft: Radius.circular(25),
+              ),
+              onTap: () {
+                // Función a ejecutar al hacer clic en el botón
+              },
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

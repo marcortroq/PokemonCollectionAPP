@@ -269,7 +269,7 @@ class RectanguloPainter extends CustomPainter {
 
   RectanguloPainter({required this.isKeyboardVisible});
 
-
+//hola que tal
   @override
   void paint(Canvas canvas, Size size) {
     Paint paint_fill_0 = Paint()
