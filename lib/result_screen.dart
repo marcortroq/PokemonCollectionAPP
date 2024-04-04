@@ -43,47 +43,41 @@ class ResultScreen extends StatelessWidget {
     final foundPokemonIndex = pokemonNames.indexWhere((pokemon) => text.contains(pokemon));
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Result',
-          style: TextStyle(
-            fontFamily: 'Sarpanch',
-            fontSize: 20.0,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
+      appBar: null, // Quita la barra de título
+      body: Stack(
+        children: [
+          Container(
+            constraints: BoxConstraints.expand(),
+            child: Image.asset(
+              'assets/fondo_ocr.jpg',
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
-      ),
-      body: Container(
-        padding: const EdgeInsets.all(30.0),
-        child: foundPokemonIndex != -1
-            ? FutureBuilder<String?>(
-                future: fetchCardImage(foundPokemonIndex),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else if (snapshot.hasData) {
-                    final cardImageBase64 = snapshot.data!;
-                    final cardImageBytes = base64Decode(cardImageBase64);
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Container(
-                            alignment: Alignment.center,
-                            child: Image.memory(cardImageBytes),
-                          ),
-                        ),
-                      ],
-                    );
-                  } else {
-                    return Text('No se encontró ninguna imagen de carta para este Pokémon');
-                  }
-                },
-              )
-            : Text('No se encontró ningún Pokémon'),
+          Center(
+            child: foundPokemonIndex != -1
+                ? FutureBuilder<String?>(
+                    future: fetchCardImage(foundPokemonIndex),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Image.asset(
+                          'assets/pokemon_carga1.gif',
+                          height: 200,
+                          width: 200,
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else if (snapshot.hasData) {
+                        final cardImageBase64 = snapshot.data!;
+                        final cardImageBytes = base64Decode(cardImageBase64);
+                        return Image.memory(cardImageBytes, fit: BoxFit.cover);
+                      } else {
+                        return Text('No se encontró ninguna imagen de carta para este Pokémon');
+                      }
+                    },
+                  )
+                : Text('No se encontró ningún Pokémon'),
+          ),
+        ],
       ),
     );
   }
