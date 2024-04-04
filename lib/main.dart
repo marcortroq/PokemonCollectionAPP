@@ -1,4 +1,7 @@
+import 'dart:convert';
+import 'menu.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyApp());
@@ -29,6 +32,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   int _counter = 0;
   bool _isKeyboardVisible = false;
 
@@ -51,7 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
               size: Size.infinite,
               painter: RectanguloPainter(isKeyboardVisible: _isKeyboardVisible),
             ),
-           CustomPaint(
+            CustomPaint(
               size: Size.infinite,
               painter: TrianglePainter(isKeyboardVisible: _isKeyboardVisible),
             ),
@@ -60,7 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
               opacity: _isKeyboardVisible ? 0.0 : 1.0,
               duration: Duration(milliseconds: 300),
               child: Center(
-                 child: _buildTitulo('assets/title.png'),
+                child: _buildTitulo('assets/title.png'),
               ),
             ),
           ],
@@ -88,9 +93,9 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Column(
         children: [
           SizedBox(height: 30),
-          _buildTextField('Email Address / Username'),
+          _buildTextField('Email Address / Username', _usernameController),
           SizedBox(height: 20),
-          _buildTextField('Password'),
+          _buildTextField('Password', _passwordController),
           SizedBox(height: 38),
           _buildSignInButton(),
           SizedBox(height: 7),
@@ -125,11 +130,12 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildTextField(String labelText) {
+  Widget _buildTextField(String labelText, TextEditingController controller) {
     return SizedBox(
       width: 305,
       height: 52,
       child: TextField(
+        controller: controller,
         onTap: () {
           setState(() {
             _isKeyboardVisible = true;
@@ -153,7 +159,7 @@ class _MyHomePageState extends State<MyHomePage> {
       height: 52,
       child: ElevatedButton(
         onPressed: () {
-          // Acción a realizar al presionar el botón
+          _signIn();
         },
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
@@ -215,13 +221,58 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+
+void _signIn() async {
+  String NOMBRE_USUARIO = _usernameController.text;
+  String CONTRASENA = _passwordController.text;
+
+  if (NOMBRE_USUARIO.isNotEmpty && CONTRASENA.isNotEmpty) {
+    var response = await http.get(
+      Uri.parse('http://51.141.92.127:5000/usuario/$NOMBRE_USUARIO'),
+    );
+
+    if (response.statusCode == 200) {
+      var userData = jsonDecode(response.body);
+      String contrasenaServidor = userData['Usuario']['CONTRASENA'];
+
+      if (CONTRASENA == contrasenaServidor) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const Menu()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Invalid username or password.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: Failed to fetch user data.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Please fill in both username and password fields.'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+}
+
 }
 
 class TrianglePainter extends CustomPainter {
-
-    final bool isKeyboardVisible;
+  final bool isKeyboardVisible;
 
   TrianglePainter({required this.isKeyboardVisible});
+
   @override
   void paint(Canvas canvas, Size size) {
     Paint paint_fill_0 = Paint()
@@ -264,12 +315,10 @@ class TrianglePainter extends CustomPainter {
 }
 
 class RectanguloPainter extends CustomPainter {
-  
   final bool isKeyboardVisible;
 
   RectanguloPainter({required this.isKeyboardVisible});
 
-//hola que tal
   @override
   void paint(Canvas canvas, Size size) {
     Paint paint_fill_0 = Paint()
@@ -304,5 +353,19 @@ class RectanguloPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return true;
+  }
+}
+
+class NextScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Next Screen'),
+      ),
+      body: Center(
+        child: Text('Welcome to the Next Screen!'),
+      ),
+    );
   }
 }

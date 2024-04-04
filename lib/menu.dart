@@ -74,6 +74,7 @@ class RPSCustomPainter2 extends CustomPainter {
 }
 
 class Menu extends StatelessWidget {
+  const Menu({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
