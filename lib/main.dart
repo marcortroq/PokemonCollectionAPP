@@ -1,247 +1,253 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as math;
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'PokemonAPP',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color.fromRGBO(255, 22, 22, 1), Colors.black],
-              ),
-            ),
-          ),
-          Positioned(
-            left: 0, // Ajusta la posición izquierda según lo necesites
-            top: 60, // Ajusta la posición superior según lo necesites
-            child: Image.asset(
-              'assets/Charizard.png', // Ruta de la imagen
-              width: 420, // Ancho de la imagen
-              height: 420, // Alto de la imagen
-              fit: BoxFit
-                  .contain, // Ajusta el tamaño de la imagen según el contenedor
-            ),
-          ),
-          Positioned(
-            left: 70, // Ajusta la posición izquierda según lo necesites
-            top: 7, // Ajusta la posición superior según lo necesites
-            child: Transform.rotate(
-              angle: 58 * 3.14 / 180, // Convierte grados a radianes
-              child: Container(
-                width: 22, // Ancho del rectángulo
-                height: 900, // Alto del rectángulo
-                color: Color.fromRGBO(29, 30, 29, 1), // Color del rectángulo
-              ),
-            ),
-          ),
-          CustomPaint(
-            size: Size.infinite,
-            painter: TrianglePainter(),
-          ),
-          Positioned(
-            left: 0, // Ajusta la posición izquierda según lo necesites
-            top: 220, // Ajusta la posición superior según lo necesites
-            child: Image.asset(
-              'assets/title.png', // Ruta de la segunda imagen
-              width: 400, // Ancho de la segunda imagen
-              height: 400, // Alto de la segunda imagen
-              fit: BoxFit
-                  .contain, // Ajusta el tamaño de la imagen según el contenedor
-            ),
-          ),
-          Positioned(
-            left: 50, // Ajusta la posición izquierda según lo necesites
-            bottom: 50, // Ajusta la posición inferior según lo necesites
-            child: Column(
-              children: [
-                SizedBox(
-                  width: 305,
-                  height: 52, // Ancho del TextField
-                  child: TextField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(13.0), // Bordes redondeados
-                      ),
-                      filled: true, // Habilitar el relleno
-                      fillColor: Colors.white, // Color de fondo
-                      labelText: 'Email Address / Username',
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20), // Espacio entre los TextField
-                SizedBox(
-                  width: 305,
-                  height: 52, // Ancho del TextField
-                  child: TextField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius:
-                            BorderRadius.circular(13.0), // Bordes redondeados
-                      ),
-                      filled: true, // Habilitar el relleno
-                      fillColor: Colors.white,
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Colors.black,
-                            width: 2), // Borde oscuro cuando está seleccionado
-                        borderRadius:
-                            BorderRadius.circular(13.0), // Bordes redondeados
-                      ), // Color de fondo
-                      labelText: 'Password',
-                    ),
-                  ),
-                ),
-                SizedBox(height: 48), // Espacio entre los TextField
-                SizedBox(
-                  width: 305,
-                  height: 52, // Alto del botón
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Acción a realizar al presionar el botón
-                    },
-                    style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(13.0), // Bordes redondeados
-                      ),
-                      padding: EdgeInsets.zero,
-                      elevation: 0,
-                    ),
-                    child: Ink(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            const Color.fromRGBO(66, 9, 9,
-                                1), // Color oscuro en el lado izquierdo
-                            const Color.fromRGBO(160, 0, 0,
-                                1), // Color más claro en el lado izquierdo
-                            const Color.fromRGBO(
-                                221, 19, 19, 1), // Color rojo en el centro
-                            const Color.fromRGBO(160, 0, 0,
-                                1), // Color más claro en el lado derecho
-                            const Color.fromRGBO(
-                                66, 9, 9, 1), // Color oscuro en el lado derecho
-                          ],
-                          begin: Alignment
-                              .centerLeft, // Comienza en el centro-izquierda
-                          end: Alignment
-                              .centerRight, // Termina en el centro-derecha
-                        ),
-                        borderRadius:
-                            BorderRadius.circular(13.0), // Bordes redondeados
-                      ),
-                      child: Container(
-                        alignment: Alignment.center,
-                        child: Text(
-                          'Sign In',
-                          style: TextStyle(
-                            color: Colors.white, // Color del texto del botón
-                            fontSize: 20, // Tamaño de la fuente
-                            fontFamily: 'RubikOne', // Familia de la fuente
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 7), // Espacio entre el botón y el texto
-                RichText(
-                  text: TextSpan(
-                    text: "I’m a new user. ",
-                    style: TextStyle(
-                      color: Colors.black, // Color del texto principal (negro)
-                      fontSize: 18, // Tamaño de la fuente
-                      fontFamily: 'Roboto', // Familia de la fuente
-                    ),
-                    children: [
-                      TextSpan(
-                        text: "Sign Up",
-                        style: TextStyle(
-                          color: Colors.red, // Color de "Sign Up" (rojo)
-                          fontWeight: FontWeight.bold,
-                          fontFamily:
-                              'Roboto', // Opcional: negrita para enfatizar
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class TrianglePainter extends CustomPainter {
+class RPSCustomPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint();
-    final path = Path();
-    path.moveTo(-560, size.height);
-    path.lineTo(size.width, size.height);
-    path.lineTo(size.width, 260);
-    path.close();
-    paint.shader = LinearGradient(
-      begin: Alignment.centerLeft,
-      end: Alignment.bottomRight,
-      colors: [
-        const Color.fromRGBO(136, 136, 136, 1),
-        const Color.fromRGBO(136, 136, 136, 1),
-        Colors.white,
-        Colors.white,
-      ],
-      stops: [0.2, 0.2, 0.9, 1.0],
-    ).createShader(path.getBounds());
-    paint.style = PaintingStyle.fill;
-    canvas.drawPath(path, paint);
+    final gradient = LinearGradient(
+      colors: [Color.fromRGBO(255, 22, 22, 1), Colors.black],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+    );
+
+    final paintFill = Paint()
+      ..shader =
+          gradient.createShader(Rect.fromLTWH(0, 0, size.width, size.height))
+      ..style = PaintingStyle.fill
+      ..strokeWidth = 0
+      ..strokeCap = StrokeCap.butt
+      ..strokeJoin = StrokeJoin.miter;
+
+    final path = Path()
+      ..moveTo(0 * 0.3762500, 0 * 0.3020000)
+      ..lineTo(550 * 0.7487500, 0 * 0.3020000)
+      ..lineTo(550 * 0.7487500, 450 * 0.7040000)
+      ..lineTo(370 * 0.5637500, 450 * 0.9040000)
+      ..lineTo(0 * 0.3762500, 450 * 0.7020000);
+
+    canvas.drawPath(path, paintFill);
+
+    final paintStroke = Paint()
+      ..color = const Color.fromARGB(255, 33, 150, 243)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0
+      ..strokeCap = StrokeCap.butt
+      ..strokeJoin = StrokeJoin.miter;
+
+    canvas.drawPath(path, paintStroke);
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return false;
   }
+}
+
+class RPSCustomPainter2 extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = Path()
+      ..moveTo(size.width * 0, size.height * 0.3316667)
+      ..lineTo(size.width * 0.4175000, size.height * 0.4166667)
+      ..lineTo(size.width * 1, size.height * 0.3316667)
+      ..lineTo(size.width * 1, size.height * 1.25)
+      ..lineTo(size.width * 0, size.height * 1.25);
+
+    final paintFill = Paint()
+      ..style = PaintingStyle.fill
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          Color.fromRGBO(179, 179, 179, 1),
+          Color.fromARGB(255, 255, 255, 255),
+        ],
+      ).createShader(Rect.fromLTRB(0, 0, size.width, size.height));
+
+    canvas.drawPath(path, paintFill);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
+class Menu extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: CustomPaint(
+              painter: RPSCustomPainter(),
+            ),
+          ),
+          Positioned(
+            left: -20,
+            top: 30,
+            child: Image.asset(
+              'assets/grow.png',
+              width: 500,
+              height: 500,
+              fit: BoxFit.contain,
+            ),
+          ),
+          Positioned(
+            left: 0,
+            top: 125,
+            child: CustomPaint(
+              size: Size(MediaQuery.of(context).size.width,
+                  MediaQuery.of(context).size.width * 1.5),
+              painter: RPSCustomPainter2(),
+            ),
+          ),
+          Positioned(
+            left: 290,
+            top: 233,
+            child: Transform.rotate(
+              angle: 65 * math.pi / 180,
+              child: Container(
+                width: 30,
+                height: 270,
+                color: Color.fromRGBO(29, 30, 29, 1),
+              ),
+            ),
+          ),
+          Positioned(
+            left: 60,
+            top: 215,
+            child: Transform.rotate(
+              angle: -65 * math.pi / 180,
+              child: Container(
+                width: 30,
+                height: 270,
+                color: Color.fromRGBO(29, 30, 29, 1),
+              ),
+            ),
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 569),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          top:
+                              90), // Ajusta la posición vertical del botón "COLLECT"
+                      child: _buildButton('PACKS', 'assets/pack.png'),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          bottom:
+                              70), // Ajusta la posición vertical del botón "COLLECT"
+                      child: _buildButton('COLLECT', 'assets/incubadora.png'),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          top:
+                              90), // Ajusta la posición vertical del botón "COLLECT"
+                      child: _buildButton('POKEDEX', 'assets/pokeball.png'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          Positioned(
+            left: (MediaQuery.of(context).size.width - 240) / 2,
+            top: (MediaQuery.of(context).size.height - 320) / 2,
+            child: Image.asset(
+              'assets/hexMedallas.png',
+              width: 240,
+              height: 240,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildButton(String text, String imagePath) {
+    return Stack(
+      children: [
+        Container(
+          width: 110,
+          height: 148,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topRight: Radius.circular(25),
+              bottomLeft: Radius.circular(25),
+            ),
+            gradient: LinearGradient(
+              colors: [
+                Color.fromRGBO(207, 72, 72, 1),
+                Color.fromRGBO(224, 17, 17, 1),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Positioned(
+                top: 113,
+                left: 10,
+                right: 10,
+                height: 1,
+                child: Container(
+                  width: double.infinity,
+                  color: Colors.white,
+                ),
+              ),
+              Positioned(
+                bottom: 4,
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 35,
+                child: Image.asset(
+                  imagePath,
+                  width: 67,
+                  height: 90,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Positioned.fill(
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(25),
+                bottomLeft: Radius.circular(25),
+              ),
+              onTap: () {
+                // Función a ejecutar al hacer clic en el botón
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: Menu(),
+  ));
 }
