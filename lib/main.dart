@@ -1,71 +1,259 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
 
-class RPSCustomPainter extends CustomPainter {
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
-  void paint(Canvas canvas, Size size) {
-    final gradient = LinearGradient(
-      colors: [Color.fromRGBO(255, 22, 22, 1), Colors.black],
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'PokemonAPP',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
-
-    final paintFill = Paint()
-      ..shader =
-          gradient.createShader(Rect.fromLTWH(0, 0, size.width, size.height))
-      ..style = PaintingStyle.fill
-      ..strokeWidth = 0
-      ..strokeCap = StrokeCap.butt
-      ..strokeJoin = StrokeJoin.miter;
-
-    final path = Path()
-      ..moveTo(0 * 0.3762500, 0 * 0.3020000)
-      ..lineTo(550 * 0.7487500, 0 * 0.3020000)
-      ..lineTo(550 * 0.7487500, 450 * 0.7040000)
-      ..lineTo(370 * 0.5637500, 450 * 0.9040000)
-      ..lineTo(0 * 0.3762500, 450 * 0.7020000);
-
-    canvas.drawPath(path, paintFill);
-
-    final paintStroke = Paint()
-      ..color = const Color.fromARGB(255, 33, 150, 243)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 0
-      ..strokeCap = StrokeCap.butt
-      ..strokeJoin = StrokeJoin.miter;
-
-    canvas.drawPath(path, paintStroke);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
   }
 }
 
-//Painter
-class RPSCustomPainter2 extends CustomPainter {
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  int _counter = 0;
+  bool _isKeyboardVisible = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        // Ocultar el teclado cuando se toca en cualquier lugar que no sea un campo de texto
+        FocusScope.of(context).requestFocus(FocusNode());
+        setState(() {
+          _isKeyboardVisible = false;
+        });
+      },
+      child: Scaffold(
+        body: Stack(
+          children: [
+            _buildBackground(),
+            _buildImage('assets/Charizard.png', 400),
+            CustomPaint(
+              size: Size.infinite,
+              painter: RectanguloPainter(isKeyboardVisible: _isKeyboardVisible),
+            ),
+            CustomPaint(
+              size: Size.infinite,
+              painter: TrianglePainter(isKeyboardVisible: _isKeyboardVisible),
+            ),
+            _buildLoginForm(),
+            AnimatedOpacity(
+              opacity: _isKeyboardVisible ? 0.0 : 1.0,
+              duration: Duration(milliseconds: 300),
+              child: Center(
+                child: _buildTitulo('assets/title.png'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBackground() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color.fromRGBO(255, 22, 22, 1), Colors.black],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoginForm() {
+    return Positioned(
+      left: 50,
+      bottom: 70,
+      child: Column(
+        children: [
+          SizedBox(height: 30),
+          _buildTextField('Email Address / Username'),
+          SizedBox(height: 20),
+          _buildTextField('Password'),
+          SizedBox(height: 38),
+          _buildSignInButton(),
+          SizedBox(height: 7),
+          _buildSignUpText(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildImage(String imagePath, double size) {
+    return Positioned(
+      top: -30,
+      bottom: size == 200 ? 60 : 240,
+      child: Image.asset(
+        imagePath,
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+      ),
+    );
+  }
+
+  Widget _buildTitulo(String imagePath) {
+    return Positioned(
+      left: 0,
+      top: -150,
+      right: 0,
+      child: Image.asset(
+        imagePath,
+        fit: BoxFit.contain,
+      ),
+    );
+  }
+
+  Widget _buildTextField(String labelText) {
+    return SizedBox(
+      width: 305,
+      height: 52,
+      child: TextField(
+        onTap: () {
+          setState(() {
+            _isKeyboardVisible = true;
+          });
+        },
+        decoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(13.0),
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          labelText: labelText,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSignInButton() {
+    return SizedBox(
+      width: 305,
+      height: 52,
+      child: ElevatedButton(
+        onPressed: () {
+          // Acción a realizar al presionar el botón
+        },
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(13.0),
+          ),
+          padding: EdgeInsets.zero,
+          elevation: 0,
+        ),
+        child: Ink(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                const Color.fromRGBO(66, 9, 9, 1),
+                const Color.fromRGBO(160, 0, 0, 1),
+                const Color.fromRGBO(221, 19, 19, 1),
+                const Color.fromRGBO(160, 0, 0, 1),
+                const Color.fromRGBO(66, 9, 9, 1),
+              ],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+            borderRadius: BorderRadius.circular(13.0),
+          ),
+          child: Container(
+            alignment: Alignment.center,
+            child: Text(
+              'Sign In',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontFamily: 'RubikOne',
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSignUpText() {
+    return RichText(
+      text: TextSpan(
+        text: "I’m a new user. ",
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 18,
+          fontFamily: 'Roboto',
+        ),
+        children: [
+          TextSpan(
+            text: "Sign Up",
+            style: TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Roboto',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TrianglePainter extends CustomPainter {
+  final bool isKeyboardVisible;
+
+  TrianglePainter({required this.isKeyboardVisible});
   @override
   void paint(Canvas canvas, Size size) {
-    final path = Path()
-      ..moveTo(size.width * 0, size.height * 0.3316667)
-      ..lineTo(size.width * 0.4175000, size.height * 0.4166667)
-      ..lineTo(size.width * 1, size.height * 0.3316667)
-      ..lineTo(size.width * 1, size.height * 1.25)
-      ..lineTo(size.width * 0, size.height * 1.25);
+    Paint paint_fill_0 = Paint()
+      ..color = const Color.fromARGB(255, 255, 255, 255)
+      ..style = PaintingStyle.fill
+      ..strokeWidth = size.width * 0.00
+      ..strokeCap = StrokeCap.butt
+      ..strokeJoin = StrokeJoin.miter;
 
-    final paintFill = Paint()
+    Path path_0 = Path();
+    if (isKeyboardVisible) {
+      path_0.moveTo(size.width * 0, size.height * 0.42);
+    } else {
+      path_0.moveTo(size.width * 0, size.height * 0.59500);
+    }
+    path_0.lineTo(size.width * 1, size.height * 0.3);
+    path_0.lineTo(size.width * 1, size.height * 3);
+    path_0.lineTo(size.width * 0, size.height * 3);
+
+    canvas.drawPath(path_0, paint_fill_0);
+
+    Paint paint_stroke_0 = Paint()
       ..style = PaintingStyle.fill
       ..shader = LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          Color.fromRGBO(179, 179, 179, 1),
-          Color.fromARGB(255, 255, 255, 255),
+          Color.fromRGBO(179, 179, 179, 1), // Rojo
+          Color.fromARGB(255, 255, 255, 255), // Verde
         ],
       ).createShader(Rect.fromLTRB(0, 0, size.width, size.height));
 
-    canvas.drawPath(path, paintFill);
+    canvas.drawPath(path_0, paint_stroke_0); // Dibujar con el degradado
   }
 
   @override
@@ -74,181 +262,45 @@ class RPSCustomPainter2 extends CustomPainter {
   }
 }
 
-class Menu extends StatelessWidget {
+class RectanguloPainter extends CustomPainter {
+  final bool isKeyboardVisible;
+
+  RectanguloPainter({required this.isKeyboardVisible});
+
+//hola que tal
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: CustomPaint(
-              painter: RPSCustomPainter(),
-            ),
-          ),
-          Positioned(
-            left: -20,
-            top: 30,
-            child: Image.asset(
-              'assets/grow.png',
-              width: 500,
-              height: 500,
-              fit: BoxFit.contain,
-            ),
-          ),
-          Positioned(
-            left: 0,
-            top: 125,
-            child: CustomPaint(
-              size: Size(MediaQuery.of(context).size.width,
-                  MediaQuery.of(context).size.width * 1.5),
-              painter: RPSCustomPainter2(),
-            ),
-          ),
-          Positioned(
-            left: 290,
-            top: 233,
-            child: Transform.rotate(
-              angle: 65 * math.pi / 180,
-              child: Container(
-                width: 30,
-                height: 270,
-                color: Color.fromRGBO(29, 30, 29, 1),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 60,
-            top: 215,
-            child: Transform.rotate(
-              angle: -65 * math.pi / 180,
-              child: Container(
-                width: 30,
-                height: 270,
-                color: Color.fromRGBO(29, 30, 29, 1),
-              ),
-            ),
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 569),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          top:
-                              90), // Ajusta la posición vertical del botón "COLLECT"
-                      child: _buildButton('PACKS', 'assets/pack.png'),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          bottom:
-                              70), // Ajusta la posición vertical del botón "COLLECT"
-                      child: _buildButton('COLLECT', 'assets/incubadora.png'),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          top:
-                              90), // Ajusta la posición vertical del botón "COLLECT"
-                      child: _buildButton('POKEDEX', 'assets/pokeball.png'),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          Positioned(
-            left: (MediaQuery.of(context).size.width - 240) / 2,
-            top: (MediaQuery.of(context).size.height - 320) / 2,
-            child: Image.asset(
-              'assets/hexMedallas.png',
-              width: 240,
-              height: 240,
-              fit: BoxFit.contain,
-            ),
-          ),
-        ],
-      ),
-    );
+  void paint(Canvas canvas, Size size) {
+    Paint paint_fill_0 = Paint()
+      ..color = Color.fromRGBO(29, 30, 29, 1)
+      ..style = PaintingStyle.fill
+      ..strokeWidth = size.width * 0.00
+      ..strokeCap = StrokeCap.butt
+      ..strokeJoin = StrokeJoin.miter;
+
+    Path path_0 = Path();
+    if (isKeyboardVisible) {
+      path_0.moveTo(size.width * 0, size.height * 0.39500);
+    } else {
+      path_0.moveTo(size.width * 0, size.height * 0.57000);
+    }
+    path_0.lineTo(size.width * 1, size.height * 0.275);
+    path_0.lineTo(size.width * 1, size.height * 0.305);
+    path_0.lineTo(size.width * 0, size.height * 0.6);
+
+    canvas.drawPath(path_0, paint_fill_0);
+
+    Paint paint_stroke_0 = Paint()
+      ..color = Color.fromRGBO(29, 30, 29, 1)
+      ..style = PaintingStyle.fill
+      ..strokeWidth = size.width * 0.00
+      ..strokeCap = StrokeCap.butt
+      ..strokeJoin = StrokeJoin.miter;
+
+    canvas.drawPath(path_0, paint_stroke_0); // Dibujar con el degradado
   }
 
-  Widget _buildButton(String text, String imagePath) {
-    return Stack(
-      children: [
-        Container(
-          width: 110,
-          height: 148,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.only(
-              topRight: Radius.circular(25),
-              bottomLeft: Radius.circular(25),
-            ),
-            gradient: LinearGradient(
-              colors: [
-                Color.fromRGBO(207, 72, 72, 1),
-                Color.fromRGBO(224, 17, 17, 1),
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Positioned(
-                top: 113,
-                left: 10,
-                right: 10,
-                height: 1,
-                child: Container(
-                  width: double.infinity,
-                  color: Colors.white,
-                ),
-              ),
-              Positioned(
-                bottom: 4,
-                child: Text(
-                  text,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 35,
-                child: Image.asset(
-                  imagePath,
-                  width: 67,
-                  height: 90,
-                ),
-              ),
-            ],
-          ),
-        ),
-        Positioned.fill(
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.only(
-                topRight: Radius.circular(25),
-                bottomLeft: Radius.circular(25),
-              ),
-              onTap: () {
-                // Función a ejecutar al hacer clic en el botón
-              },
-            ),
-          ),
-        ),
-      ],
-    );
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return true;
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: Menu(),
-  ));
 }
