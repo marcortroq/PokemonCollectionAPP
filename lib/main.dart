@@ -49,11 +49,11 @@ class _MyHomePageState extends State<MyHomePage> {
             _buildImage('assets/Charizard.png', 400),
             CustomPaint(
               size: Size.infinite,
-              painter: RectanguloPainter(),
+              painter: RectanguloPainter(isKeyboardVisible: _isKeyboardVisible),
             ),
-            CustomPaint(
+           CustomPaint(
               size: Size.infinite,
-              painter: TrianglePainter(),
+              painter: TrianglePainter(isKeyboardVisible: _isKeyboardVisible),
             ),
             _buildLoginForm(),
             AnimatedOpacity(
@@ -218,6 +218,10 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class TrianglePainter extends CustomPainter {
+
+    final bool isKeyboardVisible;
+
+  TrianglePainter({required this.isKeyboardVisible});
   @override
   void paint(Canvas canvas, Size size) {
     Paint paint_fill_0 = Paint()
@@ -228,7 +232,11 @@ class TrianglePainter extends CustomPainter {
       ..strokeJoin = StrokeJoin.miter;
 
     Path path_0 = Path();
-    path_0.moveTo(size.width * 0, size.height * 0.59500);
+    if (isKeyboardVisible) {
+      path_0.moveTo(size.width * 0, size.height * 0.42);
+    } else {
+      path_0.moveTo(size.width * 0, size.height * 0.59500);
+    }
     path_0.lineTo(size.width * 1, size.height * 0.3);
     path_0.lineTo(size.width * 1, size.height * 3);
     path_0.lineTo(size.width * 0, size.height * 3);
@@ -256,6 +264,12 @@ class TrianglePainter extends CustomPainter {
 }
 
 class RectanguloPainter extends CustomPainter {
+  
+  final bool isKeyboardVisible;
+
+  RectanguloPainter({required this.isKeyboardVisible});
+
+
   @override
   void paint(Canvas canvas, Size size) {
     Paint paint_fill_0 = Paint()
@@ -266,7 +280,11 @@ class RectanguloPainter extends CustomPainter {
       ..strokeJoin = StrokeJoin.miter;
 
     Path path_0 = Path();
-    path_0.moveTo(size.width * 0, size.height * 0.57);
+    if (isKeyboardVisible) {
+      path_0.moveTo(size.width * 0, size.height * 0.39500);
+    } else {
+      path_0.moveTo(size.width * 0, size.height * 0.57000);
+    }
     path_0.lineTo(size.width * 1, size.height * 0.275);
     path_0.lineTo(size.width * 1, size.height * 0.305);
     path_0.lineTo(size.width * 0, size.height * 0.6);
