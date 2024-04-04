@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:pokemonapp/register.dart';
 import 'menu.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -36,7 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _passwordController = TextEditingController();
   int _counter = 0;
   bool _isKeyboardVisible = false;
-
+  bool _isObscure = true;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -61,12 +62,23 @@ class _MyHomePageState extends State<MyHomePage> {
               painter: TrianglePainter(isKeyboardVisible: _isKeyboardVisible),
             ),
             _buildLoginForm(),
-            AnimatedOpacity(
+            /*AnimatedOpacity(
               opacity: _isKeyboardVisible ? 0.0 : 1.0,
               duration: Duration(milliseconds: 300),
               child: Center(
                 child: _buildTitulo('assets/title.png'),
               ),
+            ),*/
+            AnimatedSwitcher(
+              duration: Duration(milliseconds: 300),
+              switchInCurve: Curves.easeInOut,
+              switchOutCurve: Curves.easeInOut,
+              child: _isKeyboardVisible
+                  ? SizedBox.shrink()
+                  : Center(
+                      key: Key('center_key'),
+                      child: _buildTitulo('assets/title.png'),
+                    ),
             ),
           ],
         ),
@@ -95,7 +107,8 @@ class _MyHomePageState extends State<MyHomePage> {
           SizedBox(height: 30),
           _buildTextField('Email Address / Username', _usernameController),
           SizedBox(height: 20),
-          _buildTextField('Password', _passwordController),
+          _buildTextFieldContrasena('Password', _passwordController,
+              obscureText: _isObscure),
           SizedBox(height: 38),
           _buildSignInButton(),
           SizedBox(height: 7),
@@ -153,6 +166,50 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  Widget _buildTextFieldContrasena(
+      String labelText, TextEditingController controller,
+      {bool obscureText = false}) {
+    return SizedBox(
+      width: 305,
+      height: 52,
+      child: TextField(
+        controller: controller,
+        obscureText: obscureText,
+        onTap: () {
+          setState(() {
+            _isKeyboardVisible = true;
+          });
+        },
+        decoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(13.0),
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          labelText: labelText,
+          suffixIcon:
+              obscureText // Aquí se cambia el icono en función de la visibilidad del texto
+                  ? IconButton(
+                      icon: Icon(Icons.visibility),
+                      onPressed: () {
+                        setState(() {
+                          _isObscure = !_isObscure;
+                        });
+                      },
+                    )
+                  : IconButton(
+                      icon: Icon(Icons.visibility_off),
+                      onPressed: () {
+                        setState(() {
+                          _isObscure = !_isObscure;
+                        });
+                      },
+                    ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildSignInButton() {
     return SizedBox(
       width: 305,
@@ -200,50 +257,67 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildSignUpText() {
-    return RichText(
-      text: TextSpan(
-        text: "I’m a new user. ",
-        style: TextStyle(
-          color: Colors.black,
-          fontSize: 18,
-          fontFamily: 'Roboto',
-        ),
-        children: [
-          TextSpan(
-            text: "Sign Up",
-            style: TextStyle(
-              color: Colors.red,
-              fontWeight: FontWeight.bold,
-              fontFamily: 'Roboto',
-            ),
+    return GestureDetector(
+      onTap: () {
+        // Navegar a la nueva ventana
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const Register()),
+        );
+      },
+      child: RichText(
+        text: TextSpan(
+          text: "I’m a new user. ",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 18,
+            fontFamily: 'Roboto',
           ),
-        ],
+          children: [
+            TextSpan(
+              text: "Sign Up",
+              style: TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Roboto',
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-void _signIn() async {
-  String NOMBRE_USUARIO = _usernameController.text;
-  String CONTRASENA = _passwordController.text;
+  void _signIn() async {
+    String NOMBRE_USUARIO = _usernameController.text;
+    String CONTRASENA = _passwordController.text;
 
-  if (NOMBRE_USUARIO.isNotEmpty && CONTRASENA.isNotEmpty) {
-    var response = await http.get(
-      Uri.parse('http://51.141.92.127:5000/usuario/$NOMBRE_USUARIO'),
-    );
+    if (NOMBRE_USUARIO.isNotEmpty && CONTRASENA.isNotEmpty) {
+      var response = await http.get(
+        Uri.parse('http://51.141.92.127:5000/usuario/$NOMBRE_USUARIO'),
+      );
 
-    if (response.statusCode == 200) {
-      var userData = jsonDecode(response.body);
-      String contrasenaServidor = userData['Usuario']['CONTRASENA'];
+      if (response.statusCode == 200) {
+        var userData = jsonDecode(response.body);
+        String contrasenaServidor = userData['Usuario']['CONTRASENA'];
 
-      if (CONTRASENA == contrasenaServidor) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const Menu()),
-        );
+        if (CONTRASENA == contrasenaServidor) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const Menu()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Invalid username or password.'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Invalid username or password.'),
+            content: Text('Error: Failed to fetch user data.'),
             duration: Duration(seconds: 2),
           ),
         );
@@ -251,21 +325,12 @@ void _signIn() async {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error: Failed to fetch user data.'),
+          content: Text('Please fill in both username and password fields.'),
           duration: Duration(seconds: 2),
         ),
       );
     }
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Please fill in both username and password fields.'),
-        duration: Duration(seconds: 2),
-      ),
-    );
   }
-}
-
 }
 
 class TrianglePainter extends CustomPainter {
