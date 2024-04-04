@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import 'main.dart';
 
 class RPSCustomPainter extends CustomPainter {
   @override
@@ -156,9 +157,19 @@ class Menu extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(
                           top:
-                              10), // Espacio entre el botón "COLLECT" y la imagen
-                      child: Image.asset(
-                          'assets/OCR.png'), // Reemplaza 'ruta/de/la/imagen.png' con la ruta de tu imagen
+                              0), // Espacio entre el botón "COLLECT" y la imagen
+                      child: GestureDetector(
+                        onTap: () {
+                          // Navegar a la otra pestaña al hacer clic en la imagen
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => MyApp()),
+                          );
+                        },
+                        child: Image.asset(
+                          'assets/OCR.png',
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -180,76 +191,83 @@ class Menu extends StatelessWidget {
     );
   }
 
-  Widget _buildButton(String text, String imagePath) {
-    return Stack(
-      children: [
-        Container(
-          width: 110,
-          height: 148,
-          decoration: BoxDecoration(
+ Widget _buildButton(BuildContext context, String text, String imagePath) {
+  return Stack(
+    children: [
+      Container(
+        width: 110,
+        height: 148,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+            topRight: Radius.circular(25),
+            bottomLeft: Radius.circular(25),
+          ),
+          gradient: LinearGradient(
+            colors: [
+              Color.fromRGBO(207, 72, 72, 1),
+              Color.fromRGBO(224, 17, 17, 1),
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Positioned(
+              top: 113,
+              left: 10,
+              right: 10,
+              height: 1,
+              child: Container(
+                width: double.infinity,
+                color: Colors.white,
+              ),
+            ),
+            Positioned(
+              bottom: 4,
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 35,
+              child: Image.asset(
+                imagePath,
+                width: 67,
+                height: 90,
+              ),
+            ),
+          ],
+        ),
+      ),
+      Positioned.fill(
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
             borderRadius: BorderRadius.only(
               topRight: Radius.circular(25),
               bottomLeft: Radius.circular(25),
             ),
-            gradient: LinearGradient(
-              colors: [
-                Color.fromRGBO(207, 72, 72, 1),
-                Color.fromRGBO(224, 17, 17, 1),
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Positioned(
-                top: 113,
-                left: 10,
-                right: 10,
-                height: 1,
-                child: Container(
-                  width: double.infinity,
-                  color: Colors.white,
+            onTap: () {
+              // Navegar a la nueva página al hacer clic en el botón
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => packs(), // Reemplaza OtraPagina() con tu página de destino
                 ),
-              ),
-              Positioned(
-                bottom: 4,
-                child: Text(
-                  text,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 35,
-                child: Image.asset(
-                  imagePath,
-                  width: 67,
-                  height: 90,
-                ),
-              ),
-            ],
+              );
+            },
           ),
         ),
-        Positioned.fill(
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.only(
-                topRight: Radius.circular(25),
-                bottomLeft: Radius.circular(25),
-              ),
-              onTap: () {
-                // Función a ejecutar al hacer clic en el botón
-              },
-            ),
-          ),
-        ),
-      ],
-    );
+      ),
+    ],
+  );
+}
   }
 }
 
