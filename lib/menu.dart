@@ -132,26 +132,33 @@ class Menu extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 569),
-                child: Row(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          top:
-                              90), // Ajusta la posición vertical del botón "COLLECT"
-                      child: _buildButton('PACKS', 'assets/pack.png'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 90),
+                          child: _buildButton('PACKS', 'assets/pack.png'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 70),
+                          child:
+                              _buildButton('COLLECT', 'assets/incubadora.png'),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 90),
+                          child: _buildButton('POKEDEX', 'assets/pokeball.png'),
+                        ),
+                      ],
                     ),
                     Padding(
                       padding: const EdgeInsets.only(
-                          bottom:
-                              70), // Ajusta la posición vertical del botón "COLLECT"
-                      child: _buildButton('COLLECT', 'assets/incubadora.png'),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(
                           top:
-                              90), // Ajusta la posición vertical del botón "COLLECT"
-                      child: _buildButton('POKEDEX', 'assets/pokeball.png'),
+                              10), // Espacio entre el botón "COLLECT" y la imagen
+                      child: Image.asset(
+                          'assets/OCR.png'), // Reemplaza 'ruta/de/la/imagen.png' con la ruta de tu imagen
                     ),
                   ],
                 ),
