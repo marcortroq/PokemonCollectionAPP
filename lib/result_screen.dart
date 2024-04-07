@@ -38,46 +38,85 @@ class ResultScreen extends StatelessWidget {
     }
   }
 
+  void _showSaveConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Guardar Pokémon'),
+          content: Text('¿Quieres guardar este Pokémon?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Cierra el diálogo
+                Navigator.of(context).pop(); // Vuelve a la pantalla anterior
+              },
+              child: Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Aquí puedes agregar la lógica para la animación de reducción y desplazamiento
+                // Muestra un SnackBar como ejemplo
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Pokémon guardado'),
+                  ),
+                );
+                Navigator.of(context).pop(); // Cierra el diálogo
+              },
+              child: Text('Sí'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final foundPokemonIndex = pokemonNames.indexWhere((pokemon) => text.contains(pokemon));
 
     return Scaffold(
       appBar: null, // Quita la barra de título
-      body: Stack(
-        children: [
-          Container(
-            constraints: BoxConstraints.expand(),
-            child: Image.asset(
-              'assets/fondo_ocr.jpg',
-              fit: BoxFit.cover,
+      body: GestureDetector(
+        onTap: () {
+          _showSaveConfirmation(context);
+        },
+        child: Stack(
+          children: [
+            Container(
+              constraints: BoxConstraints.expand(),
+              child: Image.asset(
+                'assets/fondo_ocr.jpg',
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-          Center(
-            child: foundPokemonIndex != -1
-                ? FutureBuilder<String?>(
-                    future: fetchCardImage(foundPokemonIndex),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Image.asset(
-                          'assets/pokemon_carga1.gif',
-                          height: 200,
-                          width: 200,
-                        );
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else if (snapshot.hasData) {
-                        final cardImageBase64 = snapshot.data!;
-                        final cardImageBytes = base64Decode(cardImageBase64);
-                        return Image.memory(cardImageBytes, fit: BoxFit.cover);
-                      } else {
-                        return Text('No se encontró ninguna imagen de carta para este Pokémon');
-                      }
-                    },
-                  )
-                : Text('No se encontró ningún Pokémon'),
-          ),
-        ],
+            Center(
+              child: foundPokemonIndex != -1
+                  ? FutureBuilder<String?>(
+                      future: fetchCardImage(foundPokemonIndex),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return Image.asset(
+                            'assets/pokemon_carga1.gif',
+                            height: 200,
+                            width: 200,
+                          );
+                        } else if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        } else if (snapshot.hasData) {
+                          final cardImageBase64 = snapshot.data!;
+                          final cardImageBytes = base64Decode(cardImageBase64);
+                          return Image.memory(cardImageBytes, fit: BoxFit.cover);
+                        } else {
+                          return Text('No se encontró ninguna imagen de carta para este Pokémon');
+                        }
+                      },
+                    )
+                  : Text('No se encontró ningún Pokémon'),
+            ),
+          ],
+        ),
       ),
     );
   }
