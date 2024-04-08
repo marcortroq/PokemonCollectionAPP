@@ -1,5 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'dart:math' as math;
+import 'main.dart';
+import 'packs.dart';
 
 class RPSCustomPainter extends CustomPainter {
   @override
@@ -43,7 +47,6 @@ class RPSCustomPainter extends CustomPainter {
   }
 }
 
-//Painter
 class RPSCustomPainter2 extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -75,6 +78,7 @@ class RPSCustomPainter2 extends CustomPainter {
 }
 
 class Menu extends StatelessWidget {
+  const Menu({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -133,26 +137,45 @@ class Menu extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.only(top: 569),
-                child: Row(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          top:
-                              90), // Ajusta la posición vertical del botón "COLLECT"
-                      child: _buildButton('PACKS', 'assets/pack.png'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 90),
+                          child:
+                              _buildButton('PACKS', 'assets/pack.png', context),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 70),
+                          child: _buildButton(
+                              'COLLECT', 'assets/incubadora.png', context),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 90),
+                          child: _buildButton(
+                              'POKEDEX', 'assets/pokeball.png', context),
+                        ),
+                      ],
                     ),
                     Padding(
                       padding: const EdgeInsets.only(
-                          bottom:
-                              70), // Ajusta la posición vertical del botón "COLLECT"
-                      child: _buildButton('COLLECT', 'assets/incubadora.png'),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(
                           top:
-                              90), // Ajusta la posición vertical del botón "COLLECT"
-                      child: _buildButton('POKEDEX', 'assets/pokeball.png'),
+                              0), // Espacio entre el botón "COLLECT" y la imagen
+                      child: GestureDetector(
+                        onTap: () {
+                          // Navegar a la otra pestaña al hacer clic en la imagen
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => MyApp()),
+                          );
+                        },
+                        child: Image.asset(
+                          'assets/OCR.png', // Reemplaza 'ruta/de/la/imagen.png' con la ruta de tu imagen
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -174,7 +197,7 @@ class Menu extends StatelessWidget {
     );
   }
 
-  Widget _buildButton(String text, String imagePath) {
+  Widget _buildButton(String text, String imagePath, BuildContext context) {
     return Stack(
       children: [
         Container(
@@ -237,7 +260,13 @@ class Menu extends StatelessWidget {
                 bottomLeft: Radius.circular(25),
               ),
               onTap: () {
-                // Función a ejecutar al hacer clic en el botón
+                // Aquí es donde se navega a la pantalla packs al presionar el botón
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          Packs()), // Reemplaza 'packs()' con la clase correcta de la pantalla packs
+                );
               },
             ),
           ),
