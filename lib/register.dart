@@ -1,7 +1,9 @@
 import 'dart:convert';
-import 'package:pokemonapp/main.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:pokemonapp/main.dart';
+import 'menu.dart';
 
 void main() {
   runApp(const Register());
@@ -36,10 +38,8 @@ class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _RpasswordController = TextEditingController();
-  int _counter = 0;
   bool _isKeyboardVisible = false;
-  bool _isObscure =
-      true; // Nuevo estado para controlar la visibilidad del texto
+  bool _isObscure = true;
 
   @override
   Widget build(BuildContext context) {
@@ -94,10 +94,10 @@ class _MyHomePageState extends State<MyHomePage> {
           _buildTextField('Username', _usernameController),
           SizedBox(height: 20),
           _buildTextFieldContrasena('Password', _passwordController,
-              obscureText: _isObscure), // Pasamos el estado _isObscure aquí
+              obscureText: _isObscure),
           SizedBox(height: 20),
           _buildTextFieldContrasena('Password', _RpasswordController,
-              obscureText: _isObscure), // Pasamos el estado _isObscure aquí
+              obscureText: _isObscure),
           SizedBox(height: 30),
           _buildSignInButton(),
           SizedBox(height: 7),
@@ -151,24 +151,14 @@ class _MyHomePageState extends State<MyHomePage> {
           filled: true,
           fillColor: Colors.white,
           labelText: labelText,
-          suffixIcon:
-              obscureText // Aquí se cambia el icono en función de la visibilidad del texto
-                  ? IconButton(
-                      icon: Icon(Icons.visibility),
-                      onPressed: () {
-                        setState(() {
-                          _isObscure = !_isObscure;
-                        });
-                      },
-                    )
-                  : IconButton(
-                      icon: Icon(Icons.visibility_off),
-                      onPressed: () {
-                        setState(() {
-                          _isObscure = !_isObscure;
-                        });
-                      },
-                    ),
+          suffixIcon: IconButton(
+            icon: Icon(obscureText ? Icons.visibility : Icons.visibility_off),
+            onPressed: () {
+              setState(() {
+                _isObscure = !_isObscure;
+              });
+            },
+          ),
         ),
       ),
     );
@@ -188,33 +178,32 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildSignUpText() {
-    return GestureDetector(
-      onTap: () {
-        // Navegar a la nueva ventana
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const MyApp()),
-        );
-      },
-      child: RichText(
-        text: TextSpan(
-          text: "I already have an account. ",
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontFamily: 'Roboto',
-          ),
-          children: [
-            TextSpan(
-              text: "Sign In",
-              style: TextStyle(
-                color: Colors.red,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Roboto',
-              ),
-            ),
-          ],
+    return RichText(
+      text: TextSpan(
+        text: "I’m a new user. ",
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 18,
+          fontFamily: 'Roboto',
         ),
+        children: [
+          TextSpan(
+            text: "Sign Up",
+            style: TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Roboto',
+            ),
+            recognizer: TapGestureRecognizer()
+              ..onTap = () {
+                // Navegar a la nueva ventana
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MyApp()),
+                );
+              },
+          ),
+        ],
       ),
     );
   }
@@ -224,46 +213,7 @@ class _MyHomePageState extends State<MyHomePage> {
       width: 305,
       height: 52,
       child: ElevatedButton(
-        onPressed: () {
-          // Verificar si todos los campos están llenos
-          if (_emailController.text.isNotEmpty &&
-              _usernameController.text.isNotEmpty &&
-              _passwordController.text.isNotEmpty &&
-              _RpasswordController.text.isNotEmpty) {
-            if (_passwordController.text == _RpasswordController.text) {
-              if (_passwordController.text.length >= 6) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Correcto.'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content:
-                        Text('La contraseña debe tener al menos 6 caracteres.'),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              }
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Las contraseñas no coinciden.'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            }
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Por favor, complete todos los campos.'),
-                duration: Duration(seconds: 2),
-              ),
-            );
-          }
-        },
+        onPressed: _checkUserExistenceAndRegister,
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(13.0),
@@ -300,6 +250,79 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
+  }
+
+  void _checkUserExistenceAndRegister() async {
+    String nombreUsuario = _usernameController.text;
+
+    try {
+      var response = await http.get(
+        Uri.parse('http://51.141.92.127:5000/usuario/$nombreUsuario'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('El usuario ya existe.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      } else {
+        _registerUser();
+      }
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al verificar la existencia del usuario.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  void _registerUser() async {
+    try {
+      var response = await http.post(
+        Uri.parse('http://51.141.92.127:5000/usuario'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          'nombre_usuario': _usernameController.text,
+          'mail': _emailController.text,
+          'contrasena': _passwordController.text,
+          // Puedes incluir otros campos si es necesario, como 'admin'
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const Menu()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Hubo un error en el registro. Por favor, inténtalo de nuevo.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              'Hubo un error en el registro. Por favor, inténtalo de nuevo.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 }
 

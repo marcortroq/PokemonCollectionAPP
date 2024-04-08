@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/gestures.dart';
 import 'package:pokemonapp/register.dart';
 import 'menu.dart';
 import 'package:flutter/material.dart';
@@ -257,33 +258,32 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildSignUpText() {
-    return GestureDetector(
-      onTap: () {
-        // Navegar a la nueva ventana
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const Register()),
-        );
-      },
-      child: RichText(
-        text: TextSpan(
-          text: "I’m a new user. ",
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontFamily: 'Roboto',
-          ),
-          children: [
-            TextSpan(
-              text: "Sign Up",
-              style: TextStyle(
-                color: Colors.red,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Roboto',
-              ),
-            ),
-          ],
+    return RichText(
+      text: TextSpan(
+        text: "I’m a new user. ",
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: 18,
+          fontFamily: 'Roboto',
         ),
+        children: [
+          TextSpan(
+            text: "Sign Up",
+            style: TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Roboto',
+            ),
+            recognizer: TapGestureRecognizer()
+              ..onTap = () {
+                // Navegar a la nueva ventana
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Register()),
+                );
+              },
+          ),
+        ],
       ),
     );
   }
@@ -418,19 +418,5 @@ class RectanguloPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return true;
-  }
-}
-
-class NextScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Next Screen'),
-      ),
-      body: Center(
-        child: Text('Welcome to the Next Screen!'),
-      ),
-    );
   }
 }
