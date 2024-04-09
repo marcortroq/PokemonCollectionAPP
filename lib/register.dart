@@ -86,14 +86,12 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-Widget _buildAnimatedTitulo(String imagePath, bool isKeyboardVisible) {
+Widget _buildAnimatedTitulo(String imagePath, bool isKeyboardVisible, double screenWidth) {
   return AnimatedOpacity(
     duration: Duration(milliseconds: 300),
     opacity: isKeyboardVisible ? 0.0 : 1.0,
-    child: Positioned(
-      left: 0,
-      top: 300,
-      right: 0,
+    child: Container(
+      width: screenWidth, // Usa el ancho completo de la pantalla
       child: Image.asset(
         imagePath,
         fit: BoxFit.contain,
@@ -120,7 +118,7 @@ Widget _buildTitulo(String imagePath) {
       bottom: 20,
       child: Column(
         children: [
-          _buildAnimatedTitulo('assets/title.png', _isKeyboardVisible),
+          _buildAnimatedTitulo('assets/title.png', _isKeyboardVisible, MediaQuery.of(context).size.width),
           SizedBox(height: 20),
           _buildTextField('Email Address', _emailController),
           SizedBox(height: 10),
@@ -287,7 +285,37 @@ Widget _buildTitulo(String imagePath) {
 
   void _checkUserExistenceAndRegister() async {
     String nombreUsuario = _usernameController.text;
-
+    String contrasena = _passwordController.text;
+    if (_emailController.text.isEmpty ||
+        _usernameController.text.isEmpty ||
+        _passwordController.text.isEmpty ||
+        _RpasswordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Por favor, complete todos los campos.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+    else if (contrasena.length <= 6) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('La contraseña debe tener más de 6 caracteres.'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+    return;
+  }
+    else if(_passwordController.text != _RpasswordController.text){
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Las contraseñas no coinciden.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+    else{
     try {
       var response = await http.get(
         Uri.parse('http://51.141.92.127:5000/usuario/$nombreUsuario'),
@@ -315,6 +343,7 @@ Widget _buildTitulo(String imagePath) {
         ),
       );
     }
+  }
   }
 
   void _registerUser() async {

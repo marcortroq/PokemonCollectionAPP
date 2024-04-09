@@ -3,7 +3,7 @@ class Usuario {
   final String nombreUsuario;
   final String mail;
   final String contrasena;
-  final bool admin;
+  final int admin;
 
   Usuario({
     required this.idUsuario,

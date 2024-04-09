@@ -18,14 +18,12 @@ class Incubadora extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildButton(String text, String imagePath, BuildContext context) {
     return Stack(
         // Coloca aquí el contenido que desees sobre el fondo de pantalla
         );
   }
 }
-
 void main() {
   runApp(MaterialApp(
     home: Incubadora(),
