@@ -86,14 +86,12 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-Widget _buildAnimatedTitulo(String imagePath, bool isKeyboardVisible) {
+Widget _buildAnimatedTitulo(String imagePath, bool isKeyboardVisible, double screenWidth) {
   return AnimatedOpacity(
     duration: Duration(milliseconds: 300),
     opacity: isKeyboardVisible ? 0.0 : 1.0,
-    child: Positioned(
-      left: 0,
-      top: 300,
-      right: 0,
+    child: Container(
+      width: screenWidth, // Usa el ancho completo de la pantalla
       child: Image.asset(
         imagePath,
         fit: BoxFit.contain,
@@ -120,7 +118,7 @@ Widget _buildTitulo(String imagePath) {
       bottom: 20,
       child: Column(
         children: [
-          _buildAnimatedTitulo('assets/title.png', _isKeyboardVisible),
+          _buildAnimatedTitulo('assets/title.png', _isKeyboardVisible, MediaQuery.of(context).size.width),
           SizedBox(height: 20),
           _buildTextField('Email Address', _emailController),
           SizedBox(height: 10),

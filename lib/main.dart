@@ -11,7 +11,7 @@ void main() {
   runApp(const MyApp());
 }
 
- class MyApp extends StatelessWidget {
+class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
@@ -41,8 +41,13 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   bool _isKeyboardVisible = false;
   bool _isObscure = true;
+
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    final double screenWidth = screenSize.width;
+    final double screenHeight = screenSize.height;
+
     return GestureDetector(
       onTap: () {
         // Ocultar el teclado cuando se toca en cualquier lugar que no sea un campo de texto
@@ -54,8 +59,8 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Scaffold(
         body: Stack(
           children: [
-            _buildBackground(),
-            _buildImage('assets/Charizard.png', 400),
+            _buildBackground(screenWidth, screenHeight),
+            _buildImage('assets/Charizard.png', 400, screenWidth),
             CustomPaint(
               size: Size.infinite,
               painter: RectanguloPainter(isKeyboardVisible: _isKeyboardVisible),
@@ -64,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
               size: Size.infinite,
               painter: TrianglePainter(isKeyboardVisible: _isKeyboardVisible),
             ),
-            _buildLoginForm(),            
+            _buildLoginForm(screenWidth),
             AnimatedSwitcher(
               duration: Duration(milliseconds: 300),
               switchInCurve: Curves.easeInOut,
@@ -73,7 +78,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   ? SizedBox.shrink()
                   : Center(
                       key: Key('center_key'),
-                      child: _buildTitulo('assets/title.png'),
+                      child: _buildTitulo('assets/title.png', screenWidth),
                     ),
             ),
           ],
@@ -82,8 +87,10 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildBackground() {
+  Widget _buildBackground(double screenWidth, double screenHeight) {
     return Container(
+      width: screenWidth,
+      height: screenHeight,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
@@ -94,30 +101,30 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildLoginForm() {
+  Widget _buildLoginForm(double screenWidth) {
     return Positioned(
-      left: 50,
-      bottom: 70,
+      left: screenWidth * 0.075,
+      bottom: screenWidth * 0.05,
       child: Column(
         children: [
-          SizedBox(height: 30),
-          _buildTextField('Email Address / Username', _usernameController),
-          SizedBox(height: 20),
+          SizedBox(height: screenWidth * 0.08),
+          _buildTextField('Email Address / Username', _usernameController, screenWidth),
+          SizedBox(height: screenWidth * 0.05),
           _buildTextFieldContrasena('Password', _passwordController,
-              obscureText: _isObscure),
-          SizedBox(height: 38),
-          _buildSignInButton(),
-          SizedBox(height: 7),
+              obscureText: _isObscure, screenWidth: screenWidth),
+          SizedBox(height: screenWidth * 0.1),
+          _buildSignInButton(screenWidth),
+          SizedBox(height: screenWidth * 0.02),
           _buildSignUpText(),
         ],
       ),
     );
   }
 
-  Widget _buildImage(String imagePath, double size) {
+  Widget _buildImage(String imagePath, double size, double screenWidth) {
     return Positioned(
       top: -30,
-      bottom: size == 200 ? 60 : 240,
+      bottom: size == 200 ? screenWidth * 0.15 : screenWidth * 0.6,
       child: Image.asset(
         imagePath,
         width: size,
@@ -127,10 +134,10 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildTitulo(String imagePath) {
+  Widget _buildTitulo(String imagePath, double screenWidth) {
     return Positioned(
       left: 0,
-      top: -150,
+      top: -screenWidth * 0.3,
       right: 0,
       child: Image.asset(
         imagePath,
@@ -139,10 +146,10 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildTextField(String labelText, TextEditingController controller) {
+  Widget _buildTextField(String labelText, TextEditingController controller, double screenWidth) {
     return SizedBox(
-      width: 305,
-      height: 52,
+      width: screenWidth * 0.85,
+      height: screenWidth * 0.15,
       child: TextField(
         controller: controller,
         onTap: () {
@@ -162,12 +169,11 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildTextFieldContrasena(
-      String labelText, TextEditingController controller,
-      {bool obscureText = false}) {
+  Widget _buildTextFieldContrasena(String labelText, TextEditingController controller,
+      {bool obscureText = false, required double screenWidth}) {
     return SizedBox(
-      width: 305,
-      height: 52,
+      width: screenWidth * 0.85,
+      height: screenWidth * 0.15,
       child: TextField(
         controller: controller,
         obscureText: obscureText,
@@ -183,33 +189,32 @@ class _MyHomePageState extends State<MyHomePage> {
           filled: true,
           fillColor: Colors.white,
           labelText: labelText,
-          suffixIcon:
-              obscureText // Aquí se cambia el icono en función de la visibilidad del texto
-                  ? IconButton(
-                      icon: Icon(Icons.visibility),
-                      onPressed: () {
-                        setState(() {
-                          _isObscure = !_isObscure;
-                        });
-                      },
-                    )
-                  : IconButton(
-                      icon: Icon(Icons.visibility_off),
-                      onPressed: () {
-                        setState(() {
-                          _isObscure = !_isObscure;
-                        });
-                      },
-                    ),
+          suffixIcon: obscureText
+              ? IconButton(
+                  icon: Icon(Icons.visibility),
+                  onPressed: () {
+                    setState(() {
+                      _isObscure = !_isObscure;
+                    });
+                  },
+                )
+              : IconButton(
+                  icon: Icon(Icons.visibility_off),
+                  onPressed: () {
+                    setState(() {
+                      _isObscure = !_isObscure;
+                    });
+                  },
+                ),
         ),
       ),
     );
   }
 
-  Widget _buildSignInButton() {
+  Widget _buildSignInButton(double screenWidth) {
     return SizedBox(
-      width: 305,
-      height: 52,
+      width: screenWidth * 0.85,
+      height: screenWidth * 0.15,
       child: ElevatedButton(
         onPressed: () {
           _signIn();
@@ -242,7 +247,7 @@ class _MyHomePageState extends State<MyHomePage> {
               'Sign In',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 20,
+                fontSize: screenWidth * 0.04,
                 fontFamily: 'RubikOne',
               ),
             ),
@@ -283,55 +288,71 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-void _signIn() async {
-  String username = _usernameController.text;
-  String password = _passwordController.text;
+  void _signIn() async {
+    String username = _usernameController.text;
+    String password = _passwordController.text;
 
-  // Crear el cuerpo de la solicitud en formato JSON
-  Map<String, String> requestBody = {
-    'usuario': username,
-    'contrasena': password,
-  };
+    if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Por favor, complete todos los campos.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    } else {
+      // Crear el cuerpo de la solicitud en formato JSON
+      Map<String, String> requestBody = {
+        'usuario': username,
+        'contrasena': password,
+      };
 
-  // Realizar la solicitud HTTP al servidor
-  Uri url = Uri.parse('http://51.141.92.127:5000/login');
-  final response = await http.post(
-    url,
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    },
-    body: jsonEncode(requestBody),
-  );
+      // Realizar la solicitud HTTP al servidor
+      Uri url = Uri.parse('http://51.141.92.127:5000/login');
+      final response = await http.post(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(requestBody),
+      );
 
-  // Procesar la respuesta del servidor
-  if (response.statusCode == 200) {
-    // Si la solicitud fue exitosa, extraer los datos del usuario
-    Map<String, dynamic> userData = jsonDecode(response.body)['usuario'];
+      // Procesar la respuesta del servidor
+      if (response.statusCode == 200) {
+        // Si la solicitud fue exitosa, extraer los datos del usuario
+        Map<String, dynamic> userData = jsonDecode(response.body)['usuario'];
 
-    // Aquí puedes realizar acciones adicionales, como guardar el usuario en el almacenamiento local, etc.
-    Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Menu()),
-                );
-    // Mostrar un mensaje de éxito
-    _showSnackBar('Inicio de sesión exitoso');
-  } else {
-    // Si la solicitud falló, mostrar un mensaje de error
-    String errorMessage = jsonDecode(response.body)['mensaje'];
-    _showSnackBar('Error al iniciar sesión: $errorMessage');
+        // Crear una instancia de Usuario con los datos recibidos del JSON
+        Usuario usuario = Usuario(
+          idUsuario: userData['ID_USUARIO'],
+          nombreUsuario: userData['NOMBRE_USUARIO'],
+          mail: userData['MAIL'],
+          contrasena: userData['CONTRASEÑA'],
+          admin: userData['ADMIN'],
+        );
+
+        // Aquí puedes realizar acciones adicionales, como guardar el usuario en el almacenamiento local, etc.
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const Menu()),
+        );
+        // Mostrar un mensaje de éxito
+        _showSnackBar('Inicio de sesión exitoso');
+      } else {
+        // Si la solicitud falló, mostrar un mensaje de error
+        String errorMessage = jsonDecode(response.body)['mensaje'];
+        _showSnackBar('Error al iniciar sesión: $errorMessage');
+      }
+    }
   }
-}
 
-
-
-
-void _showSnackBar(String message) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(message),      
-    ),
-  );
-}
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+  }
 }
 
 class TrianglePainter extends CustomPainter {
