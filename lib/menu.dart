@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:pokemonapp/countdown_timer.dart';
 import 'package:pokemonapp/incubadora.dart';
 import 'package:pokemonapp/main_ocr.dart';
 import 'dart:math' as math;
@@ -148,17 +149,21 @@ class Menu extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(top: 90),
                           child:
-                            _buildButton("PACKS", "assets/pack.png", Packs(), context)
+                            _buildButton("PACKS", "assets/pack.png", Packs(), context, topLeftRadius: 0, bottomRightRadius: 0)
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 70),
-                          child: 
-                             _buildButton("COLLECT", "assets/incubadora.png", Incubadora(), context) //INCUBADORA
+                       Padding(
+                          padding: const EdgeInsets.only(bottom: 40),
+                          child: Stack(
+                            children: [                              
+                              _buildButton("COLLECT", "assets/incubadora.png", Incubadora(), context), // INCUBADORA
+                              CountdownTimer(), // Contador de cuenta atrás de 12 horas
+                            ],
+                          ),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 90),
                           child: 
-                            _buildButton("POKEDEX", "assets/pokeball.png", Packs(), context) //POKEDEX
+                            _buildButton("POKEDEX", "assets/pokeball.png", Packs(), context, topRightRadius: 0, bottomLeftRadius: 0) //POKEDEX
                         ),
                       ],
                     ),
@@ -194,6 +199,17 @@ class Menu extends StatelessWidget {
               fit: BoxFit.contain,
             ),
           ),
+           Positioned(
+            left: 100, // Posición X del botón rectangular
+            top: 520, // Posición Y del botón rectangular
+            child: _buildRectangularButton(
+              "NUEVO BOTÓN", // Texto del botón
+              () {
+                // Acción al hacer clic en el botón
+                print("Botón rectangular presionado");
+              },
+            ),
+          ),
         ],
       ),
     );
@@ -207,7 +223,12 @@ void navigateToScreen<T>(BuildContext context, Widget screen) {
   );
 }
 
-  Widget _buildButton(String text, String imagePath, Widget screen, BuildContext context) {
+  Widget _buildButton(String text, String imagePath, Widget screen, BuildContext context, {
+  double? topLeftRadius,
+  double? topRightRadius,
+  double? bottomLeftRadius,
+  double? bottomRightRadius,
+}) {
   return Stack(
     children: [
       Container(
@@ -215,8 +236,14 @@ void navigateToScreen<T>(BuildContext context, Widget screen) {
         height: 148,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.only(
-            topRight: Radius.circular(25),
-            bottomLeft: Radius.circular(25),
+            topLeft: Radius.circular(topLeftRadius ?? 25), // Usar el valor proporcionado o el predeterminado
+            topRight: Radius.circular(topRightRadius ?? 25),
+            bottomLeft: Radius.circular(bottomLeftRadius ?? 25),
+            bottomRight: Radius.circular(bottomRightRadius ?? 25),
+          ),
+          border: Border.all(
+            color: Colors.black, 
+            width: 1.5, 
           ),
           gradient: LinearGradient(
             colors: [
@@ -257,6 +284,7 @@ void navigateToScreen<T>(BuildContext context, Widget screen) {
                 width: 67,
                 height: 90,
               ),
+              
             ),
           ],
         ),
@@ -266,8 +294,10 @@ void navigateToScreen<T>(BuildContext context, Widget screen) {
           color: Colors.transparent,
           child: InkWell(
             borderRadius: BorderRadius.only(
-              topRight: Radius.circular(25),
-              bottomLeft: Radius.circular(25),
+              topLeft: Radius.circular(topLeftRadius ?? 25),
+              topRight: Radius.circular(topRightRadius ?? 25),
+              bottomLeft: Radius.circular(bottomLeftRadius ?? 25),
+              bottomRight: Radius.circular(bottomRightRadius ?? 25),
             ),
             onTap: () {
               // Aquí llamamos a la función navigateToScreen con la pantalla proporcionada.
@@ -279,6 +309,56 @@ void navigateToScreen<T>(BuildContext context, Widget screen) {
     ],
   );
 }
+
+Widget _buildRectangularButton(String text, VoidCallback onPressed) {
+    return SizedBox(
+      width: 215,
+      height: 60,
+      child: ElevatedButton(
+        onPressed: () {
+          
+        },
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(13.0),
+          ),
+          padding: EdgeInsets.zero,
+          elevation: 0,
+        ),
+        child: Ink(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                const Color.fromRGBO(66, 9, 9, 1),
+                const Color.fromRGBO(160, 0, 0, 1),
+                const Color.fromRGBO(221, 19, 19, 1),
+                const Color.fromRGBO(160, 0, 0, 1),
+                const Color.fromRGBO(66, 9, 9, 1),
+              ],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+            borderRadius: BorderRadius.circular(13.0),
+            border: Border.all(
+            color: Colors.black, 
+            width: 2, 
+          ),
+          ),
+          child: Container(
+            alignment: Alignment.center,
+            child: Text(
+              'Play',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 30,
+                fontFamily: 'Pokemon-Solid',
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 void main() {

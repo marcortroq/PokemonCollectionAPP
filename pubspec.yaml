@@ -73,6 +73,9 @@ flutter:
       - family: RubikOne
         fonts:
           - asset: fonts/RubikOne-Regular.ttf
+      - family: Pokemon-Solid
+        fonts:
+          - asset: fonts/Pokemon-Solid.ttf
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
