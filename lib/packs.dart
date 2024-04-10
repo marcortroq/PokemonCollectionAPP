@@ -26,6 +26,13 @@ class _PacksState extends State<Packs> {
             ),
           ),
           _labels(context),
+          Positioned(
+            top: 150,
+            left: 0,
+            right: 0,
+            child:
+                _isCollectionSelected ? _pokestoreContent() : _myPacksContent(),
+          ),
         ],
       ),
     );
@@ -95,6 +102,45 @@ class _PacksState extends State<Packs> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _pokestoreContent() {
+    return Column(
+      children: [
+        Text(
+          'Contenido de POKESTORE',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontFamily: 'sarpanch',
+          ),
+        ),
+        SizedBox(height: 20), // Espacio entre el texto y la imagen
+        Image.asset(
+          'assets/bandera.png', // Ruta de la imagen en tus assets
+          width: 200, // Ancho deseado de la imagen
+          height: 200, // Alto deseado de la imagen
+          fit: BoxFit.contain, // Ajuste de la imagen dentro del contenedor
+        ),
+        // Aquí puedes agregar más widgets que quieres mostrar cuando se selecciona "POKESTORE"
+      ],
+    );
+  }
+
+  Widget _myPacksContent() {
+    return Column(
+      children: [
+        Text(
+          'Contenido de MY PACKS',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontFamily: 'sarpanch',
+          ),
+        ),
+        // Aquí puedes agregar más widgets que quieres mostrar cuando se selecciona "MY PACKS"
+      ],
     );
   }
 }
