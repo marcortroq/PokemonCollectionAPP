@@ -7,7 +7,8 @@ class Packs extends StatefulWidget {
 }
 
 class _PacksState extends State<Packs> {
-  bool _isCollectionSelected = true;
+  PageController _pageController = PageController(initialPage: 0);
+  int _currentPageIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +22,7 @@ class _PacksState extends State<Packs> {
                 image: AssetImage(
                   'assets/fondosec.png',
                 ),
-                fit: BoxFit.cover,
+                fit: BoxFit.fill,
               ),
             ),
           ),
@@ -30,8 +31,20 @@ class _PacksState extends State<Packs> {
             top: 150,
             left: 0,
             right: 0,
-            child:
-                _isCollectionSelected ? _pokestoreContent() : _myPacksContent(),
+            bottom:
+                0, // Ajuste para ocupar todo el espacio menos el área de los labels
+            child: PageView(
+              controller: _pageController,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentPageIndex = index;
+                });
+              },
+              children: [
+                _pokestoreContent(),
+                _myPacksContent(),
+              ],
+            ),
           ),
         ],
       ),
@@ -39,8 +52,11 @@ class _PacksState extends State<Packs> {
   }
 
   Widget _labels(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Positioned(
-      top: 100,
+      top: MediaQuery.of(context).size.height *
+          0.12, // 10% del alto de la pantalla
       left: 0,
       right: 0,
       child: Row(
@@ -48,16 +64,16 @@ class _PacksState extends State<Packs> {
         children: [
           GestureDetector(
             onTap: () {
-              setState(() {
-                _isCollectionSelected = true;
-              });
+              _pageController.animateToPage(0,
+                  duration: Duration(milliseconds: 500),
+                  curve: Curves.easeInOut);
             },
             child: Container(
               padding: EdgeInsets.only(
                 bottom: 2,
               ),
               decoration: BoxDecoration(
-                border: _isCollectionSelected
+                border: _currentPageIndex == 0
                     ? Border(
                         bottom: BorderSide(width: 2.0, color: Colors.white),
                       )
@@ -67,7 +83,8 @@ class _PacksState extends State<Packs> {
                 "POKESTORE",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 20,
+                  fontSize: screenWidth *
+                      0.05, // Tamaño de fuente relativo al ancho de la pantalla
                   fontFamily: 'sarpanch',
                 ),
               ),
@@ -75,16 +92,16 @@ class _PacksState extends State<Packs> {
           ),
           GestureDetector(
             onTap: () {
-              setState(() {
-                _isCollectionSelected = false;
-              });
+              _pageController.animateToPage(1,
+                  duration: Duration(milliseconds: 500),
+                  curve: Curves.easeInOut);
             },
             child: Container(
               padding: EdgeInsets.only(
                 bottom: 2,
               ),
               decoration: BoxDecoration(
-                border: !_isCollectionSelected
+                border: _currentPageIndex == 1
                     ? Border(
                         bottom: BorderSide(width: 2.0, color: Colors.white),
                       )
@@ -94,7 +111,8 @@ class _PacksState extends State<Packs> {
                 "MY PACKS",
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 20,
+                  fontSize: screenWidth *
+                      0.05, // Tamaño de fuente relativo al ancho de la pantalla
                   fontFamily: 'sarpanch',
                 ),
               ),
@@ -106,51 +124,71 @@ class _PacksState extends State<Packs> {
   }
 
   Widget _pokestoreContent() {
-    return Column(
-      children: [
-        SizedBox(
-            height: 1), // Espacio entre el texto y la primera fila de imágenes
-        _banderaImage('SOBRES PREMIUM'),
-        SizedBox(
-          height: 20,
-        ), // Espacio entre la primera fila de imágenes y la segunda fila
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+    final List<PackData> packData = [
+      PackData(
+        title: 'SOBRES PREMIUM',
+        images: ['assets/sobrepremium.png', 'assets/sobrepremium.png'],
+        prices: ['550', '1000'],
+      ),
+      PackData(
+        title: 'SOBRES',
+        images: ['assets/sobre.png', 'assets/sobre.png'],
+        prices: ['1000', '1600'],
+      ),
+      PackData(
+        title: 'MONEDAS',
+        images: ['assets/buy.png', 'assets/buy.png'],
+        prices: ['4.99€', '9.99€'],
+      ),
+      PackData(
+        title: 'MONEDAS PREMIUM',
+        images: ['assets/buy.png', 'assets/buy.png'],
+        prices: ['4.99€', '9.99€'],
+      ),
+    ];
+
+    return ListView.builder(
+      itemCount: packData.length,
+      itemBuilder: (context, index) {
+        return Column(
           children: [
-            _imageWithText('assets/sobrepremium.png', '500'),
-            SizedBox(width: 20), // Espacio entre las imágenes
-            _imageWithText('assets/sobrepremium.png', '1000'),
+            _banderaImage(packData[index].title, 11, 80),
+            SizedBox(height: 20),
+            _buildImageWithTextRows(packData[index]),
+            SizedBox(height: 20),
           ],
-        ),
-        SizedBox(
-            height: 10), // Espacio entre el texto y la primera fila de imágenes
-        _banderaImage('SOBRES PREMIUM'),
-        SizedBox(
-          height: 20,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _imageWithText('assets/sobre.png', '500'),
-            SizedBox(width: 20), // Espacio entre las imágenes
-            _imageWithText('assets/sobre.png', '1000'),
-          ],
-        ),
-      ],
+        );
+      },
     );
   }
 
-  Widget _banderaImage(String text) {
+  Widget _buildImageWithTextRows(PackData packData) {
+    List<Widget> rows = [];
+    for (int i = 0; i < packData.prices.length; i += 2) {
+      Widget row = Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _imageWithText(packData.images[0], packData.prices[i]),
+          SizedBox(width: 20),
+          if (i + 1 < packData.prices.length)
+            _imageWithText(packData.images[1], packData.prices[i + 1]),
+        ],
+      );
+      rows.add(row);
+    }
+    return Column(children: rows);
+  }
+
+  Widget _banderaImage(String text, double top, double left) {
     return Stack(
       alignment: Alignment.center,
       children: [
         Image.asset(
           'assets/bandera.png',
-          width: 362, // Ancho deseado de la imagen
+          width: 362,
           fit: BoxFit.contain,
         ),
         Positioned(
-          // Centra el texto dentro del Stack
           child: Text(
             text,
             style: TextStyle(
@@ -158,10 +196,11 @@ class _PacksState extends State<Packs> {
               fontSize: 20,
               fontFamily: 'sarpanch',
             ),
+            textAlign: TextAlign.center, // Alineación central del texto
           ),
-          // Ubica el texto en el centro del Stack
-          top: 11,
-          left: 80,
+          top: top,
+          left: left,
+          right: left, // Ajuste para centrar horizontalmente
         ),
       ],
     );
@@ -173,11 +212,10 @@ class _PacksState extends State<Packs> {
       children: [
         Image.asset(
           imagePath,
-          width: 170, // Ancho deseado de la imagen
+          width: 170,
           fit: BoxFit.contain,
         ),
         Positioned(
-          // Centra el texto dentro del Stack
           child: Text(
             text,
             style: TextStyle(
@@ -186,7 +224,6 @@ class _PacksState extends State<Packs> {
               fontFamily: 'sarpanch',
             ),
           ),
-          // Ubica el texto en el centro del Stack
           top: 110,
           left: 63,
         ),
@@ -205,10 +242,22 @@ class _PacksState extends State<Packs> {
             fontFamily: 'sarpanch',
           ),
         ),
-        // Aquí puedes agregar más widgets que quieres mostrar cuando se selecciona "MY PACKS"
+        // Puedes agregar más widgets aquí si lo deseas
       ],
     );
   }
+}
+
+class PackData {
+  final String title;
+  final List<String> images;
+  final List<String> prices;
+
+  PackData({
+    required this.title,
+    required this.images,
+    required this.prices,
+  });
 }
 
 void main() {
