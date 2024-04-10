@@ -108,22 +108,64 @@ class _PacksState extends State<Packs> {
   Widget _pokestoreContent() {
     return Column(
       children: [
-        Text(
-          'Contenido de POKESTORE',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontFamily: 'sarpanch',
-          ),
+        SizedBox(height: 1), // Espacio entre el texto y la imagen
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            Image.asset(
+              'assets/bandera.png', // Ruta de la imagen en tus assets
+              width: 362, // Ancho deseado de la imagen
+              fit: BoxFit.contain, // Ajuste de la imagen dentro del contenedor
+            ),
+            Positioned(
+              // Centra el texto dentro del Stack
+              child: Text(
+                'SOBRES PREMIUM',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontFamily: 'sarpanch',
+                ),
+              ),
+              // Ubica el texto en el centro del Stack
+              top: 11,
+              left: 80,
+            ),
+          ],
         ),
-        SizedBox(height: 20), // Espacio entre el texto y la imagen
+        SizedBox(
+            height: 20), // Espacio entre la primera imagen y las siguientes
+        // Aquí puedes agregar las siguientes imágenes con texto
+        _imageWithText('assets/sobrepremium.png', 'Texto de la imagen 1'),
+        SizedBox(height: 20), // Espacio entre las dos imágenes
+        _imageWithText('assets/sobrepremium.png', 'Texto de la imagen 2'),
+      ],
+    );
+  }
+
+  Widget _imageWithText(String imagePath, String text) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
         Image.asset(
-          'assets/bandera.png', // Ruta de la imagen en tus assets
-          width: 200, // Ancho deseado de la imagen
-          height: 200, // Alto deseado de la imagen
-          fit: BoxFit.contain, // Ajuste de la imagen dentro del contenedor
+          imagePath,
+          width: 362, // Ancho deseado de la imagen
+          fit: BoxFit.contain,
         ),
-        // Aquí puedes agregar más widgets que quieres mostrar cuando se selecciona "POKESTORE"
+        Positioned(
+          // Centra el texto dentro del Stack
+          child: Text(
+            text,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontFamily: 'sarpanch',
+            ),
+          ),
+          // Ubica el texto en el centro del Stack
+          top: 11,
+          left: 80,
+        ),
       ],
     );
   }
