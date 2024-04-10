@@ -108,47 +108,44 @@ class _PacksState extends State<Packs> {
   Widget _pokestoreContent() {
     return Column(
       children: [
-        SizedBox(height: 1), // Espacio entre el texto y la imagen
-        Stack(
-          alignment: Alignment.center,
+        SizedBox(
+            height: 1), // Espacio entre el texto y la primera fila de imágenes
+        _banderaImage('SOBRES PREMIUM'),
+        SizedBox(
+          height: 20,
+        ), // Espacio entre la primera fila de imágenes y la segunda fila
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              'assets/bandera.png', // Ruta de la imagen en tus assets
-              width: 362, // Ancho deseado de la imagen
-              fit: BoxFit.contain, // Ajuste de la imagen dentro del contenedor
-            ),
-            Positioned(
-              // Centra el texto dentro del Stack
-              child: Text(
-                'SOBRES PREMIUM',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontFamily: 'sarpanch',
-                ),
-              ),
-              // Ubica el texto en el centro del Stack
-              top: 11,
-              left: 80,
-            ),
+            _imageWithText('assets/sobrepremium.png', '500'),
+            SizedBox(width: 20), // Espacio entre las imágenes
+            _imageWithText('assets/sobrepremium.png', '1000'),
           ],
         ),
         SizedBox(
-            height: 20), // Espacio entre la primera imagen y las siguientes
-        // Aquí puedes agregar las siguientes imágenes con texto
-        _imageWithText('assets/sobrepremium.png', 'Texto de la imagen 1'),
-        SizedBox(height: 20), // Espacio entre las dos imágenes
-        _imageWithText('assets/sobrepremium.png', 'Texto de la imagen 2'),
+            height: 10), // Espacio entre el texto y la primera fila de imágenes
+        _banderaImage('SOBRES PREMIUM'),
+        SizedBox(
+          height: 20,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            _imageWithText('assets/sobre.png', '500'),
+            SizedBox(width: 20), // Espacio entre las imágenes
+            _imageWithText('assets/sobre.png', '1000'),
+          ],
+        ),
       ],
     );
   }
 
-  Widget _imageWithText(String imagePath, String text) {
+  Widget _banderaImage(String text) {
     return Stack(
       alignment: Alignment.center,
       children: [
         Image.asset(
-          imagePath,
+          'assets/bandera.png',
           width: 362, // Ancho deseado de la imagen
           fit: BoxFit.contain,
         ),
@@ -165,6 +162,33 @@ class _PacksState extends State<Packs> {
           // Ubica el texto en el centro del Stack
           top: 11,
           left: 80,
+        ),
+      ],
+    );
+  }
+
+  Widget _imageWithText(String imagePath, String text) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Image.asset(
+          imagePath,
+          width: 170, // Ancho deseado de la imagen
+          fit: BoxFit.contain,
+        ),
+        Positioned(
+          // Centra el texto dentro del Stack
+          child: Text(
+            text,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontFamily: 'sarpanch',
+            ),
+          ),
+          // Ubica el texto en el centro del Stack
+          top: 110,
+          left: 63,
         ),
       ],
     );
