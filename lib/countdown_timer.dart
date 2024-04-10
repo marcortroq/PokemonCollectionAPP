@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 class CountdownTimer extends StatefulWidget {
+  
   @override
   _CountdownTimerState createState() => _CountdownTimerState();
 }
@@ -44,24 +45,20 @@ class _CountdownTimerState extends State<CountdownTimer> {
   @override
   Widget build(BuildContext context) {
     Duration duration = Duration(seconds: _secondsRemaining);
-    return Align(
-      alignment: Alignment.center,
+    return Positioned(
+      top: 5,
+      right: -2, 
       child: Container(
-        padding: EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.5),
-          borderRadius: BorderRadius.circular(4),
-        ),
+        width: 100,
         child: Text(
           _formatDuration(duration),
           style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.bold,
+            fontSize: 20,            
             color: Colors.white,
             fontFamily: 'Sarpanch'
           ),
         ),
       ),
     );
-  }
+      }
 }

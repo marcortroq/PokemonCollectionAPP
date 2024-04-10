@@ -192,11 +192,25 @@ class Menu extends StatelessWidget {
           Positioned(
             left: (MediaQuery.of(context).size.width - 240) / 2,
             top: (MediaQuery.of(context).size.height - 320) / 2,
-            child: Image.asset(
-              'assets/hexMedallas.png',
-              width: 240,
-              height: 240,
-              fit: BoxFit.contain,
+            child: Stack(
+              children: [
+                Image.asset(
+                  'assets/hexMedallas.png',
+                  width: 240,
+                  height: 240,
+                  fit: BoxFit.contain,
+                ),
+                Positioned(
+                  left: 50, // Cambia esto según donde quieras colocar la medalla dentro de hexMedallas.png
+                  top: 50, // Cambia esto según donde quieras colocar la medalla dentro de hexMedallas.png
+                  child: Image.asset(
+                    'assets/MedallaRoca.png',
+                    width: 100, // Ajusta el tamaño de la medalla según tus necesidades
+                    height: 100,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ],
             ),
           ),
            Positioned(
