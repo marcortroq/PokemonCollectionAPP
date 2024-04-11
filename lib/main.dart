@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/services.dart';
 import 'package:pokemonapp/register.dart';
 import 'package:pokemonapp/usuario.dart';
 import 'menu.dart';
@@ -8,12 +9,19 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Configura el estilo de la barra de navegación
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    systemNavigationBarColor: Colors.black, // Color de fondo de la barra de navegación
+    systemNavigationBarIconBrightness: Brightness.light, // Color de los íconos de la barra de navegación
+  ));
   runApp(const MyApp());
 }
-
-class MyApp extends StatelessWidget {
+ 
+ class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
-
+ 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -41,6 +49,44 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   bool _isKeyboardVisible = false;
   bool _isObscure = true;
+  late DateTime currentBackPressTime;
+
+ Future<bool> _onBackPressed() {
+  // Si el teclado está visible, ocultarlo y no mostrar el cuadro de diálogo
+  if (_isKeyboardVisible) {    
+    _setKeyboardVisibility(false);
+    return Future.value(false);
+  }  
+  // Si el teclado no está visible, mostrar el cuadro de diálogo de confirmación
+  return showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('¿Desea salir de la aplicación?'),
+      content: Text('Presione "Salir" para salir de la aplicación'),
+      actions: <Widget>[
+        ElevatedButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text('Cancelar'),
+        ),
+        ElevatedButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          child: Text('Salir'),
+        ),
+      ],
+    ),
+  ).then((value) => value ?? false);
+}
+
+
+
+  void _setKeyboardVisibility(bool isVisible) {
+    setState(() {
+      _isKeyboardVisible = isVisible;
+    });
+  }
+
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -49,43 +95,48 @@ class _MyHomePageState extends State<MyHomePage> {
     final double screenHeight = screenSize.height;
 
     return GestureDetector(
-      onTap: () {
-        // Ocultar el teclado cuando se toca en cualquier lugar que no sea un campo de texto
-        FocusScope.of(context).requestFocus(FocusNode());
-        setState(() {
-          _isKeyboardVisible = false;
-        });
-      },
-      child: Scaffold(
-        body: Stack(
-          children: [
-            _buildBackground(screenWidth, screenHeight),
-            _buildImage('assets/Charizard.png', 400, screenWidth),
-            CustomPaint(
-              size: Size.infinite,
-              painter: RectanguloPainter(isKeyboardVisible: _isKeyboardVisible),
-            ),
-            CustomPaint(
-              size: Size.infinite,
-              painter: TrianglePainter(isKeyboardVisible: _isKeyboardVisible),
-            ),
-            _buildLoginForm(screenWidth),
-            AnimatedSwitcher(
-              duration: Duration(milliseconds: 300),
-              switchInCurve: Curves.easeInOut,
-              switchOutCurve: Curves.easeInOut,
-              child: _isKeyboardVisible
-                  ? SizedBox.shrink()
-                  : Center(
-                      key: Key('center_key'),
-                      child: _buildTitulo('assets/title.png', screenWidth),
-                    ),
-            ),
-          ],
+    onTap: () {
+      // Ocultar el teclado cuando se toca en cualquier lugar que no sea un campo de texto
+      FocusScope.of(context).requestFocus(FocusNode());
+      _setKeyboardVisibility(false);
+    },
+    child: Scaffold(
+      body: WillPopScope(
+        onWillPop: _onBackPressed,
+        child: Center(
+          child: Stack(
+            children: [
+              _buildBackground(screenWidth, screenHeight),
+              _buildImage('assets/Charizard.png', 400, screenWidth),
+              CustomPaint(
+                size: Size.infinite,
+                painter: RectanguloPainter(isKeyboardVisible: _isKeyboardVisible),
+              ),
+              CustomPaint(
+                size: Size.infinite,
+                painter: TrianglePainter(isKeyboardVisible: _isKeyboardVisible),
+              ),
+              _buildLoginForm(screenWidth),
+              AnimatedSwitcher(
+                duration: Duration(milliseconds: 300),
+                switchInCurve: Curves.easeInOut,
+                switchOutCurve: Curves.easeInOut,
+                child: _isKeyboardVisible
+                    ? SizedBox.shrink()
+                    : Center(
+                        key: Key('center_key'),
+                        child: _buildTitulo('assets/title.png', screenWidth),
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
+  
 
   Widget _buildBackground(double screenWidth, double screenHeight) {
     return Container(
@@ -153,9 +204,7 @@ class _MyHomePageState extends State<MyHomePage> {
       child: TextField(
         controller: controller,
         onTap: () {
-          setState(() {
-            _isKeyboardVisible = true;
-          });
+          _setKeyboardVisibility(true);
         },
         decoration: InputDecoration(
           border: OutlineInputBorder(
@@ -178,9 +227,7 @@ class _MyHomePageState extends State<MyHomePage> {
         controller: controller,
         obscureText: obscureText,
         onTap: () {
-          setState(() {
-            _isKeyboardVisible = true;
-          });
+          _setKeyboardVisibility(true);
         },
         decoration: InputDecoration(
           border: OutlineInputBorder(
@@ -303,12 +350,12 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {
       // Crear el cuerpo de la solicitud en formato JSON
       Map<String, String> requestBody = {
-        'usuario': username,
+        'nombre_usuario': username,
         'contrasena': password,
       };
 
       // Realizar la solicitud HTTP al servidor
-      Uri url = Uri.parse('http://51.141.92.127:5000/login');
+      Uri url = Uri.parse('http://20.162.90.233:5000/login');
       final response = await http.post(
         url,
         headers: <String, String>{
@@ -324,11 +371,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
         // Crear una instancia de Usuario con los datos recibidos del JSON
         Usuario usuario = Usuario(
-          idUsuario: userData['ID_USUARIO'],
-          nombreUsuario: userData['NOMBRE_USUARIO'],
-          mail: userData['MAIL'],
-          contrasena: userData['CONTRASEÑA'],
-          admin: userData['ADMIN'],
+          idUsuario: userData['id_usuario'],
+          nombreUsuario: userData['nombre_usuario'],
+          mail: userData['mail'],
+          contrasena: userData['contraseña'],
+          admin: userData['admin'],
+          sobres: userData['sobres']
         );
 
         // Aquí puedes realizar acciones adicionales, como guardar el usuario en el almacenamiento local, etc.
@@ -442,3 +490,4 @@ class RectanguloPainter extends CustomPainter {
     return true;
   }
 }
+ 
