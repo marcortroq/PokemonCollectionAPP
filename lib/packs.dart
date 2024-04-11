@@ -1,6 +1,10 @@
+import 'dart:js_interop_unsafe';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:pokemonapp/usuario.dart';
 import 'open_pack.dart';
+import 'usuario.dart';
 
 class Packs extends StatefulWidget {
   @override
@@ -10,7 +14,8 @@ class Packs extends StatefulWidget {
 class _PacksState extends State<Packs> {
   PageController _pageController = PageController(initialPage: 0);
   int _currentPageIndex = 0;
-  int mypacks = 7;
+
+  Usuario user = Usuario(idUsuario: 1, nombreUsuario: 'marcortroq', mail: 'marcortroq', contrasena: 'contrasena', admin: "NO", sobres: 10)
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +49,7 @@ class _PacksState extends State<Packs> {
               },
               children: [
                 _pokestoreContent(),
-                _myPacksContent(),
+                _myPacksContent(user),
               ],
             ),
           ),
@@ -233,7 +238,8 @@ class _PacksState extends State<Packs> {
     );
   }
 
-  Widget _myPacksContent() {
+  Widget _myPacksContent(Usuario usuario) {
+    int mypacks = usuario.sobres;
     List<Widget> images = _generateImagesList(
         mypacks); // Inicialmente mostramos todas las imágenes
 
