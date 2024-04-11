@@ -201,15 +201,165 @@ class Menu extends StatelessWidget {
                   fit: BoxFit.contain,
                 ),
                 Positioned(
-                  left: 50, // Cambia esto según donde quieras colocar la medalla dentro de hexMedallas.png
-                  top: 50, // Cambia esto según donde quieras colocar la medalla dentro de hexMedallas.png
+                  left: 72, 
+                  top: 45, 
                   child: Image.asset(
                     'assets/MedallaRoca.png',
-                    width: 100, // Ajusta el tamaño de la medalla según tus necesidades
-                    height: 100,
+                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
+                    height: 35,
                     fit: BoxFit.contain,
                   ),
                 ),
+                Positioned(
+                  left: 72, 
+                  top: 45, 
+                  child: Image.asset(
+                    'assets/medallaRocaOut.png',
+                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
+                    height: 35,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                Positioned(
+                  left: 72, 
+                  top: 165, 
+                  child: Image.asset(
+                    'assets/MedallaVolcan.png',
+                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
+                    height: 35,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                Positioned(
+                  left: 72, 
+                  top: 165, 
+                  child: Image.asset(
+                    'assets/medallaVolcanOut.png',
+                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
+                    height: 35,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                Positioned(
+                  left: 100, 
+                  top: 80,
+                  child: Image.asset(
+                    'assets/MedallaAlma.png',
+                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
+                    height: 35,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                Positioned(
+                  left: 100, 
+                  top: 80,
+                  child: Image.asset(
+                    'assets/medallaAlmaout.png',
+                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
+                    height: 35,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                Positioned(
+                  left: 160, 
+                  top: 105, 
+                  child: Image.asset(
+                    'assets/MedallaPantano.png',
+                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
+                    height: 35,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                Positioned(
+                  left: 160, 
+                  top: 105, 
+                  child: Image.asset(
+                    'assets/medallaPantanoOut.png',
+                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
+                    height: 35,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                Positioned(
+                  left: 130,
+                  top: 45,
+                  child: Image.asset(
+                    'assets/MedallaCascada.png',
+                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
+                    height: 35,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                Positioned(
+                  left: 130,
+                  top: 45,
+                  child: Image.asset(
+                    'assets/medallaCascadaOut.png',
+                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
+                    height: 35,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                Positioned(
+                  left: 100, 
+                  top: 130, 
+                  child: Image.asset(
+                    'assets/MedallaArcoiris.png',
+                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
+                    height: 35,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                Positioned(
+                  left: 100, 
+                  top: 130, 
+                  child: Image.asset(
+                    'assets/medallaArcoirisout.png',
+                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
+                    height: 35,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                Positioned(
+                  left: 45, 
+                  top: 105, 
+                  child: Image.asset(
+                    'assets/MedallaTrueno.png',
+                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
+                    height: 35,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                Positioned(
+                  left: 45, 
+                  top: 105, 
+                  child: Image.asset(
+                    'assets/medallaTruenoOut.png',
+                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
+                    height: 35,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                Positioned(
+                  left: 130, 
+                  top: 165, 
+                  child: Image.asset(
+                    'assets/MedallaTierra.png',
+                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
+                    height: 35,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                Positioned(
+                  left: 130, 
+                  top: 165, 
+                  child: Image.asset(
+                    'assets/medallaTierraOut.png',
+                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
+                    height: 35,
+                    fit: BoxFit.contain,
+                  ),
+                )
               ],
             ),
           ),
