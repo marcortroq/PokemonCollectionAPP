@@ -59,15 +59,11 @@ class _MyHomePageState extends State<MyHomePage> {
               size: Size.infinite,
               painter: RectanguloPainter(isKeyboardVisible: _isKeyboardVisible),
             ),
-            
             CustomPaint(
               size: Size.infinite,
               painter: TrianglePainter(isKeyboardVisible: _isKeyboardVisible),
             ),
             _buildLoginForm(),
-            
-
-
           ],
         ),
       ),
@@ -86,51 +82,35 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-Widget _buildAnimatedTitulo(String imagePath, bool isKeyboardVisible) {
-  return AnimatedOpacity(
-    duration: Duration(milliseconds: 300),
-    opacity: isKeyboardVisible ? 0.0 : 1.0,
-    child: Positioned(
-      left: 0,
-      top: 300,
-      right: 0,
-      child: Image.asset(
-        imagePath,
-        fit: BoxFit.contain,
-      ),
-    ),
-  );
-}
-
-
-Widget _buildTitulo(String imagePath) {
-    return Positioned(
-      left: 0,
-      top: 300,
-      right: 0,
-      child: Image.asset(
-        imagePath,
-        fit: BoxFit.contain,
+  Widget _buildAnimatedTitulo(String imagePath, bool isKeyboardVisible, double screenWidth) {
+    return AnimatedOpacity(
+      duration: Duration(milliseconds: 300),
+      opacity: isKeyboardVisible ? 0.0 : 1.0,
+      child: Container(
+        width: screenWidth, // Usa el ancho completo de la pantalla
+        child: Image.asset(
+          imagePath,
+          fit: BoxFit.contain,
+        ),
       ),
     );
   }
+
   Widget _buildLoginForm() {
     return Positioned(
       left: 0,
-      bottom: 20,
+      bottom: MediaQuery.of(context).viewInsets.bottom + 20,
       child: Column(
         children: [
-          _buildAnimatedTitulo('assets/title.png', _isKeyboardVisible),
+          _buildAnimatedTitulo('assets/title.png', _isKeyboardVisible, MediaQuery.of(context).size.width),
           SizedBox(height: 20),
           _buildTextField('Email Address', _emailController),
           SizedBox(height: 10),
           _buildTextField('Username', _usernameController),
           SizedBox(height: 10),
-          _buildTextFieldContrasena('Password', _passwordController,
-              obscureText: _isObscure),
+          _buildTextFieldContrasena('Password', _passwordController, obscureText: _isObscure),
           SizedBox(height: 10),
-          _buildTextFieldContrasena('Password', _RpasswordController,
-              obscureText: _isObscure),
+          _buildTextFieldContrasena('Password', _RpasswordController, obscureText: _isObscure),
           SizedBox(height: 20),
           _buildSignInButton(),
           SizedBox(height: 7),
@@ -142,7 +122,7 @@ Widget _buildTitulo(String imagePath) {
 
   Widget _buildTextField(String labelText, TextEditingController controller) {
     return SizedBox(
-      width: 305,
+      width: MediaQuery.of(context).size.width * 0.85,
       height: 52,
       child: TextField(
         controller: controller,
@@ -163,11 +143,10 @@ Widget _buildTitulo(String imagePath) {
     );
   }
 
-  Widget _buildTextFieldContrasena(
-      String labelText, TextEditingController controller,
+  Widget _buildTextFieldContrasena(String labelText, TextEditingController controller,
       {bool obscureText = false}) {
     return SizedBox(
-      width: 305,
+      width: MediaQuery.of(context).size.width * 0.85,
       height: 52,
       child: TextField(
         controller: controller,
@@ -243,7 +222,7 @@ Widget _buildTitulo(String imagePath) {
 
   Widget _buildSignInButton() {
     return SizedBox(
-      width: 305,
+      width: MediaQuery.of(context).size.width * 0.85,
       height: 52,
       child: ElevatedButton(
         onPressed: _checkUserExistenceAndRegister,
@@ -287,52 +266,83 @@ Widget _buildTitulo(String imagePath) {
 
   void _checkUserExistenceAndRegister() async {
     String nombreUsuario = _usernameController.text;
-
-    try {
-      var response = await http.get(
-        Uri.parse('http://51.141.92.127:5000/usuario/$nombreUsuario'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('El usuario ya existe.'),
-            duration: Duration(seconds: 2),
-          ),
-        );
-      } else {
-        _registerUser();
-      }
-    } catch (e) {
-      print('Error: $e');
+    String contrasena = _passwordController.text;
+    if (_emailController.text.isEmpty ||
+        _usernameController.text.isEmpty ||
+        _passwordController.text.isEmpty ||
+        _RpasswordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error al verificar la existencia del usuario.'),
+          content: Text('Por favor, complete todos los campos.'),
           duration: Duration(seconds: 2),
         ),
       );
+      return;
+    }
+    else if (contrasena.length <= 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('La contraseña debe tener más de 6 caracteres.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+    else if(_passwordController.text != _RpasswordController.text){
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Las contraseñas no coinciden.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+    else{
+      try {
+        var response = await http.get(
+          Uri.parse('http://20.162.90.233:5000/api/usuario/nombre/$nombreUsuario'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+        );
+
+        if (response.statusCode == 200) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('El usuario ya existe.'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        } else {
+          _registerUser();
+        }
+      } catch (e) {
+        print('Error: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al verificar la existencia del usuario.'),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
     }
   }
 
   void _registerUser() async {
     try {
       var response = await http.post(
-        Uri.parse('http://51.141.92.127:5000/usuario'),
+        Uri.parse('http://20.162.90.233:5000/api/usuario'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: jsonEncode(<String, String>{
           'nombre_usuario': _usernameController.text,
           'mail': _emailController.text,
-          'contrasena': _passwordController.text,
+          'contraseña': _passwordController.text,
           // Puedes incluir otros campos si es necesario, como 'admin'
         }),
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const Menu()),
@@ -358,7 +368,6 @@ Widget _buildTitulo(String imagePath) {
     }
   }
 }
-
 class TrianglePainter extends CustomPainter {
   final bool isKeyboardVisible;
 

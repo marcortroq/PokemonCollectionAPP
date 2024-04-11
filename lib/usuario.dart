@@ -3,7 +3,8 @@ class Usuario {
   final String nombreUsuario;
   final String mail;
   final String contrasena;
-  final bool admin;
+  final int admin;
+  final int sobres;
 
   Usuario({
     required this.idUsuario,
@@ -11,15 +12,17 @@ class Usuario {
     required this.mail,
     required this.contrasena,
     required this.admin,
+    required this.sobres,
   });
 
   factory Usuario.fromJson(Map<String, dynamic> json) {
     return Usuario(
       idUsuario: json['ID_USUARIO'],
       nombreUsuario: json['NOMBRE_USUARIO'],
-      mail: json['MAIL'],
       contrasena: json['CONTRASEÑA'],
+      mail: json['MAIL'],      
       admin: json['ADMIN'],
+      sobres: json['SOBRES']
     );
   }
 }
