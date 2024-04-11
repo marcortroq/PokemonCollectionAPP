@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:pokemonapp/incubadora.dart';
+import 'package:pokemonapp/main_ocr.dart';
 import 'dart:math' as math;
 import 'main.dart';
 import 'packs.dart';
@@ -146,17 +148,17 @@ class Menu extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(top: 90),
                           child:
-                              _buildButton('PACKS', 'assets/pack.png', context),
+                            _buildButton("PACKS", "assets/pack.png", Packs(), context)
                         ),
                         Padding(
                           padding: const EdgeInsets.only(bottom: 70),
-                          child: _buildButton(
-                              'COLLECT', 'assets/incubadora.png', context),
+                          child: 
+                             _buildButton("COLLECT", "assets/incubadora.png", Incubadora(), context) //INCUBADORA
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 90),
-                          child: _buildButton(
-                              'POKEDEX', 'assets/pokeball.png', context),
+                          child: 
+                            _buildButton("POKEDEX", "assets/pokeball.png", Packs(), context) //POKEDEX
                         ),
                       ],
                     ),
@@ -169,7 +171,7 @@ class Menu extends StatelessWidget {
                           // Navegar a la otra pestaña al hacer clic en la imagen
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => MyApp()),
+                            MaterialPageRoute(builder: (context) => MainScreen()),
                           );
                         },
                         child: Image.asset(
@@ -197,83 +199,86 @@ class Menu extends StatelessWidget {
     );
   }
 
-  Widget _buildButton(String text, String imagePath, BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          width: 110,
-          height: 148,
-          decoration: BoxDecoration(
+  // Esta función genérica acepta cualquier tipo de pantalla como parámetro y navega a ella.
+void navigateToScreen<T>(BuildContext context, Widget screen) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => screen),
+  );
+}
+
+  Widget _buildButton(String text, String imagePath, Widget screen, BuildContext context) {
+  return Stack(
+    children: [
+      Container(
+        width: 110,
+        height: 148,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+            topRight: Radius.circular(25),
+            bottomLeft: Radius.circular(25),
+          ),
+          gradient: LinearGradient(
+            colors: [
+              Color.fromRGBO(207, 72, 72, 1),
+              Color.fromRGBO(224, 17, 17, 1),
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Positioned(
+              top: 113,
+              left: 10,
+              right: 10,
+              height: 1,
+              child: Container(
+                width: double.infinity,
+                color: Colors.white,
+              ),
+            ),
+            Positioned(
+              bottom: 4,
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 35,
+              child: Image.asset(
+                imagePath,
+                width: 67,
+                height: 90,
+              ),
+            ),
+          ],
+        ),
+      ),
+      Positioned.fill(
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
             borderRadius: BorderRadius.only(
               topRight: Radius.circular(25),
               bottomLeft: Radius.circular(25),
             ),
-            gradient: LinearGradient(
-              colors: [
-                Color.fromRGBO(207, 72, 72, 1),
-                Color.fromRGBO(224, 17, 17, 1),
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Positioned(
-                top: 113,
-                left: 10,
-                right: 10,
-                height: 1,
-                child: Container(
-                  width: double.infinity,
-                  color: Colors.white,
-                ),
-              ),
-              Positioned(
-                bottom: 4,
-                child: Text(
-                  text,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 35,
-                child: Image.asset(
-                  imagePath,
-                  width: 67,
-                  height: 90,
-                ),
-              ),
-            ],
+            onTap: () {
+              // Aquí llamamos a la función navigateToScreen con la pantalla proporcionada.
+              navigateToScreen(context, screen);
+            },
           ),
         ),
-        Positioned.fill(
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.only(
-                topRight: Radius.circular(25),
-                bottomLeft: Radius.circular(25),
-              ),
-              onTap: () {
-                // Aquí es donde se navega a la pantalla packs al presionar el botón
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          Packs()), // Reemplaza 'packs()' con la clase correcta de la pantalla packs
-                );
-              },
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
+}
 }
 
 void main() {
