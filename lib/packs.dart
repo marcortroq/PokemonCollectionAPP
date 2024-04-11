@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'open_pack.dart';
 
 class Packs extends StatefulWidget {
   @override
@@ -9,6 +10,7 @@ class Packs extends StatefulWidget {
 class _PacksState extends State<Packs> {
   PageController _pageController = PageController(initialPage: 0);
   int _currentPageIndex = 0;
+  int mypacks = 7;
 
   @override
   Widget build(BuildContext context) {
@@ -232,19 +234,53 @@ class _PacksState extends State<Packs> {
   }
 
   Widget _myPacksContent() {
-    return Column(
-      children: [
-        Text(
-          'Contenido de MY PACKS',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontFamily: 'sarpanch',
+    List<Widget> images = _generateImagesList(
+        mypacks); // Inicialmente mostramos todas las imágenes
+
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(height: 40),
+          // Centrar la bandera
+          Center(child: _banderaImage("MIS SOBRES", 11, 80)),
+          // Mostrar las imágenes en dos columnas
+          Padding(
+            padding: EdgeInsets.only(top: 0.0), // Eliminar el espacio superior
+            child: GridView.count(
+              crossAxisCount: 2, // Dos columnas
+              crossAxisSpacing: 10.0, // Espacio entre columnas
+              shrinkWrap: true,
+              physics:
+                  NeverScrollableScrollPhysics(), // Deshabilitar el scroll del GridView
+              children: images.map((image) {
+                return GestureDetector(
+                  onTap: () {
+                    mypacks -= 1;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => OpenPack()),
+                    );
+                  },
+                  child: image,
+                );
+              }).toList(),
+            ),
           ),
-        ),
-        // Puedes agregar más widgets aquí si lo deseas
-      ],
+        ],
+      ),
     );
+  }
+
+  List<Widget> _generateImagesList(int number) {
+    List<Widget> images = [];
+    // Aquí agregamos todas las imágenes que queremos mostrar inicialmente
+    for (int i = 0; i < number; i++) {
+      images.add(
+        Image.asset("assets/mypacks.png"),
+      );
+    }
+    return images;
   }
 }
 
