@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:math';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pokemonapp/menu.dart';
@@ -22,9 +25,11 @@ class _StateIncubadora extends State<Incubadora> {
   bool showImages = false;
   int clickedImages = 0;
   int totalImages = 4; // Cambia esto al número total de imágenes que tienes
+List<String?> cardImages = [null, null, null, null];
 
   List<bool> imageStates = [false, false, false, false];
   List<bool> imageTapped = [false, false, false, false]; // Lista para rastrear si una imagen ha sido tocada
+  List<String> lastShownImages = ['', '', '', '']; // Lista para almacenar la última imagen mostrada
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +53,7 @@ class _StateIncubadora extends State<Incubadora> {
           children: [
             _buildBackground(),
             if (!showImages) _buildIncubadora('assets/incubadora1.png', 275, screenWidth),
-            if (showImages)_buildIncubadora2('assets/incubadora1.png', 275, screenWidth,0.5),            
+            if (showImages)_buildIncubadora2('assets/incubadora1.png', 275, screenWidth,0.5),
             if (showImages)
               _buildItem('assets/PortadaColor.png', 175, screenWidth, 0.45, 0.5, 'Mensaje 1', 0),
             if (showImages)
@@ -88,21 +93,20 @@ class _StateIncubadora extends State<Incubadora> {
   }
 
   Widget _buildIncubadora2(String imagePath, double size, double screenWidth, double opacity) {
-  return Positioned(
-    top: screenWidth * 0.7,
-    left: (screenWidth * 1 - size) / 2,
-    child: Opacity(
-      opacity: opacity,
-      child: Image.asset(
-        imagePath,
-        width: size,
-        height: size,
-        fit: BoxFit.contain,
+    return Positioned(
+      top: screenWidth * 0.7,
+      left: (screenWidth * 1 - size) / 2,
+      child: Opacity(
+        opacity: opacity,
+        child: Image.asset(
+          imagePath,
+          width: size,
+          height: size,
+          fit: BoxFit.contain,
+        ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Widget _buildItem(String imagePath, double size, double screenWidth, double top, double left, String message, int index) {
     return Positioned(
@@ -112,8 +116,9 @@ class _StateIncubadora extends State<Incubadora> {
         onTap: () {
           if (!imageTapped[index]) {
             setState(() {
-               _showCenteredImage(context, imagePath, index);
-              // Cambia el estado de la imagen en la posición 'index' para mostrar una nueva imagen
+              _showCenteredImage(context, imagePath, index);
+              // Guarda la imagen que se va a mostrar en lastShownImages
+              lastShownImages[index] = imagePath;
               imageStates[index] = !imageStates[index];
               imageTapped[index] = true; // Marca la imagen como tocada
             });
@@ -140,24 +145,60 @@ class _StateIncubadora extends State<Incubadora> {
   showDialog(
     context: context,
     builder: (BuildContext context) {
-      return Center(
-        child: GestureDetector(
-          onTap: () {
-            Navigator.of(context).pop();
-          },
-          child: SizedBox(
-            width: 250,
-            height: 500,
-            child: Image.asset(
-              imageStates[index] ? 'assets/SobreAperturaEspecial.png' : imagePath, // Usa 'assets/pack.png' cuando se amplíe
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
+      return FutureBuilder(
+        future: fetchRandomCardImage(),
+        builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          } else {
+            final decodedImage = base64Decode(snapshot.data!);
+            cardImages[index] = snapshot.data; // Almacena la foto de la carta en la lista
+
+            return Center(
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+                child: SizedBox(
+                  width: 270,
+                  height: 400,
+                  child: Image.memory(
+                    decodedImage,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            );
+          }
+        },
       );
     },
   );
 }
 
-  }
 
+  Future<String?> fetchRandomCardImage() async {
+    final random = Random();
+    final pokemonId = random.nextInt(151) + 1;
+    final response = await http.get(Uri.parse('http://20.162.113.208:5000/api/cartas/$pokemonId'));
+
+    if (response.statusCode == 200) {
+      final jsonData = json.decode(response.body);
+      final fotoCarta = jsonData['foto_carta'];
+
+      if (fotoCarta != null) {
+        return fotoCarta;
+      } else {
+        throw Exception('La imagen de la carta no está disponible');
+      }
+    } else {
+      throw Exception('Fallo al cargar la imagen de la carta: ${response.statusCode}');
+    }
+  }
+}
