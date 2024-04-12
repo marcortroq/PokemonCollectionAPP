@@ -26,11 +26,11 @@ class RPSCustomPainter extends CustomPainter {
       ..strokeJoin = StrokeJoin.miter;
 
     final path = Path()
-      ..moveTo(0 * 0.3762500, 0 * 0.3020000)
-      ..lineTo(550 * 0.7487500, 0 * 0.3020000)
-      ..lineTo(550 * 0.7487500, 450 * 0.7040000)
-      ..lineTo(370 * 0.5637500, 450 * 0.9040000)
-      ..lineTo(0 * 0.3762500, 450 * 0.7020000);
+      ..moveTo(0 * 0.3762500, 0 * 0.4020000)
+      ..lineTo(650 * 0.7487500, 0 * 0.3020000)
+      ..lineTo(650 * 0.7487500, 550 * 0.7040000)
+      ..lineTo(470 * 0.5637500, 550 * 0.9040000)
+      ..lineTo(0 * 0.3762500, 550 * 0.7020000);
 
     canvas.drawPath(path, paintFill);
 
@@ -84,6 +84,19 @@ class Menu extends StatelessWidget {
   const Menu({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+
+    // Calcula el tamaño de la imagen del fondo
+    double backgroundWidth = screenSize.width * 1.2;
+    double backgroundHeight = screenSize.height * 1.2;
+
+    // Calcula el tamaño y la posición de otros elementos
+    double imageWidth = screenSize.width * 0.25;
+    double imageHeight = screenSize.width * 0.25;
+    double buttonWidth = screenSize.width * 0.35;
+    double buttonHeight = screenSize.height * 0.1;
+    double iconSize = screenSize.width * 0.1;
+
     return Scaffold(
       body: Stack(
         children: [
@@ -93,64 +106,63 @@ class Menu extends StatelessWidget {
             ),
           ),
           Positioned(
-            left: -20,
-            top: 30,
+            left: -backgroundWidth * 0.1,
+            bottom: screenSize.height * 0.06,
             child: Image.asset(
               'assets/grow.png',
-              width: 500,
-              height: 500,
+              width: backgroundWidth,
+              height: backgroundHeight,
               fit: BoxFit.contain,
             ),
           ),
           Positioned(
-            left: 0,
-            top: 125,
+            right: screenSize.width * 0.0,
+            bottom: screenSize.height * 0.15,
             child: CustomPaint(
-              size: Size(MediaQuery.of(context).size.width,
-                  MediaQuery.of(context).size.width * 1.5),
+              size: Size(screenSize.width, screenSize.width * 1.5),
               painter: RPSCustomPainter2(),
             ),
           ),
           Positioned(
-            left: 290,
-            top: 233,
+            right: screenSize.width * 0.0,
+            bottom: screenSize.height * 0.47,
             child: Transform.rotate(
               angle: 65 * math.pi / 180,
               child: Container(
-                width: 30,
-                height: 270,
+                width: screenSize.width * 0.065,
+                height: screenSize.height * 0.316,
                 color: Color.fromRGBO(29, 30, 29, 1),
               ),
             ),
           ),
           Positioned(
-            left: 60,
-            top: 215,
+            left: screenSize.width * 0.0,
+            bottom: screenSize.height * 0.47,
             child: Transform.rotate(
               angle: -65 * math.pi / 180,
               child: Container(
-                width: 30,
-                height: 270,
+                width: screenSize.width * 0.065,
+                height: screenSize.height * 0.316,
                 color: Color.fromRGBO(29, 30, 29, 1),
               ),
             ),
           ),
           Positioned(
-            top: 0, 
-            left: (MediaQuery.of(context).size.width - 200) / 2, 
+            top: screenSize.height * 0.0, 
+            left: (screenSize.width - 200) / 2, 
             child: Image.asset(
               'assets/barramoneda.png', // Ruta de tu imagen
-              width: 200, 
-              height: 100, 
+              width: screenSize.width * 0.5, 
+              height: screenSize.height * 0.13, 
             ),
           ),
           Positioned(
-            top: 0, 
-            left: (MediaQuery.of(context).size.width - -80) / 2, 
+            top: screenSize.height * 0.0, 
+            left: (screenSize.width - -80) / 2, 
             child: Image.asset(
               'assets/barrapremium.png', // Ruta de tu imagen
-              width: 200, 
-              height: 100, 
+              width: screenSize.width * 0.5, 
+              height: screenSize.height * 0.13, 
             ),
           ),
           Column(
@@ -165,12 +177,12 @@ class Menu extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(top: 90),
+                          padding: EdgeInsets.only(top: screenSize.height * 0.05),
                           child:
                             _buildButton("PACKS", "assets/pack.png", Packs(), context, topLeftRadius: 0, bottomRightRadius: 0)
                         ),
                        Padding(
-                          padding: const EdgeInsets.only(bottom: 40),
+                          padding: EdgeInsets.only(bottom: screenSize.height * 0.09),
                           child: Stack(
                             children: [                              
                               _buildButton("COLLECT", "assets/incubadora.png", Incubadora(), context), // INCUBADORA
@@ -179,202 +191,202 @@ class Menu extends StatelessWidget {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(top: 90),
+                          padding: EdgeInsets.only(top: screenSize.height * 0.05),
                           child: 
                             _buildButton("POKEDEX", "assets/pokeball.png", Packs(), context, topRightRadius: 0, bottomLeftRadius: 0) //POKEDEX
                         ),
                       ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          top:
-                              0), // Espacio entre el botón "COLLECT" y la imagen
-                      child: GestureDetector(
-                        onTap: () {
-                          // Navegar a la otra pestaña al hacer clic en la imagen
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => MainScreen()),
-                          );
-                        },
-                        child: Image.asset(
-                          'assets/OCR.png', // Reemplaza 'ruta/de/la/imagen.png' con la ruta de tu imagen
-                        ),
-                      ),
-                    ),
+                   
                   ],
                 ),
               ),
             ],
           ),
           Positioned(
-            left: (MediaQuery.of(context).size.width - 240) / 2,
-            top: (MediaQuery.of(context).size.height - 320) / 2,
+                left: MediaQuery.of(context).size.width * 0.42, 
+                  top: MediaQuery.of(context).size.height * 0.9, 
+                child: GestureDetector(
+                  onTap: () {
+                    // Navegar a la otra pestaña al hacer clic en la imagen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => MainScreen()),
+                    );
+                  },
+                  child: Image.asset(
+                    'assets/OCR.png', // Reemplaza 'ruta/de/la/imagen.png' con la ruta de tu imagen
+                  ),
+                ),
+              ),
+          Positioned(
+            left: (MediaQuery.of(context).size.width * 0.4) / 2,
+            top: (MediaQuery.of(context).size.height * 0.28) / 2,
             child: Stack(
               children: [
                 Image.asset(
                   'assets/hexMedallas.png',
-                  width: 240,
-                  height: 240,
+                 width: MediaQuery.of(context).size.width * 0.6,
+                height: MediaQuery.of(context).size.height * 0.6,
                   fit: BoxFit.contain,
                 ),
                 Positioned(
-                  left: 72, 
-                  top: 45, 
+                  left: MediaQuery.of(context).size.width * 0.17, 
+                  top: MediaQuery.of(context).size.height * 0.21, 
                   child: Image.asset(
                     'assets/MedallaRoca.png',
-                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
-                    height: 35,
+                    width: MediaQuery.of(context).size.width * 0.09, 
+                    height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: 72, 
-                  top: 45, 
+                  left: MediaQuery.of(context).size.width * 0.17, 
+                  top: MediaQuery.of(context).size.height * 0.21, 
                   child: Image.asset(
                     'assets/medallaRocaOut.png',
-                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
-                    height: 35,
+                    width: MediaQuery.of(context).size.width * 0.09, 
+                    height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: 72, 
-                  top: 165, 
+                  left: MediaQuery.of(context).size.width * 0.17, 
+                  top: MediaQuery.of(context).size.height * 0.35,
                   child: Image.asset(
                     'assets/MedallaVolcan.png',
-                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
-                    height: 35,
+                    width: MediaQuery.of(context).size.width * 0.09, 
+                    height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: 72, 
-                  top: 165, 
+                  left: MediaQuery.of(context).size.width * 0.17, 
+                  top: MediaQuery.of(context).size.height * 0.35, 
                   child: Image.asset(
                     'assets/medallaVolcanOut.png',
-                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
-                    height: 35,
+                    width: MediaQuery.of(context).size.width * 0.09, 
+                    height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: 100, 
-                  top: 80,
+                  left: MediaQuery.of(context).size.width * 0.245, 
+                  top: MediaQuery.of(context).size.height * 0.25,
                   child: Image.asset(
                     'assets/MedallaAlma.png',
-                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
-                    height: 35,
+                    width: MediaQuery.of(context).size.width * 0.09, 
+                    height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: 100, 
-                  top: 80,
+                  left: MediaQuery.of(context).size.width * 0.245, 
+                  top: MediaQuery.of(context).size.height * 0.25,
                   child: Image.asset(
                     'assets/medallaAlmaout.png',
-                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
-                    height: 35,
+                    width: MediaQuery.of(context).size.width * 0.09, 
+                    height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: 160, 
-                  top: 105, 
+                  left: MediaQuery.of(context).size.width * 0.4, 
+                  top: MediaQuery.of(context).size.height * 0.285, 
                   child: Image.asset(
                     'assets/MedallaPantano.png',
-                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
-                    height: 35,
+                    width: MediaQuery.of(context).size.width * 0.09, 
+                    height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: 160, 
-                  top: 105, 
+                  left: MediaQuery.of(context).size.width * 0.4, 
+                  top: MediaQuery.of(context).size.height * 0.285, 
                   child: Image.asset(
                     'assets/medallaPantanoOut.png',
-                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
-                    height: 35,
+                    width: MediaQuery.of(context).size.width * 0.09, 
+                    height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: 130,
-                  top: 45,
+                  left: MediaQuery.of(context).size.width * 0.32, 
+                  top: MediaQuery.of(context).size.height * 0.21,
                   child: Image.asset(
                     'assets/MedallaCascada.png',
-                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
-                    height: 35,
+                    width: MediaQuery.of(context).size.width * 0.09, 
+                    height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: 130,
-                  top: 45,
+                  left: MediaQuery.of(context).size.width * 0.32, 
+                  top: MediaQuery.of(context).size.height * 0.21,
                   child: Image.asset(
                     'assets/medallaCascadaOut.png',
-                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
-                    height: 35,
+                    width: MediaQuery.of(context).size.width * 0.09, 
+                    height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: 100, 
-                  top: 130, 
+                  left: MediaQuery.of(context).size.width * 0.25,  
+                  top: MediaQuery.of(context).size.height * 0.315, 
                   child: Image.asset(
                     'assets/MedallaArcoiris.png',
-                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
-                    height: 35,
+                    width: MediaQuery.of(context).size.width * 0.09, 
+                    height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: 100, 
-                  top: 130, 
+                  left: MediaQuery.of(context).size.width * 0.25,  
+                  top: MediaQuery.of(context).size.height * 0.315,
                   child: Image.asset(
                     'assets/medallaArcoirisout.png',
-                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
-                    height: 35,
+                    width: MediaQuery.of(context).size.width * 0.09, 
+                    height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: 45, 
-                  top: 105, 
+                  left: MediaQuery.of(context).size.width * 0.1,  
+                  top: MediaQuery.of(context).size.height * 0.285, 
                   child: Image.asset(
                     'assets/MedallaTrueno.png',
-                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
-                    height: 35,
+                    width: MediaQuery.of(context).size.width * 0.09, 
+                    height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: 45, 
-                  top: 105, 
+                  left: MediaQuery.of(context).size.width * 0.1,  
+                  top: MediaQuery.of(context).size.height * 0.285,  
                   child: Image.asset(
                     'assets/medallaTruenoOut.png',
-                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
-                    height: 35,
+                    width: MediaQuery.of(context).size.width * 0.09, 
+                    height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: 130, 
-                  top: 165, 
+                  left: MediaQuery.of(context).size.width * 0.32,  
+                  top: MediaQuery.of(context).size.height * 0.35, 
                   child: Image.asset(
                     'assets/MedallaTierra.png',
-                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
-                    height: 35,
+                    width: MediaQuery.of(context).size.width * 0.09, 
+                    height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: 130, 
-                  top: 165, 
+                  left: MediaQuery.of(context).size.width * 0.32,  
+                  top: MediaQuery.of(context).size.height * 0.35, 
                   child: Image.asset(
                     'assets/medallaTierraOut.png',
-                    width: 35, // Ajusta el tamaño de la medalla según tus necesidades
-                    height: 35,
+                    width: MediaQuery.of(context).size.width * 0.09, 
+                    height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 )
@@ -382,15 +394,11 @@ class Menu extends StatelessWidget {
             ),
           ),
            Positioned(
-            left: 100, // Posición X del botón rectangular
-            top: 520, // Posición Y del botón rectangular
-            child: _buildRectangularButton(
-              "NUEVO BOTÓN", // Texto del botón
-              () {
-                // Acción al hacer clic en el botón
-                print("Botón rectangular presionado");
-              },
-            ),
+            left: screenSize.width * 0.23,
+            top: screenSize.height * 0.6,
+            child: _buildRectangularButton("NUEVO BOTÓN", () {
+              print("Botón rectangular presionado");
+            }),
           ),
         ],
       ),
@@ -497,9 +505,7 @@ Widget _buildRectangularButton(String text, VoidCallback onPressed) {
       width: 215,
       height: 60,
       child: ElevatedButton(
-        onPressed: () {
-          
-        },
+        onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(13.0),
@@ -522,9 +528,9 @@ Widget _buildRectangularButton(String text, VoidCallback onPressed) {
             ),
             borderRadius: BorderRadius.circular(13.0),
             border: Border.all(
-            color: Colors.black, 
-            width: 2, 
-          ),
+              color: Colors.black,
+              width: 2,
+            ),
           ),
           child: Container(
             alignment: Alignment.center,

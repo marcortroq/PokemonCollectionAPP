@@ -47,7 +47,7 @@ class _CountdownTimerState extends State<CountdownTimer> {
     Duration duration = Duration(seconds: _secondsRemaining);
     return Positioned(
       top: 5,
-      right: -2, 
+      right: -9, 
       child: Container(
         width: 100,
         child: Text(
