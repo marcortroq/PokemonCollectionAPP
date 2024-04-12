@@ -376,6 +376,7 @@ class _MyHomePageState extends State<MyHomePage> {
         mail: userData['mail'],
         admin: userData['admin'],
         sobres: userData['sobres'],
+        xp: userData['xp'],
       );
 
       // Obtener el UsuarioProvider del contexto
