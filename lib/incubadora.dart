@@ -125,7 +125,7 @@ class _StateIncubadora extends State<Incubadora> {
           angle: imageStates[index] ? 0 : 0, // Girar la imagen si está tocada
           child: Image.asset(
             // Utiliza el estado correspondiente para mostrar la imagen correcta
-            imageStates[index] ? 'assets/pack.png' : imagePath,
+            imageStates[index] ? 'assets/SobreAperturaEspecial.png' : imagePath,
             width: size,
             height: size,
             fit: BoxFit.contain,
@@ -149,7 +149,7 @@ class _StateIncubadora extends State<Incubadora> {
             width: 250,
             height: 500,
             child: Image.asset(
-              imageStates[index] ? 'assets/pack.png' : imagePath, // Usa 'assets/pack.png' cuando se amplíe
+              imageStates[index] ? 'assets/SobreAperturaEspecial.png' : imagePath, // Usa 'assets/pack.png' cuando se amplíe
               fit: BoxFit.cover,
             ),
           ),
