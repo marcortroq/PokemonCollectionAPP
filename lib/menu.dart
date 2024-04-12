@@ -138,13 +138,30 @@ class Menu extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Padding(
-                padding: const EdgeInsets.only(top: 569),
+                padding: const EdgeInsets.only(top: 300),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
+                        Padding(
+                      padding: const EdgeInsets.only(
+                          top:
+                              0), // Espacio entre el botón "COLLECT" y la imagen
+                      child: GestureDetector(
+                        onTap: () {
+                          // Navegar a la otra pestaña al hacer clic en la imagen
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => MainScreen()),
+                          );
+                        },
+                        child: Image.asset(
+                          'assets/OCR.png', // Reemplaza 'ruta/de/la/imagen.png' con la ruta de tu imagen
+                        ),
+                      ),
+                    ),
                         Padding(
                           padding: const EdgeInsets.only(top: 90),
                           child:
@@ -162,23 +179,7 @@ class Menu extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          top:
-                              0), // Espacio entre el botón "COLLECT" y la imagen
-                      child: GestureDetector(
-                        onTap: () {
-                          // Navegar a la otra pestaña al hacer clic en la imagen
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => MainScreen()),
-                          );
-                        },
-                        child: Image.asset(
-                          'assets/OCR.png', // Reemplaza 'ruta/de/la/imagen.png' con la ruta de tu imagen
-                        ),
-                      ),
-                    ),
+                    
                   ],
                 ),
               ),
