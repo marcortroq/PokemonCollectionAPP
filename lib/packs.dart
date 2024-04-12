@@ -13,14 +13,6 @@ class _PacksState extends State<Packs> {
   PageController _pageController = PageController(initialPage: 0);
   int _currentPageIndex = 0;
 
-  Usuario user = Usuario(
-      idUsuario: 1,
-      nombreUsuario: 'marcortroq',
-      mail: 'marcortroq',
-      contrasena: 'contrasena',
-      admin: 1,
-      sobres: 7);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +45,7 @@ class _PacksState extends State<Packs> {
               },
               children: [
                 _pokestoreContent(),
-                _myPacksContent(user),
+                _myPacksContent(),
               ],
             ),
           ),
@@ -242,8 +234,8 @@ class _PacksState extends State<Packs> {
     );
   }
 
-  Widget _myPacksContent(Usuario usuario) {
-    int mypacks = usuario.sobres;
+  Widget _myPacksContent() {
+    int mypacks = 8;
     List<Widget> images = _generateImagesList(
         mypacks); // Inicialmente mostramos todas las imágenes
 
@@ -266,7 +258,6 @@ class _PacksState extends State<Packs> {
               children: images.map((image) {
                 return GestureDetector(
                   onTap: () {
-                    usuario.sobres -= 1;
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => OpenPack()),

@@ -15,8 +15,10 @@ void main() {
 
   // Configura el estilo de la barra de navegación
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    systemNavigationBarColor: Colors.black, // Color de fondo de la barra de navegación
-    systemNavigationBarIconBrightness: Brightness.light, // Color de los íconos de la barra de navegación
+    systemNavigationBarColor:
+        Colors.black, // Color de fondo de la barra de navegación
+    systemNavigationBarIconBrightness:
+        Brightness.light, // Color de los íconos de la barra de navegación
   ));
   runApp(const MyApp());
 }
@@ -28,7 +30,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => UsuarioProvider()), // Provider para UsuarioProvider
+        ChangeNotifierProvider(
+            create: (_) => UsuarioProvider()), // Provider para UsuarioProvider
         // Puedes agregar más providers aquí si es necesario
       ],
       child: MaterialApp(
@@ -81,11 +84,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 _buildImage('assets/Charizard.png', 400, screenWidth),
                 CustomPaint(
                   size: Size.infinite,
-                  painter: RectanguloPainter(isKeyboardVisible: _isKeyboardVisible),
+                  painter:
+                      RectanguloPainter(isKeyboardVisible: _isKeyboardVisible),
                 ),
                 CustomPaint(
                   size: Size.infinite,
-                  painter: TrianglePainter(isKeyboardVisible: _isKeyboardVisible),
+                  painter:
+                      TrianglePainter(isKeyboardVisible: _isKeyboardVisible),
                 ),
                 _buildLoginForm(screenWidth),
                 AnimatedSwitcher(
@@ -128,9 +133,11 @@ class _MyHomePageState extends State<MyHomePage> {
       child: Column(
         children: [
           SizedBox(height: screenWidth * 0.08),
-          _buildTextField('Email Address / Username', _usernameController, screenWidth),
+          _buildTextField(
+              'Email Address / Username', _usernameController, screenWidth),
           SizedBox(height: screenWidth * 0.05),
-          _buildTextFieldContrasena('Password', _passwordController, obscureText: _isObscure, screenWidth: screenWidth),
+          _buildTextFieldContrasena('Password', _passwordController,
+              obscureText: _isObscure, screenWidth: screenWidth),
           SizedBox(height: screenWidth * 0.1),
           _buildSignInButton(screenWidth),
           SizedBox(height: screenWidth * 0.02),
@@ -165,7 +172,8 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildTextField(String labelText, TextEditingController controller, double screenWidth) {
+  Widget _buildTextField(
+      String labelText, TextEditingController controller, double screenWidth) {
     return SizedBox(
       width: screenWidth * 0.85,
       height: screenWidth * 0.15,
@@ -186,7 +194,8 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildTextFieldContrasena(String labelText, TextEditingController controller,
+  Widget _buildTextFieldContrasena(
+      String labelText, TextEditingController controller,
       {bool obscureText = false, required double screenWidth}) {
     return SizedBox(
       width: screenWidth * 0.85,
@@ -379,7 +388,8 @@ class _MyHomePageState extends State<MyHomePage> {
       );
 
       // Obtener el UsuarioProvider del contexto
-      UsuarioProvider usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
+      UsuarioProvider usuarioProvider =
+          Provider.of<UsuarioProvider>(context, listen: false);
 
       // Establecer el usuario autenticado en el UsuarioProvider
       usuarioProvider.setUsuario(usuario);
