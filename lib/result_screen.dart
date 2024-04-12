@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'usuario.dart'; // Importa la clase Usuario
 import 'usuario_provider.dart'; // Importa el UsuarioProvider
+ // Importa el UsuarioProvider
 
 class ResultScreen extends StatelessWidget {
   final String text;
@@ -31,7 +32,8 @@ class ResultScreen extends StatelessWidget {
     super(key: key);
 
   Future<String?> fetchCardImage(int pokemonIndex) async {
-    final response = await http.get(Uri.parse('http://20.162.113.208:5000/api/cartas/${pokemonIndex + 1}'));
+    final pokemonId = pokemonIndex + 1; // Sumar 1 a la ID recibida
+        final response = await http.get(Uri.parse('http://20.162.113.208:5000/api/cartas/$pokemonId'));
 
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
@@ -54,78 +56,58 @@ class ResultScreen extends StatelessWidget {
 
       final pokemonId = foundPokemonIndex + 1;
 
-      // Verificar si el usuario ya tiene este Pokémon registrado
-      bool pokemonRegistrado = await usuario!.verificarPokemonRegistrado(pokemonId);
+      // Mostrar diálogo de confirmación para guardar el Pokémon
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Guardar Pokémon'),
+            content: Text('¿Quieres guardar este Pokémon?'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Cierra el diálogo
+                },
+                child: Text('No'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  final apiUrl = 'http://20.162.113.208:5000/api/pokedex';
+                  final requestBody = jsonEncode({
+                    'id_usuario': usuario!.idUsuario,
+                    'id_pokemon': pokemonId,
+                  });
 
-      if (pokemonRegistrado) {
-        // El Pokémon ya está registrado, muestra los datos del usuario
-        print('Usuario encontrado:');
-        print('ID Usuario: ${usuario.idUsuario}');
-        print('Nombre Usuario: ${usuario.nombreUsuario}');
-        print('Correo Electrónico: ${usuario.mail}');
-        print('Administrador: ${usuario.admin == 1 ? 'Sí' : 'No'}');
-        print('Cantidad de Sobres: ${usuario.sobres}');
+                  final response = await http.post(
+                    Uri.parse(apiUrl),
+                    headers: <String, String>{
+                      'Content-Type': 'application/json; charset=UTF-8',
+                    },
+                    body: requestBody,
+                  );
 
-        // Mostrar mensaje en la interfaz gráfica
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Pokémon ya registrado. Revisa los datos del usuario en la consola.'),
-          ),
-        );
-      } else {
-        // Mostrar diálogo de confirmación para guardar el Pokémon
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('Guardar Pokémon'),
-              content: Text('¿Quieres guardar este Pokémon?'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Cierra el diálogo
-                  },
-                  child: Text('No'),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    final apiUrl = 'http://20.162.113.208:5000/api/pokedex';
-                    final requestBody = jsonEncode({
-                      'id_usuario': usuario!.idUsuario,
-                      'id_pokemon': pokemonId,
-                    });
-
-                    final response = await http.post(
-                      Uri.parse(apiUrl),
-                      headers: <String, String>{
-                        'Content-Type': 'application/json; charset=UTF-8',
-                      },
-                      body: requestBody,
+                  if (response.statusCode == 201) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Pokémon guardado'),
+                      ),
                     );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error al guardar el Pokémon'),
+                      ),
+                    );
+                  }
 
-                    if (response.statusCode == 201) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Pokémon guardado'),
-                        ),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Error al guardar el Pokémon'),
-                        ),
-                      );
-                    }
-
-                    Navigator.of(context).pop(); // Cierra el diálogo
-                  },
-                  child: Text('Sí'),
-                ),
-              ],
-            );
-          },
-        );
-      }
+                  Navigator.of(context).pop(); // Cierra el diálogo
+                },
+                child: Text('Sí'),
+              ),
+            ],
+          );
+        },
+      );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -184,3 +166,4 @@ class ResultScreen extends StatelessWidget {
     );
   }
 }
+
