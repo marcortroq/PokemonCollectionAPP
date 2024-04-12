@@ -99,7 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildLoginForm() {
     return Positioned(
       left: 0,
-      bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+      bottom: MediaQuery.of(context).viewInsets.top+0,
       child: Column(
         children: [
           _buildAnimatedTitulo('assets/title.png', _isKeyboardVisible, MediaQuery.of(context).size.width),
@@ -142,6 +142,28 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+  Widget _buildTextField1(String labelText, TextEditingController controller) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.85,
+      height: 52,
+      child: TextField(
+        controller: controller,
+        onTap: () {
+          setState(() {
+            _isKeyboardVisible = true;
+          });
+        },
+        decoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(13.0),
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          labelText: labelText,
+        ),
+      ),
+    );
+  }
 
   Widget _buildTextFieldContrasena(String labelText, TextEditingController controller,
       {bool obscureText = false}) {
@@ -163,13 +185,69 @@ class _MyHomePageState extends State<MyHomePage> {
           filled: true,
           fillColor: Colors.white,
           labelText: labelText,
-          suffixIcon: IconButton(
-            icon: Icon(obscureText ? Icons.visibility : Icons.visibility_off),
-            onPressed: () {
-              setState(() {
-                _isObscure = !_isObscure;
-              });
-            },
+          suffixIcon: Padding(
+            padding: const EdgeInsets.only(right: 8.0), // Ajusta el espaciado a tu preferencia
+            child: obscureText
+              ? IconButton(
+                  icon: Icon(Icons.visibility),
+                  onPressed: () {
+                    setState(() {
+                      _isObscure = !_isObscure;
+                    });
+                  },
+                )
+              : IconButton(
+                  icon: Icon(Icons.visibility_off),
+                  onPressed: () {
+                    setState(() {
+                      _isObscure = !_isObscure;
+                    });
+                  }
+              ),            
+          ),
+        ),
+      ),
+    );
+  }
+  Widget _buildTextFieldContrasena1(String labelText, TextEditingController controller,
+      {bool obscureText = false}) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.85,
+      height: 52,
+      child: TextField(
+        controller: controller,
+        obscureText: obscureText,
+        onTap: () {
+          setState(() {
+            _isKeyboardVisible = true;
+          });
+        },
+        decoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(13.0),
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          labelText: labelText,
+          suffixIcon: Padding(
+            padding: const EdgeInsets.only(right: 8.0), // Ajusta el espaciado a tu preferencia
+            child: obscureText
+              ? IconButton(
+                  icon: Icon(Icons.visibility),
+                  onPressed: () {
+                    setState(() {
+                      _isObscure = !_isObscure;
+                    });
+                  },
+                )
+              : IconButton(
+                  icon: Icon(Icons.visibility_off),
+                  onPressed: () {
+                    setState(() {
+                      _isObscure = !_isObscure;
+                    });
+                  }
+              ),            
           ),
         ),
       ),
