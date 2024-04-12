@@ -4,6 +4,7 @@ class Usuario {
   final String mail;
   final int admin;
   final int sobres;
+  final int xp;
 
   Usuario({
     required this.idUsuario,
@@ -11,6 +12,7 @@ class Usuario {
     required this.mail,
     required this.admin,
     required this.sobres,
+    required this.xp,
   });
 
   Future<bool> verificarPokemonRegistrado(int pokemonId) async {
