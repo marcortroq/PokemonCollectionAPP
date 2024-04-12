@@ -260,7 +260,7 @@ class _PacksState extends State<Packs> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => OpenPack()),
+                      MaterialPageRoute(builder: (context) => open_pack()),
                     );
                   },
                   child: image,

@@ -378,7 +378,7 @@ class _MyHomePageState extends State<MyHomePage> {
     else{
       try {
         var response = await http.get(
-          Uri.parse('http://20.162.90.233:5000/api/usuario/nombre/$nombreUsuario'),
+          Uri.parse('http://20.162.113.208:5000/api/usuario/nombre/$nombreUsuario'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
           },
@@ -409,7 +409,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _registerUser() async {
     try {
       var response = await http.post(
-        Uri.parse('http://20.162.90.233:5000/api/usuario'),
+        Uri.parse('http://20.162.113.208:5000/api/usuario'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
