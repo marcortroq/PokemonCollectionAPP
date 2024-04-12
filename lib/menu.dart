@@ -135,6 +135,24 @@ class Menu extends StatelessWidget {
               ),
             ),
           ),
+          Positioned(
+            top: 0, 
+            left: (MediaQuery.of(context).size.width - 200) / 2, 
+            child: Image.asset(
+              'assets/barramoneda.png', // Ruta de tu imagen
+              width: 200, 
+              height: 100, 
+            ),
+          ),
+          Positioned(
+            top: 0, 
+            left: (MediaQuery.of(context).size.width - -80) / 2, 
+            child: Image.asset(
+              'assets/barrapremium.png', // Ruta de tu imagen
+              width: 200, 
+              height: 100, 
+            ),
+          ),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
