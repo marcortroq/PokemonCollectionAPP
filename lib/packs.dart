@@ -1,5 +1,3 @@
-import 'dart:js_interop_unsafe';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pokemonapp/usuario.dart';
@@ -15,7 +13,13 @@ class _PacksState extends State<Packs> {
   PageController _pageController = PageController(initialPage: 0);
   int _currentPageIndex = 0;
 
-  Usuario user = Usuario(idUsuario: 1, nombreUsuario: 'marcortroq', mail: 'marcortroq', contrasena: 'contrasena', admin: "NO", sobres: 10)
+  Usuario user = Usuario(
+      idUsuario: 1,
+      nombreUsuario: 'marcortroq',
+      mail: 'marcortroq',
+      contrasena: 'contrasena',
+      admin: 1,
+      sobres: 7);
 
   @override
   Widget build(BuildContext context) {
@@ -262,7 +266,7 @@ class _PacksState extends State<Packs> {
               children: images.map((image) {
                 return GestureDetector(
                   onTap: () {
-                    mypacks -= 1;
+                    usuario.sobres -= 1;
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => OpenPack()),
