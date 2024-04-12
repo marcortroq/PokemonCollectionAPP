@@ -1,15 +1,17 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'usuario.dart'; // Importa la clase Usuario
+import 'usuario_provider.dart'; // Importa el UsuarioProvider
 
 class ResultScreen extends StatelessWidget {
   final String text;
   final List<String> pokemonNames;
 
-  ResultScreen({Key? key, required this.text})
-      : pokemonNames = [
-          'Bulbasaur', 'Ivysaur', 'Venusaur', 'Charmander', 'Charmeleon', 'Charizard', 'Squirtle', 'Wartortle', 'Blastoise',
+  ResultScreen({Key? key, required this.text}) :
+    pokemonNames = [
+      'Bulbasaur', 'Ivysaur', 'Venusaur', 'Charmander', 'Charmeleon', 'Charizard', 'Squirtle', 'Wartortle', 'Blastoise',
           'Caterpie', 'Metapod', 'Butterfree', 'Weedle', 'Kakuna', 'Beedrill', 'Pidgey', 'Pidgeotto', 'Pidgeot', 'Rattata',
           'Raticate', 'Spearow', 'Fearow', 'Ekans', 'Arbok', 'Pikachu', 'Raichu', 'Sandshrew', 'Sandslash', 'Nidoran♀',
           'Nidorina', 'Nidoqueen', 'Nidoran♂', 'Nidorino', 'Nidoking', 'Clefairy', 'Clefable', 'Vulpix', 'Ninetales',
@@ -25,11 +27,11 @@ class ResultScreen extends StatelessWidget {
           'Tauros', 'Magikarp', 'Gyarados', 'Lapras', 'Ditto', 'Eevee', 'Vaporeon', 'Jolteon', 'Flareon', 'Porygon',
           'Omanyte', 'Omastar', 'Kabuto', 'Kabutops', 'Aerodactyl', 'Snorlax', 'Articuno', 'Zapdos', 'Moltres', 'Dratini',
           'Dragonair', 'Dragonite', 'Mewtwo', 'Mew'
-        ],
-        super(key: key);
+    ],
+    super(key: key);
 
   Future<String?> fetchCardImage(int pokemonIndex) async {
-    final response = await http.get(Uri.parse('http://20.162.90.233:5000/api/cartas/${pokemonIndex + 1}'));
+    final response = await http.get(Uri.parse('http://20.162.113.208:5000/api/cartas/${pokemonIndex + 1}'));
 
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
@@ -45,110 +47,103 @@ class ResultScreen extends StatelessWidget {
     }
   }
 
-  void _showSaveConfirmation(BuildContext context, int foundPokemonIndex, Usuario usuario) async {
-  try {
-    final pokemonId = foundPokemonIndex + 1;
+  void _showSaveConfirmation(BuildContext context, int foundPokemonIndex) async {
+    try {
+      final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
+      final usuario = usuarioProvider.usuario;
 
-    // Verificar si el usuario ya tiene este Pokémon registrado
-    bool pokemonRegistrado = await usuario.verificarPokemonRegistrado(pokemonId);
+      final pokemonId = foundPokemonIndex + 1;
 
-    if (pokemonRegistrado) {
-      // El Pokémon ya está registrado, imprime los datos del usuario
-      print('Usuario encontrado:');
-      print('ID Usuario: ${usuario.idUsuario}');
-      print('Nombre Usuario: ${usuario.nombreUsuario}');
-      print('Correo Electrónico: ${usuario.mail}');
-      print('Administrador: ${usuario.admin == 1 ? 'Sí' : 'No'}');
-      print('Cantidad de Sobres: ${usuario.sobres}');
+      // Verificar si el usuario ya tiene este Pokémon registrado
+      bool pokemonRegistrado = await usuario!.verificarPokemonRegistrado(pokemonId);
 
-      // Opcional: Mostrar un mensaje en la interfaz gráfica
+      if (pokemonRegistrado) {
+        // El Pokémon ya está registrado, muestra los datos del usuario
+        print('Usuario encontrado:');
+        print('ID Usuario: ${usuario.idUsuario}');
+        print('Nombre Usuario: ${usuario.nombreUsuario}');
+        print('Correo Electrónico: ${usuario.mail}');
+        print('Administrador: ${usuario.admin == 1 ? 'Sí' : 'No'}');
+        print('Cantidad de Sobres: ${usuario.sobres}');
+
+        // Mostrar mensaje en la interfaz gráfica
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Pokémon ya registrado. Revisa los datos del usuario en la consola.'),
+          ),
+        );
+      } else {
+        // Mostrar diálogo de confirmación para guardar el Pokémon
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Guardar Pokémon'),
+              content: Text('¿Quieres guardar este Pokémon?'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Cierra el diálogo
+                  },
+                  child: Text('No'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    final apiUrl = 'http://20.162.113.208:5000/api/pokedex';
+                    final requestBody = jsonEncode({
+                      'id_usuario': usuario!.idUsuario,
+                      'id_pokemon': pokemonId,
+                    });
+
+                    final response = await http.post(
+                      Uri.parse(apiUrl),
+                      headers: <String, String>{
+                        'Content-Type': 'application/json; charset=UTF-8',
+                      },
+                      body: requestBody,
+                    );
+
+                    if (response.statusCode == 201) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Pokémon guardado'),
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error al guardar el Pokémon'),
+                        ),
+                      );
+                    }
+
+                    Navigator.of(context).pop(); // Cierra el diálogo
+                  },
+                  child: Text('Sí'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Pokémon ya registrado. Revisa los datos del usuario en la consola.'),
+          content: Text('Error: $e'),
         ),
       );
-    } else {
-      // Mostrar el diálogo de confirmación para guardar el Pokémon
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Guardar Pokémon'),
-            content: Text('¿Quieres guardar este Pokémon?'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop(); // Cierra el diálogo
-                },
-                child: Text('No'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  final apiUrl = 'http://20.162.90.233:5000/api/pokedex';
-                  final requestBody = jsonEncode({
-                    'id_usuario': usuario.idUsuario,
-                    'id_pokemon': pokemonId,
-                  });
-
-                  final response = await http.post(
-                    Uri.parse(apiUrl),
-                    headers: <String, String>{
-                      'Content-Type': 'application/json; charset=UTF-8',
-                    },
-                    body: requestBody,
-                  );
-
-                  if (response.statusCode == 201) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Pokémon guardado'),
-                      ),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Error al guardar el Pokémon'),
-                      ),
-                    );
-                  }
-
-                  Navigator.of(context).pop(); // Cierra el diálogo
-                },
-                child: Text('Sí'),
-              ),
-            ],
-          );
-        },
-      );
     }
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Error: $e'),
-      ),
-    );
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
-    final usuario = Usuario(
-      idUsuario: 1,
-      nombreUsuario: 'Ejemplo',
-      mail: 'ejemplo@correo.com',
-      contrasena: 'password',
-      admin: 0, // No es admin (cambiar según corresponda)
-      sobres: 5, // Cantidad de sobres (cambiar según corresponda)
-    );
-
     final foundPokemonIndex = pokemonNames.indexWhere((pokemon) => text.contains(pokemon));
 
     return Scaffold(
       appBar: null,
       body: GestureDetector(
         onTap: () {
-          _showSaveConfirmation(context, foundPokemonIndex, usuario);
+          _showSaveConfirmation(context, foundPokemonIndex);
         },
         child: Stack(
           children: [
