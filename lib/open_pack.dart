@@ -47,16 +47,16 @@ class _StateOpenPack extends State<open_pack> {
         body: Stack(
           children: [
             _buildBackground(),
-            if (!showImages) _buildIncubadora('assets/incubadora1.png', 275, screenWidth),
-            if (showImages)_buildIncubadora2('assets/incubadora1.png', 275, screenWidth,0.5),            
+            if (!showImages) _buildIncubadora('assets/SobreEspecial.png', 275, screenWidth),
+            if (showImages)_buildIncubadora2('assets/SobreEspecial.png', 275, screenWidth,0.5),            
             if (showImages)
-              _buildItem('assets/PortadaColor.png', 175, screenWidth, 0.45, 0.5, 'Mensaje 1', 0),
+              _buildItem('assets/SobreAperturaEspecial.png', 175, screenWidth, 0.45, 0.5, 'Mensaje 1', 0),
             if (showImages)
-              _buildItem('assets/PortadaColor.png', 175, screenWidth, 1.05, 0.5, 'Mensaje 2', 1),
+              _buildItem('assets/SobreAperturaEspecial.png', 175, screenWidth, 1.05, 0.5, 'Mensaje 2', 1),
             if (showImages)
-              _buildItem('assets/PortadaColor.png', 175, screenWidth, 0.65, 1.5, 'Mensaje 3', 2),
+              _buildItem('assets/SobreAperturaEspecial.png', 175, screenWidth, 0.65, 1.5, 'Mensaje 3', 2),
             if (showImages)
-              _buildItem('assets/PortadaColor.png', 175, screenWidth, 1.25, 1.5, 'Mensaje 4', 3),
+              _buildItem('assets/SobreAperturaEspecial.png', 175, screenWidth, 1.25, 1.5, 'Mensaje 4', 3),
           ],
         ),
       ),
@@ -125,7 +125,7 @@ class _StateOpenPack extends State<open_pack> {
           angle: imageStates[index] ? 0 : 0, // Girar la imagen si está tocada
           child: Image.asset(
             // Utiliza el estado correspondiente para mostrar la imagen correcta
-            imageStates[index] ? 'assets/pack.png' : imagePath,
+            imageStates[index] ? 'assets/SobreAperturaEspecial.png' : imagePath,
             width: size,
             height: size,
             fit: BoxFit.contain,
@@ -147,9 +147,9 @@ class _StateOpenPack extends State<open_pack> {
           },
           child: SizedBox(
             width: 250,
-            height: 500,
+            height: 400,
             child: Image.asset(
-              imageStates[index] ? 'assets/pack.png' : imagePath, // Usa 'assets/pack.png' cuando se amplíe
+              imageStates[index] ? 'assets/SobreAperturaEspecial.png' : imagePath, // Usa 'assets/pack.png' cuando se amplíe
               fit: BoxFit.cover,
             ),
           ),
