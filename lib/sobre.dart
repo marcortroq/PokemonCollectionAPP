@@ -7,18 +7,18 @@ void main() {
 
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive, overlays: []);
   runApp(MaterialApp(
-    home: Incubadora(),
+    home: Sobre(),
   ));
 }
 
-class Incubadora extends StatefulWidget {
-  const Incubadora({Key? key}) : super(key: key);
+class Sobre extends StatefulWidget {
+  const Sobre({Key? key}) : super(key: key);
 
   @override
-  State<Incubadora> createState() => _StateIncubadora();
+  State<Sobre> createState() => _StateSobre();
 }
 
-class _StateIncubadora extends State<Incubadora> {
+class _StateSobre extends State<Sobre> {
   bool showImages = false;
   int clickedImages = 0;
   int totalImages = 4; // Cambia esto al número total de imágenes que tienes

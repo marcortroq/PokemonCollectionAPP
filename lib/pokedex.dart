@@ -1,66 +1,67 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-
-class Pokedex extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(
-              'assets/fondosec.png',
-            ),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: _labels(context),
-      ),
-    );
-  }
-
-  Widget _labels(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        GestureDetector(
-          onTap: () {
-            // Acción a realizar cuando se toque la etiqueta 1
-          },
-          child: Container(
-            padding: EdgeInsets.all(8),
-            child: Text(
-              "COLLECTION",
-              style: TextStyle(
-                  color: Colors.black, fontSize: 20, fontFamily: 'sarpanch'),
-            ),
-          ),
-        ),
-        GestureDetector(
-          onTap: () {
-            // Acción a realizar cuando se toque la etiqueta 2
-          },
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            padding: EdgeInsets.all(8),
-            child: Text(
-              "DUPLICATES",
-              style: TextStyle(
-                  color: Colors.black, fontSize: 20, fontFamily: 'sarpanch'),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(MaterialApp(
     home: Pokedex(),
   ));
+}
+
+class Pokedex extends StatefulWidget {
+  @override
+  _PokedexState createState() => _PokedexState();
+}
+
+class _PokedexState extends State<Pokedex> {
+  List<Map<String, dynamic>>? _pokemonCards;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPokemonCardsInRange();
+  }
+
+  Future<void> _fetchPokemonCardsInRange() async {
+    var url =
+        Uri.parse('http://51.141.92.127:5000/carta?start_id=15&end_id=16');
+    var response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+      setState(() {
+        _pokemonCards = List<Map<String, dynamic>>.from(data['Cartas']);
+      });
+    } else {
+      print('Error al cargar las cartas de Pokémon: ${response.statusCode}');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Pokedex'),
+      ),
+      body: _pokemonCards != null
+          ? ListView.builder(
+              itemCount: _pokemonCards!.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(
+                      'ID Pokemon: ${_pokemonCards![index]['ID_POKEMON']}'),
+                  subtitle: _pokemonCards![index]['FOTO_CARTA'] != null
+                      ? Image.memory(
+                          // Decodificar la imagen en base64 y mostrarla
+                          base64Decode(_pokemonCards![index]['FOTO_CARTA']),
+                          width: 100,
+                          height: 100,
+                        )
+                      : Text('No hay imagen disponible'),
+                );
+              },
+            )
+          : Center(child: CircularProgressIndicator()),
+    );
+  }
 }
