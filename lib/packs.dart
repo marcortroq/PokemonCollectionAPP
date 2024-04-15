@@ -1,8 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pokemonapp/usuario.dart';
+import 'package:provider/provider.dart';
 import 'open_pack.dart';
 import 'usuario.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'usuario_provider.dart'; // Importa el UsuarioProvider
 
 class Packs extends StatefulWidget {
   @override
@@ -235,42 +239,109 @@ class _PacksState extends State<Packs> {
   }
 
   Widget _myPacksContent() {
-    int mypacks = 8;
-    List<Widget> images = _generateImagesList(
-        mypacks); // Inicialmente mostramos todas las imágenes
+    final usuarioProvider =
+        Provider.of<UsuarioProvider>(context, listen: false);
+    final usuario = usuarioProvider.usuario;
+    int idUsuario = usuario?.idUsuario ?? 0;
 
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(height: 40),
-          // Centrar la bandera
-          Center(child: _banderaImage("MIS SOBRES", 11, 80)),
-          // Mostrar las imágenes en dos columnas
-          Padding(
-            padding: EdgeInsets.only(top: 0.0), // Eliminar el espacio superior
-            child: GridView.count(
-              crossAxisCount: 2, // Dos columnas
-              crossAxisSpacing: 10.0, // Espacio entre columnas
-              shrinkWrap: true,
-              physics:
-                  NeverScrollableScrollPhysics(), // Deshabilitar el scroll del GridView
-              children: images.map((image) {
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => open_pack()),
-                    );
-                  },
-                  child: image,
-                );
-              }).toList(),
+    return FutureBuilder<int>(
+      future: obtenerSobresUsuario(idUsuario),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          int mypacks = snapshot.data ?? 0;
+          List<Widget> images = _generateImagesList(mypacks);
+
+          return SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(height: 40),
+                // Centrar la bandera
+                Center(child: _banderaImage("MIS SOBRES", 11, 80)),
+                // Mostrar las imágenes en dos columnas
+                Padding(
+                  padding: EdgeInsets.only(top: 0.0),
+                  child: GridView.count(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 10.0,
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    children: images.map((image) {
+                      return GestureDetector(
+                        onTap: () {
+                          mypacks -= 1;
+                          _restarSobre(idUsuario);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => OpenPack()),
+                          );
+                        },
+                        child: image,
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
+          );
+        } else {
+          return Container(); // Devuelve un contenedor vacío mientras se espera la respuesta
+        }
+      },
     );
+  }
+
+  Future<int> obtenerSobresUsuario(int idUsuario) async {
+    final url = 'http://20.162.113.208:5000/api/usuario/$idUsuario';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        // La solicitud fue exitosa, parsea la respuesta JSON
+        final Map<String, dynamic> data = json.decode(response.body);
+        final int sobres = data['sobres'] as int;
+        return sobres;
+      } else {
+        // La solicitud no fue exitosa, maneja el error según sea necesario
+        print(
+            'Error al obtener los sobres. Código de estado: ${response.statusCode}');
+        return -1; // Retornar un valor por defecto o manejar el error de otra manera
+      }
+    } catch (e) {
+      // Error al realizar la solicitud, maneja el error según sea necesario
+      print('Error en la solicitud: $e');
+      return -1; // Retornar un valor por defecto o manejar el error de otra manera
+    }
+  }
+
+  Future<void> _restarSobre(int idUsuario) async {
+    final url =
+        'http://20.162.113.208:5000/api/usuario/restar_sobres/$idUsuario';
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        // No necesitamos enviar ningún cuerpo en esta solicitud POST
+      );
+
+      if (response.statusCode == 200) {
+        // La solicitud fue exitosa, puedes manejar la respuesta aquí si es necesario
+        final Map<String, dynamic> data = json.decode(response.body);
+        print('Sobres restados exitosamente. Nuevo estado de sobres:');
+        print('ID de usuario: ${data['id_usuario']}');
+        print('Nombre de usuario: ${data['nombre_usuario']}');
+        print('Sobres: ${data['sobres']}');
+        // Puedes imprimir o utilizar otros campos de la respuesta según tus necesidades
+      } else {
+        // La solicitud no fue exitosa, maneja el error según sea necesario
+        print(
+            'Error al restar sobres. Código de estado: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Error al realizar la solicitud, maneja el error según sea necesario
+      print('Error en la solicitud: $e');
+    }
   }
 
   List<Widget> _generateImagesList(int number) {
