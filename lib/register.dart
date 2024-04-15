@@ -100,7 +100,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildLoginForm() {
     return Positioned(
       left: 0,
-      bottom: MediaQuery.of(context).viewInsets.top+0,
+      bottom: MediaQuery.of(context).viewInsets.top+10,
       child: Column(
         children: [
           _buildAnimatedTitulo('assets/title.png', _isKeyboardVisible, MediaQuery.of(context).size.width),

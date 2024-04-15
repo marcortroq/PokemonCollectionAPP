@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:pokemonapp/countdown_timer.dart';
 import 'package:pokemonapp/incubadora.dart';
 import 'package:pokemonapp/main_ocr.dart';
+import 'package:pokemonapp/pokedex.dart';
 import 'dart:math' as math;
 import 'main.dart';
 import 'packs.dart';
@@ -193,7 +194,7 @@ class Menu extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.only(top: screenSize.height * 0.05),
                           child: 
-                            _buildButton("POKEDEX", "assets/pokeball.png", Packs(), context, topRightRadius: 0, bottomLeftRadius: 0) //POKEDEX
+                            _buildButton("POKEDEX", "assets/pokeball.png", Pokedex(), context, topRightRadius: 0, bottomLeftRadius: 0) //POKEDEX
                         ),
                       ],
                     ),
