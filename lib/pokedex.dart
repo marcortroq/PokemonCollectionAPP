@@ -23,8 +23,7 @@ class _PokedexState extends State<Pokedex> {
   }
 
   Future<void> _fetchPokemonCardsInRange() async {
-    var url =
-        Uri.parse('http://51.141.92.127:5000/carta?start_id=15&end_id=16');
+    var url = Uri.parse('http://20.162.90.233:5000/api/cartas');
     var response = await http.get(url);
 
     if (response.statusCode == 200) {
