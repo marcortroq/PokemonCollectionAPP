@@ -1,26 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pokemonapp/menu.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive, overlays: []);
   runApp(MaterialApp(
-    home: OpenPack(),
+    home: open_pack(),
   ));
 }
 
-class OpenPack extends StatefulWidget {
-  const OpenPack({Key? key}) : super(key: key);
+class open_pack extends StatefulWidget {
+  const open_pack({Key? key}) : super(key: key);
 
   @override
-  State<OpenPack> createState() => _StateOpenPack();
+  State<open_pack> createState() => _StateOpenPack();
 }
 
-class _StateOpenPack extends State<OpenPack> {
+class _StateOpenPack extends State<open_pack> {
   bool showImages = false;
   int clickedImages = 0;
   int totalImages = 4; // Cambia esto al número total de imágenes que tienes
+
+  List<bool> imageStates = [false, false, false, false];
+  List<bool> imageTapped = [false, false, false, false]; // Lista para rastrear si una imagen ha sido tocada
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +33,12 @@ class _StateOpenPack extends State<OpenPack> {
 
     return GestureDetector(
       onTap: () {
+        if (showImages && imageStates.every((state) => state)) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Menu()), // Reemplaza 'NewScreen()' con la pantalla que desees mostrar
+          );
+        }
         setState(() {
           showImages = true; // Al hacer clic, mostrar las imágenes
         });
@@ -37,20 +47,16 @@ class _StateOpenPack extends State<OpenPack> {
         body: Stack(
           children: [
             _buildBackground(),
-            if (!showImages)
-              _buildIncubadora('assets/pack.png', 275, screenWidth),
+            if (!showImages) _buildIncubadora('assets/SobreEspecial.png', 275, screenWidth),
+            if (showImages)_buildIncubadora2('assets/SobreEspecial.png', 275, screenWidth,0.5),            
             if (showImages)
-              _buildItem('assets/PortadaColor.png', 175, screenWidth, 0.45, 0.5,
-                  'Mensaje 1'),
+              _buildItem('assets/SobreAperturaEspecial.png', 175, screenWidth, 0.45, 0.5, 'Mensaje 1', 0),
             if (showImages)
-              _buildItem('assets/PortadaColor.png', 175, screenWidth, 1.05, 0.5,
-                  'Mensaje 2'),
+              _buildItem('assets/SobreAperturaEspecial.png', 175, screenWidth, 1.05, 0.5, 'Mensaje 2', 1),
             if (showImages)
-              _buildItem('assets/PortadaColor.png', 175, screenWidth, 0.65, 1.5,
-                  'Mensaje 3'),
+              _buildItem('assets/SobreAperturaEspecial.png', 175, screenWidth, 0.65, 1.5, 'Mensaje 3', 2),
             if (showImages)
-              _buildItem('assets/PortadaColor.png', 175, screenWidth, 1.25, 1.5,
-                  'Mensaje 4'),
+              _buildItem('assets/SobreAperturaEspecial.png', 175, screenWidth, 1.25, 1.5, 'Mensaje 4', 3),
           ],
         ),
       ),
@@ -81,46 +87,77 @@ class _StateOpenPack extends State<OpenPack> {
     );
   }
 
-  Widget _buildItem(String imagePath, double size, double screenWidth,
-      double top, double left, String message) {
+  Widget _buildIncubadora2(String imagePath, double size, double screenWidth, double opacity) {
+  return Positioned(
+    top: screenWidth * 0.7,
+    left: (screenWidth * 1 - size) / 2,
+    child: Opacity(
+      opacity: opacity,
+      child: Image.asset(
+        imagePath,
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+      ),
+    ),
+  );
+}
+
+
+  Widget _buildItem(String imagePath, double size, double screenWidth, double top, double left, String message, int index) {
     return Positioned(
       top: screenWidth * top,
       left: (screenWidth * left - size) / 2,
       child: GestureDetector(
         onTap: () {
-          setState(() {
-            clickedImages++; // Incrementa el contador cuando se hace clic en una imagen
-          });
-
-          print(message);
-
-          if (clickedImages >= totalImages) {
-            // Si todas las imágenes han sido clicadas, muestra el mensaje final
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text('Todas las cartas han sido clicadas'),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Text('Cerrar'),
-                    ),
-                  ],
-                );
-              },
-            );
+          if (!imageTapped[index]) {
+            setState(() {
+               _showCenteredImage(context, imagePath, index);
+              // Cambia el estado de la imagen en la posición 'index' para mostrar una nueva imagen
+              imageStates[index] = !imageStates[index];
+              imageTapped[index] = true; // Marca la imagen como tocada
+            });
+          } else {
+            _showCenteredImage(context, imagePath, index);
           }
         },
-        child: Image.asset(
-          imagePath,
-          width: size,
-          height: size,
-          fit: BoxFit.contain,
+        child: Transform.rotate(
+          angle: imageStates[index] ? 0 : 0, // Girar la imagen si está tocada
+          child: Image.asset(
+            // Utiliza el estado correspondiente para mostrar la imagen correcta
+            imageStates[index] ? 'assets/SobreAperturaEspecial.png' : imagePath,
+            width: size,
+            height: size,
+            fit: BoxFit.contain,
+          ),
         ),
       ),
     );
   }
+
+  // Método para mostrar la imagen centrada y aumentada
+  void _showCenteredImage(BuildContext context, String imagePath, int index) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return Center(
+        child: GestureDetector(
+          onTap: () {
+            Navigator.of(context).pop();
+          },
+          child: SizedBox(
+            width: 250,
+            height: 400,
+            child: Image.asset(
+              imageStates[index] ? 'assets/SobreAperturaEspecial.png' : imagePath, // Usa 'assets/pack.png' cuando se amplíe
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+      );
+    },
+  );
 }
+
+  }
+
