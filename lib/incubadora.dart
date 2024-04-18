@@ -25,7 +25,7 @@ class _StateIncubadora extends State<Incubadora> {
   bool showImages = false;
   int clickedImages = 0;
   int totalImages = 4; // Cambia esto al número total de imágenes que tienes
-List<String?> cardImages = [null, null, null, null];
+  List<String?> cardImages = [null, null, null, null];
 
   List<bool> imageStates = [false, false, false, false];
   List<bool> imageTapped = [false, false, false, false]; // Lista para rastrear si una imagen ha sido tocada
@@ -109,96 +109,82 @@ List<String?> cardImages = [null, null, null, null];
   }
 
   Widget _buildItem(String imagePath, double size, double screenWidth, double top, double left, String message, int index) {
-    return Positioned(
-      top: screenWidth * top,
-      left: (screenWidth * left - size) / 2,
-      child: GestureDetector(
-        onTap: () {
+  return Positioned(
+    top: screenWidth * top,
+    left: (screenWidth * left - size) / 2,
+    child: GestureDetector(
+      onTap: () {
+        setState(() {
           if (!imageTapped[index]) {
-            setState(() {
-              _showCenteredImage(context, imagePath, index);
-              // Guarda la imagen que se va a mostrar en lastShownImages
-              lastShownImages[index] = imagePath;
-              imageStates[index] = !imageStates[index];
-              imageTapped[index] = true; // Marca la imagen como tocada
-            });
-          } else {
-            _showCenteredImage(context, imagePath, index);
+            // Si la imagen no ha sido tocada previamente, obtén la imagen de la base de datos
+            _fetchImageData(index);
+            imageTapped[index] = true; // Marca la imagen como tocada
           }
-        },
-        child: Transform.rotate(
-          angle: imageStates[index] ? 0 : 0, // Girar la imagen si está tocada
-          child: Image.asset(
-            // Utiliza el estado correspondiente para mostrar la imagen correcta
-            imageStates[index] ? 'assets/SobreAperturaEspecial.png' : imagePath,
-            width: size,
-            height: size,
-            fit: BoxFit.contain,
-          ),
+          // Cambia el estado de la imagen en la posición 'index' para mostrar la imagen local o la de la base de datos
+          imageStates[index] = !imageStates[index];
+        });
+      },
+      child: Transform.rotate(
+        angle: imageStates[index] ? 0 : 0, // Girar la imagen si está tocada
+        child: Image.asset(
+          // Utiliza el estado correspondiente para mostrar la imagen local o la de la base de datos
+          imageStates[index] ? 'assets/SobreAperturaEspecial.png' : imagePath,
+          width: size,
+          height: size,
+          fit: BoxFit.contain,
         ),
       ),
-    );
-  }
-
-  // Método para mostrar la imagen centrada y aumentada
-  void _showCenteredImage(BuildContext context, String imagePath, int index) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return FutureBuilder(
-        future: fetchRandomCardImage(),
-        builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
-          } else {
-            final decodedImage = base64Decode(snapshot.data!);
-            cardImages[index] = snapshot.data; // Almacena la foto de la carta en la lista
-
-            return Center(
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).pop();
-                },
-                child: SizedBox(
-                  width: 270,
-                  height: 400,
-                  child: Image.memory(
-                    decodedImage,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            );
-          }
-        },
-      );
-    },
+    ),
   );
 }
 
 
-  Future<String?> fetchRandomCardImage() async {
-    final random = Random();
-    final pokemonId = random.nextInt(151) + 1;
-    final response = await http.get(Uri.parse('http://20.162.113.208:5000/api/cartas/$pokemonId'));
-
-    if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body);
-      final fotoCarta = jsonData['foto_carta'];
-
-      if (fotoCarta != null) {
-        return fotoCarta;
-      } else {
-        throw Exception('La imagen de la carta no está disponible');
-      }
-    } else {
-      throw Exception('Fallo al cargar la imagen de la carta: ${response.statusCode}');
-    }
+  // Método para mostrar la imagen centrada y aumentada
+  void _showCenteredImage(BuildContext context, String imagePath, int index) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Center(
+          child: GestureDetector(
+            onTap: () {
+              Navigator.of(context).pop();
+            },
+            child: SizedBox(
+              width: 250,
+              height: 400,
+              child: Image.asset(
+                imageStates[index] ? 'assets/SobreAperturaEspecial.png' : imagePath, // Usa 'assets/pack.png' cuando se amplíe
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
+
+  // Método para obtener la imagen de la base de datos
+  void _fetchImageData(int index) async {
+  final String pokemonId = '2'; // Reemplaza con el ID del Pokémon correspondiente
+  final String url = 'http://20.162.113.208:5000/api/cartas/$pokemonId';
+
+  try {
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      // Si la solicitud es exitosa, obtén la URL de la imagen de la respuesta
+      final responseData = json.decode(response.body);
+      final imageUrl = responseData['foto_Carta'];
+
+      // Actualiza la imagen en la posición 'index' con la imagen de la URL obtenida
+      setState(() {
+        cardImages[index] = imageUrl;
+      });
+    } else {
+      throw Exception('Failed to load image');
+    }
+  } catch (e) {
+    print('Error: $e');
+  }
+}
+
 }
