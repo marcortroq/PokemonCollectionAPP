@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:typed_data';
+import 'package:pokemonapp/usuario.dart';
+import 'usuario_provider.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -141,8 +144,13 @@ class _PokedexState extends State<Pokedex> {
   }
 
   Widget _pokedexContent() {
+    final usuarioProvider =
+        Provider.of<UsuarioProvider>(context, listen: false);
+    final usuario = usuarioProvider.usuario;
+    int idUsuario = usuario?.idUsuario ?? 0;
+
     return FutureBuilder<List<dynamic>>(
-      future: fetchUserCards(2), // Cambia 1 por el ID del usuario
+      future: fetchUserCards(idUsuario), // Cambia 1 por el ID del usuario
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
