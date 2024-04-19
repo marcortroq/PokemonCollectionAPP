@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:pokemonapp/countdown_timer.dart';
 import 'package:pokemonapp/incubadora.dart';
+import 'package:pokemonapp/Pokedex.dart';
 import 'package:pokemonapp/main_ocr.dart';
 import 'dart:math' as math;
 import 'main.dart';
@@ -240,7 +241,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                         Padding(
                           padding: EdgeInsets.only(top: screenSize.height * 0.05),
                           child: 
-                            _buildButton("POKEDEX", "assets/pokeball.png", Packs(), context, topRightRadius: 0, bottomLeftRadius: 0) //POKEDEX
+                            _buildButton("POKEDEX", "assets/pokeball.png", Pokedex(), context, topRightRadius: 0, bottomLeftRadius: 0) //POKEDEX
                         ),
                       ],
                     ),
