@@ -142,7 +142,7 @@ class _PokedexState extends State<Pokedex> {
 
   Widget _pokedexContent() {
     return FutureBuilder<List<dynamic>>(
-      future: fetchUserCards(19), // Cambia 1 por el ID del usuario
+      future: fetchUserCards(2), // Cambia 1 por el ID del usuario
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
@@ -170,7 +170,7 @@ class _PokedexState extends State<Pokedex> {
                 imageUrl = baseUrl + imagePath;
               } else {
                 // Si el usuario no tiene la carta, cargar la imagen estática desde assets
-                imageUrl = 'assets/PortadaColor.png';
+                imageUrl = 'assets/ContraPortada.png';
               }
               return GestureDetector(
                 onTap: () {
