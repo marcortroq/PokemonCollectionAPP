@@ -133,9 +133,16 @@ class _PokedexState extends State<Pokedex> {
     );
   }
 
+// Función para verificar si el usuario tiene la carta correspondiente al índice
+  bool userHasCardAtIndex(int index, List<dynamic> userCards) {
+    // Verificar si el JSON contiene una carta con el ID del Pokémon correspondiente al índice
+    bool hasCard = userCards.any((card) => card['id_pokemon'] == index + 1);
+    return hasCard;
+  }
+
   Widget _pokedexContent() {
     return FutureBuilder<List<dynamic>>(
-      future: fetchUserCards(1), // Cambia 1 por el ID del usuario
+      future: fetchUserCards(19), // Cambia 1 por el ID del usuario
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
@@ -148,25 +155,68 @@ class _PokedexState extends State<Pokedex> {
           List<dynamic> userCards = snapshot.data!;
           return GridView.builder(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 4,
+              crossAxisCount: 3,
               mainAxisSpacing: 4.0,
               crossAxisSpacing: 4.0,
             ),
-            itemCount: userCards.length,
+            itemCount: 151, // Mostrar 151 cartas
             itemBuilder: (context, index) {
-              var card = userCards[index];
-              String base64Image = card['foto_carta'];
-              Uint8List bytes = base64Decode(base64Image);
-              return Padding(
-                padding: EdgeInsets.all(4.0),
-                child: Image.memory(
-                  bytes,
-                  fit: BoxFit.fitHeight,
+              bool userHasCard = userHasCardAtIndex(index, userCards);
+              String imageUrl;
+              if (userHasCard) {
+                String baseUrl = 'http://20.162.113.208';
+                String imagePath =
+                    '/FOTOS_CARTAS/${index + 1}.png'; // La imagen sigue el formato de ID de Pokémon
+                imageUrl = baseUrl + imagePath;
+              } else {
+                // Si el usuario no tiene la carta, cargar la imagen estática desde assets
+                imageUrl = 'assets/PortadaColor.png';
+              }
+              return GestureDetector(
+                onTap: () {
+                  // Mostrar la imagen centrada y aumentada al hacer clic
+                  if (userHasCard) {
+                    _showCenteredImage(context, imageUrl);
+                  }
+                },
+                child: Padding(
+                  padding: EdgeInsets.all(4.0),
+                  child: userHasCard
+                      ? Image.network(
+                          imageUrl,
+                          fit: BoxFit.fitHeight,
+                        )
+                      : Image.asset(
+                          imageUrl,
+                          fit: BoxFit.fitHeight,
+                        ),
                 ),
               );
             },
           );
         }
+      },
+    );
+  }
+
+  void _showCenteredImage(BuildContext context, String imageUrl) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Center(
+          child: GestureDetector(
+            onTap: () {
+              Navigator.of(context).pop();
+            },
+            child: SizedBox(
+              height: 400,
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        );
       },
     );
   }

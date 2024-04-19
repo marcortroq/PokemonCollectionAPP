@@ -149,7 +149,7 @@ class _PacksState extends State<Packs> {
       ),
       PackData(
         title: 'MONEDAS PREMIUM',
-        images: ['assets/buy.png', 'assets/buy.png'],
+        images: ['assets/buyPremium.png', 'assets/buyPremium.png'],
         prices: ['4.99€', '9.99€'],
       ),
     ];
@@ -273,7 +273,8 @@ class _PacksState extends State<Packs> {
                           _restarSobre(idUsuario);
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => open_pack()),
+                            MaterialPageRoute(
+                                builder: (context) => open_pack()),
                           );
                         },
                         child: image,
