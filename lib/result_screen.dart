@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:pokemonapp/menu.dart';
 import 'usuario.dart';
 import 'usuario_provider.dart';
 
@@ -72,16 +73,11 @@ class _ResultScreenState extends State<ResultScreen> {
                           future: fetchCardImage(foundPokemonIndex),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
-                              return Image.asset(
-                                'assets/pokemon_carga1.gif',
-                                height: 200,
-                                width: 200,
-                              );
+                              return CircularProgressIndicator();
                             } else if (snapshot.hasError) {
                               return Text('Error: ${snapshot.error}');
                             } else if (snapshot.hasData) {
-                              final cardImageBase64 = snapshot.data!;
-                              final cardImageBytes = base64Decode(cardImageBase64);
+                              final cardImageLocation = snapshot.data!;
                               return GestureDetector(
                                 onTap: () {
                                   _showSaveConfirmation(context, foundPokemonIndex);
@@ -89,7 +85,10 @@ class _ResultScreenState extends State<ResultScreen> {
                                 child: AnimatedOpacity(
                                   opacity: 1.0,
                                   duration: Duration(seconds: 3),
-                                  child: Image.memory(cardImageBytes, fit: BoxFit.cover),
+                                  child: Image.network(
+                                    'http://20.162.113.208$cardImageLocation',
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               );
                             } else {
@@ -130,62 +129,77 @@ class _ResultScreenState extends State<ResultScreen> {
 
       final pokemonId = foundPokemonIndex + 1;
 
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Guardar Pokémon'),
-            content: Text('¿Quieres guardar este Pokémon?'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('No'),
-              ),
-              TextButton(
-                onPressed: () async {
-                  final apiUrl = 'http://20.162.113.208:5000/api/pokedex';
-                  final requestBody = jsonEncode({
-                    'id_usuario': usuario!.idUsuario,
-                    'id_pokemon': pokemonId,
-                  });
+      // Verifica si ya se ha guardado el Pokémon
+      if (!_showCardImage) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Guardar Pokémon'),
+              content: Text('¿Quieres guardar este Pokémon?'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('No'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    final apiUrl = 'http://20.162.113.208:5000/api/pokedex';
+                    final requestBody = jsonEncode({
+                      'id_usuario': usuario!.idUsuario,
+                      'id_pokemon': pokemonId,
+                    });
 
-                  final response = await http.post(
-                    Uri.parse(apiUrl),
-                    headers: <String, String>{
-                      'Content-Type': 'application/json; charset=UTF-8',
-                    },
-                    body: requestBody,
-                  );
-
-                  if (response.statusCode == 201) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Pokémon guardado'),
-                      ),
+                    final response = await http.post(
+                      Uri.parse(apiUrl),
+                      headers: <String, String>{
+                        'Content-Type': 'application/json; charset=UTF-8',
+                      },
+                      body: requestBody,
                     );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Error al guardar el Pokémon'),
-                      ),
-                    );
-                  }
 
-                  // Set _showCardImage to true to trigger the animation
-                  setState(() {
-                    _showCardImage = true;
-                  });
+                    if (response.statusCode == 201) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Pokémon guardado'),
+                        ),
+                      );
 
-                  Navigator.of(context).pop();
-                },
-                child: Text('Sí'),
-              ),
-            ],
-          );
-        },
-      );
+                      // Set _showCardImage to true to trigger the animation
+                      setState(() {
+                        _showCardImage = true;
+                      });
+
+                      // Navegar a la pantalla del menú después del guardado
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Menu()),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error al guardar el Pokémon'),
+                        ),
+                      );
+                    }
+
+                    Navigator.of(context).pop(); // Cierra el diálogo de confirmación
+                  },
+                  child: Text('Sí'),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        // Si _showCardImage es true (ya se guardó el Pokémon), navega al menú
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Menu()),
+        );
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -194,4 +208,5 @@ class _ResultScreenState extends State<ResultScreen> {
       );
     }
   }
+
 }
