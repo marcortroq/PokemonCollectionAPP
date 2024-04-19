@@ -25,6 +25,8 @@ class _StateIncubadora extends State<Incubadora> {
   int totalImages = 4; // Cambia esto al número total de imágenes que tienes
 
   List<String> cardImages = []; // Lista para almacenar las URLs de las imágenes de cartas
+  bool showOverlayImage = false;
+  String overlayImagePath = "assets/PortadaColor.png"; // Ruta de la imagen para desaparecer
 
   @override
   Widget build(BuildContext context) {
@@ -33,17 +35,24 @@ class _StateIncubadora extends State<Incubadora> {
 
     return GestureDetector(
       onTap: () {
-        if (!showImages) {
-          _handleIncubadoraTap();
+        if (showOverlayImage) {
+          // Ocultar la imagen cuando hagas clic
+          setState(() {
+            showOverlayImage = false;
+          });
+        } else {
+          _handleIncubadoraTap(); // Llama a la función para manejar el tap si no se muestra la imagen de la portada
         }
-      }, // Llama a la función para manejar el tap solo si las imágenes no están mostradas
+      },
       child: Scaffold(
         body: Stack(
           children: [
             _buildBackground(),
-            _buildPortadaColor('assets/PortadaColor.png', 275, screenWidth),
-            if (showImages)
-              _buildCardImages(screenWidth),
+            if (!showImages)
+              _buildIncubadora('assets/incubadora1.png', 275, screenWidth),
+            if (showImages) _buildIncubadora2('assets/incubadora1.png', 275, screenWidth, 0.5),
+            if (showImages) _buildCardImages(screenWidth),
+            _buildOverlayImage('assets/PortadaColor.png', 75,screenWidth),
           ],
         ),
       ),
@@ -61,16 +70,25 @@ class _StateIncubadora extends State<Incubadora> {
     );
   }
 
-  Widget _buildPortadaColor(String imagePath, double size, double screenWidth) {
+  Widget _buildIncubadora(String imagePath, double size, double screenWidth) {
     return Positioned(
       top: screenWidth * 0.7,
       left: (screenWidth * 1 - size) / 2,
-      child: GestureDetector(
-        onTap: () {
-          if (!showImages) {
-            _handleIncubadoraTap();
-          }
-        },
+      child: Image.asset(
+        imagePath,
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+      ),
+    );
+  }
+
+  Widget _buildIncubadora2(String imagePath, double size, double screenWidth, double opacity) {
+    return Positioned(
+      top: screenWidth * 0.7,
+      left: (screenWidth * 1 - size) / 2,
+      child: Opacity(
+        opacity: opacity,
         child: Image.asset(
           imagePath,
           width: size,
@@ -141,6 +159,11 @@ class _StateIncubadora extends State<Incubadora> {
       } catch (e) {
         print("Error al cargar las imágenes de las cartas: $e");
       }
+    } else {
+      // Mostrar la imagen de la portada si ya se cargaron las imágenes
+      setState(() {
+        showOverlayImage = true;
+      });
     }
   }
 
@@ -176,7 +199,6 @@ class _StateIncubadora extends State<Incubadora> {
     }
   }
 
-  // Método para mostrar la imagen centrada y aumentada
   void _showCenteredImage(BuildContext context, String imageUrl) {
     showDialog(
       context: context,
@@ -196,6 +218,19 @@ class _StateIncubadora extends State<Incubadora> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildOverlayImage(String imagePath, double size,double screenWidth) {
+    return Positioned(
+      top: screenWidth * 0.7,
+      left: (screenWidth * 1 - size) / 2,
+      child: Image.asset(
+        imagePath,
+        width: size,
+        height: size,
+        fit: BoxFit.contain,
+      ),
     );
   }
 }
