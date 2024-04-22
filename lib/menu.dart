@@ -5,6 +5,7 @@ import 'package:pokemonapp/countdown_timer.dart';
 import 'package:pokemonapp/incubadora.dart';
 import 'package:pokemonapp/main_ocr.dart';
 import 'package:pokemonapp/nav_bar.dart';
+import 'package:pokemonapp/pokedex.dart';
 import 'dart:math' as math;
 import 'main.dart';
 import 'packs.dart';
@@ -242,7 +243,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                         Padding(
                           padding: EdgeInsets.only(top: screenSize.height * 0.05),
                           child: 
-                            _buildButton("POKEDEX", "assets/pokeball.png", Packs(), context, topRightRadius: 0, bottomLeftRadius: 0) //POKEDEX
+                            _buildButton("POKEDEX", "assets/pokeball.png", Pokedex(), context, topRightRadius: 0, bottomLeftRadius: 0) //POKEDEX
                         ),
                       ],
                     ),
