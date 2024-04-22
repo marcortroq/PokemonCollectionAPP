@@ -214,27 +214,66 @@ class _PacksState extends State<Packs> {
   }
 
   Widget _imageWithText(String imagePath, String text) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Image.asset(
-          imagePath,
-          width: 170,
-          fit: BoxFit.contain,
-        ),
-        Positioned(
-          child: Text(
-            text,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontFamily: 'sarpanch',
-            ),
+    return GestureDetector(
+      onTap: () {
+        _showPopUp(context);
+      },
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Image.asset(
+            imagePath,
+            width: 170,
+            fit: BoxFit.contain,
           ),
-          top: 110,
-          left: 63,
-        ),
-      ],
+          Positioned(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontFamily: 'sarpanch',
+              ),
+            ),
+            top: 110,
+            left: 63,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showPopUp(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor:
+              Colors.blue, // Cambia el color de fondo del AlertDialog
+          title: Text(
+            'Pop Up de ejemplo',
+            style: TextStyle(
+                color: Colors.white), // Cambia el color del texto del título
+          ),
+          content: Text(
+            'Este es un Pop Up simple.',
+            style: TextStyle(
+                color: Colors.white), // Cambia el color del texto del contenido
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                'Cerrar',
+                style: TextStyle(
+                    color: Colors.white), // Cambia el color del texto del botón
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -310,9 +349,8 @@ class _PacksState extends State<Packs> {
         return -1; // Retornar un valor por defecto o manejar el error de otra manera
       }
     } catch (e) {
-      // Error al realizar la solicitud, maneja el error según sea necesario
       print('Error en la solicitud: $e');
-      return -1; // Retornar un valor por defecto o manejar el error de otra manera
+      return -1;
     }
   }
 
@@ -323,7 +361,6 @@ class _PacksState extends State<Packs> {
     try {
       final response = await http.post(
         Uri.parse(url),
-        // No necesitamos enviar ningún cuerpo en esta solicitud POST
       );
 
       if (response.statusCode == 200) {
