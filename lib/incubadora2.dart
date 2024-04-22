@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 
+import 'package:pokemonapp/menu.dart';
+import 'package:pokemonapp/usuario_provider.dart';
+import 'package:provider/provider.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -21,12 +25,18 @@ class Incubadora extends StatefulWidget {
 }
 
 class _StateIncubadora extends State<Incubadora> {
+  double opacity = 1.0;
+  bool _isVisible = true;
+  bool _isVisible2 = true;
+  bool _isVisible3 = true;
+  bool _isVisible4 = true;
   bool showImages = false;
   int totalImages = 4; // Cambia esto al número total de imágenes que tienes
-
   List<String> cardImages = []; // Lista para almacenar las URLs de las imágenes de cartas
   bool showOverlayImage = false;
   String overlayImagePath = "assets/PortadaColor.png"; // Ruta de la imagen para desaparecer
+  int clickedImagesCount = 0;
+  List<int> numerosGenerados = [];
 
   @override
   Widget build(BuildContext context) {
@@ -35,13 +45,21 @@ class _StateIncubadora extends State<Incubadora> {
 
     return GestureDetector(
       onTap: () {
-        if (showOverlayImage) {
-          // Ocultar la imagen cuando hagas clic
-          setState(() {
-            showOverlayImage = false;
-          });
+        if (clickedImagesCount == totalImages) {
+          // Navegar a otra pantalla cuando se hayan hecho clic en todas las imágenes
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Menu()),
+          );
         } else {
-          _handleIncubadoraTap(); // Llama a la función para manejar el tap si no se muestra la imagen de la portada
+          if (showOverlayImage) {
+            // Ocultar la imagen cuando hagas clic
+            setState(() {
+              showOverlayImage = false;
+            });
+          } else {
+            _handleIncubadoraTap(); // Llama a la función para manejar el tap si no se muestra la imagen de la portada
+          }
         }
       },
       child: Scaffold(
@@ -50,9 +68,17 @@ class _StateIncubadora extends State<Incubadora> {
             _buildBackground(),
             if (!showImages)
               _buildIncubadora('assets/incubadora1.png', 275, screenWidth),
-            if (showImages) _buildIncubadora2('assets/incubadora1.png', 275, screenWidth, 0.5),
+            if (showImages)
+              _buildIncubadora2('assets/incubadora1.png', 275, screenWidth, 0.5),
             if (showImages) _buildCardImages(screenWidth),
-            _buildOverlayImage('assets/PortadaColor.png', 75,screenWidth),
+            if (showImages)
+              _buildOverlayImage('assets/PortadaColor.png', 200, screenWidth, screenWidth * 0.5, screenWidth * 0.52, 0),
+            if (showImages)
+              _buildOverlayImage2('assets/PortadaColor.png', 200, screenWidth, screenWidth * 1.25, screenWidth * 0.52, 1),
+            if (showImages)
+              _buildOverlayImage3('assets/PortadaColor.png', 200, screenWidth, screenWidth * 0.3, screenWidth * 0.52, 2),
+            if (showImages)
+              _buildOverlayImage4('assets/PortadaColor.png', 200, screenWidth, screenWidth * 1.05, screenWidth * 0.52, 3),
           ],
         ),
       ),
@@ -112,6 +138,114 @@ class _StateIncubadora extends State<Incubadora> {
     );
   }
 
+  Widget _buildOverlayImage(String imagePath, double size, double screenWidth, double top, double left, int index) {
+    return Positioned(
+      top: top, // Ajusta la posición vertical de la imagen
+      left: left, // Centra la imagen horizontalmente
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _isVisible = false;
+            clickedImagesCount++; // Cambia la visibilidad a false al hacer clic
+          });
+        },
+        child: AnimatedSwitcher( // Usa AnimatedSwitcher en lugar de AnimatedOpacity
+          duration: Duration(milliseconds: 500), // Duración de la animación
+          child: _isVisible
+              ? Image.asset(
+                  imagePath,
+                  key: ValueKey<int>(index), // Key para diferenciar entre las imágenes
+                  width: size,
+                  height: size,
+                  fit: BoxFit.contain,
+                )
+              : SizedBox.shrink(), // Utiliza SizedBox.shrink() para hacer que la imagen desaparezca completamente
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOverlayImage2(String imagePath, double size, double screenWidth, double top, double left, int index) {
+    return Positioned(
+      top: top, // Ajusta la posición vertical de la imagen
+      left: left, // Centra la imagen horizontalmente
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _isVisible2 = false;
+            clickedImagesCount++; // Cambia la visibilidad a false al hacer clic
+          });
+        },
+        child: AnimatedSwitcher( // Usa AnimatedSwitcher en lugar de AnimatedOpacity
+          duration: Duration(milliseconds: 500), // Duración de la animación
+          child: _isVisible2
+              ? Image.asset(
+                  imagePath,
+                  key: ValueKey<int>(index), // Key para diferenciar entre las imágenes
+                  width: size,
+                  height: size,
+                  fit: BoxFit.contain,
+                )
+              : SizedBox.shrink(), // Utiliza SizedBox.shrink() para hacer que la imagen desaparezca completamente
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOverlayImage3(String imagePath, double size, double screenWidth, double top, double left, int index) {
+    return Positioned(
+      top: top, // Ajusta la posición vertical de la imagen
+      right: left, // Centra la imagen horizontalmente
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _isVisible3 = false;
+            clickedImagesCount++; // Cambia la visibilidad a false al hacer clic
+          });
+        },
+        child: AnimatedSwitcher( // Usa AnimatedSwitcher en lugar de AnimatedOpacity
+          duration: Duration(milliseconds: 500), // Duración de la animación
+          child: _isVisible3
+              ? Image.asset(
+                  imagePath,
+                  key: ValueKey<int>(index), // Key para diferenciar entre las imágenes
+                  width: size,
+                  height: size,
+                  fit: BoxFit.contain,
+                )
+              : SizedBox.shrink(), // Utiliza SizedBox.shrink() para hacer que la imagen desaparezca completamente
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOverlayImage4(String imagePath, double size, double screenWidth, double top, double left, int index) {
+    return Positioned(
+      top: top, // Ajusta la posición vertical de la imagen
+      right: left, // Centra la imagen horizontalmente
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _isVisible4 = false;
+            clickedImagesCount++; // Cambia la visibilidad a false al hacer clic
+          });
+        },
+        child: AnimatedSwitcher( // Usa AnimatedSwitcher en lugar de AnimatedOpacity
+          duration: Duration(milliseconds: 500), // Duración de la animación
+          child: _isVisible4
+              ? Image.asset(
+                  imagePath,
+                  key: ValueKey<int>(index), // Key para diferenciar entre las imágenes
+                  width: size,
+                  height: size,
+                  fit: BoxFit.contain,
+                )
+              : SizedBox.shrink(), // Utiliza SizedBox.shrink() para hacer que la imagen desaparezca completamente
+        ),
+      ),
+    );
+  }
+
   double _getImageTopPosition(int index, double screenWidth) {
     // Define la posición vertical de cada imagen basada en su índice
     switch (index) {
@@ -154,8 +288,12 @@ class _StateIncubadora extends State<Incubadora> {
           cardImages.add(completeUrl);
         }
         setState(() {
+          print(numerosGenerados);
           showImages = true; // Mostrar las imágenes cargadas
         });
+
+        // Mostrar el diálogo de confirmación para guardar el Pokémon
+        _showSaveConfirmation(context);
       } catch (e) {
         print("Error al cargar las imágenes de las cartas: $e");
       }
@@ -169,7 +307,8 @@ class _StateIncubadora extends State<Incubadora> {
 
   Future<String> fetchRandomCardImage() async {
     final random = Random();
-    final pokemonId = random.nextInt(151) + 1;
+    final pokemonId = random.nextInt(144) + 1;
+     numerosGenerados.add(pokemonId);
     final response = await http.get(Uri.parse('http://20.162.113.208:5000/api/cartas/$pokemonId'));
 
     if (response.statusCode == 200) {
@@ -190,6 +329,10 @@ class _StateIncubadora extends State<Incubadora> {
     if (index < cardImages.length) {
       return GestureDetector(
         onTap: () {
+           // Sumamos 1 al índice para obtener el ID del Pokémon
+          setState(() {
+            // Incrementar el contador de imágenes clicadas
+          });
           _showCenteredImage(context, cardImages[index]);
         },
         child: Image.network(cardImages[index], height: 195),
@@ -221,16 +364,44 @@ class _StateIncubadora extends State<Incubadora> {
     );
   }
 
-  Widget _buildOverlayImage(String imagePath, double size,double screenWidth) {
-    return Positioned(
-      top: screenWidth * 0.7,
-      left: (screenWidth * 1 - size) / 2,
-      child: Image.asset(
-        imagePath,
-        width: size,
-        height: size,
-        fit: BoxFit.contain,
-      ),
-    );
+  
+
+  void _showSaveConfirmation(BuildContext context) async {
+    try {
+      final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
+      final usuario = usuarioProvider.usuario;
+
+      // Guardar los Pokémon en la base de datos
+      for (int i = 0; i < totalImages; i++) {
+        try {
+          final apiUrl = 'http://20.162.113.208:5000/api/pokedex';
+          final requestBody = jsonEncode({
+            'id_usuario': usuario!.idUsuario,
+            'id_pokemon': numerosGenerados[i], // Utiliza los valores de la lista numerosGenerados como ID del Pokémon
+          });
+
+          final response = await http.post(
+            Uri.parse(apiUrl),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: requestBody,
+          );
+
+          if (response.statusCode == 201) {
+            print('Pokémon guardado');
+          } else {
+            print('Error al guardar el Pokémon$e');
+          }
+        } catch (e) {
+          print('Error al guardar el Pokémon: $e');
+        }
+      }
+    } catch (e) {
+      print('Error al guardar los Pokémon automáticamente: $e');
+      // Si ocurre un error, podrías mostrar un mensaje o manejarlo de otra manera aquí
+    }
   }
 }
+
+
