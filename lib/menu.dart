@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:pokemonapp/countdown_timer.dart';
-import 'package:pokemonapp/incubadora2.dart';
+import 'package:pokemonapp/incubadora.dart';
 import 'package:pokemonapp/main_ocr.dart';
 import 'package:pokemonapp/pokedex.dart';
 import 'dart:math' as math;
