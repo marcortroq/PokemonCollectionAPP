@@ -12,6 +12,8 @@ import 'package:provider/provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
   // Configura el estilo de la barra de navegación
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -210,28 +212,29 @@ class _MyHomePageState extends State<MyHomePage> {
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(13.0),
           ),
-           filled: true,
+          filled: true,
           fillColor: Colors.white,
           labelText: labelText,
           suffixIcon: Padding(
-            padding: const EdgeInsets.only(right: 12.0), // Ajusta el espaciado a tu preferencia
+            padding: const EdgeInsets.only(
+                right: 12.0), // Ajusta el espaciado a tu preferencia
             child: obscureText
-              ? IconButton(
-                  icon: const Icon(Icons.visibility),
-                  onPressed: () {
-                    setState(() {
-                      _isObscure = !_isObscure;
-                    });
-                  },
-                )
-              : IconButton(
-                  icon: const Icon(Icons.visibility_off),
-                  onPressed: () {
-                    setState(() {
-                      _isObscure = !_isObscure;
-                    });
-                  },
-                ),
+                ? IconButton(
+                    icon: const Icon(Icons.visibility),
+                    onPressed: () {
+                      setState(() {
+                        _isObscure = !_isObscure;
+                      });
+                    },
+                  )
+                : IconButton(
+                    icon: const Icon(Icons.visibility_off),
+                    onPressed: () {
+                      setState(() {
+                        _isObscure = !_isObscure;
+                      });
+                    },
+                  ),
           ),
         ),
       ),
