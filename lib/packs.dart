@@ -248,30 +248,71 @@ class _PacksState extends State<Packs> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor:
-              Colors.blue, // Cambia el color de fondo del AlertDialog
-          title: Text(
-            'Pop Up de ejemplo',
-            style: TextStyle(
-                color: Colors.white), // Cambia el color del texto del título
-          ),
-          content: Text(
-            'Este es un Pop Up simple.',
-            style: TextStyle(
-                color: Colors.white), // Cambia el color del texto del contenido
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                'Cerrar',
-                style: TextStyle(
-                    color: Colors.white), // Cambia el color del texto del botón
+          backgroundColor: Colors.black,
+          content: Container(
+            width: 300.0, // Ancho del contenedor
+            height: 200.0, // Alto del contenedor
+            decoration: BoxDecoration(
+              borderRadius:
+                  BorderRadius.circular(20.0), // Agrega bordes redondeados
+              gradient: LinearGradient(
+                colors: [
+                  const Color.fromRGBO(178, 168, 168, 1),
+                  const Color.fromRGBO(255, 255, 255, 1)
+                ], // Define el degradado de blanco a gris
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
               ),
             ),
-          ],
+            padding: EdgeInsets.all(20.0), // Ajusta el relleno del contenedor
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(
+                  'Pop Up ejemplo',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 16.0),
+                Text(
+                  'Este es un Pop Up simple.',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16.0,
+                  ),
+                ),
+                SizedBox(height: 16.0),
+                Container(
+                  width: double
+                      .infinity, // Ancho del contenedor igual al del AlertDialog
+                  height: 50.0, // Altura del contenedor
+                  color: Colors.grey, // Color del contenedor gris
+                ),
+                SizedBox(height: 16.0),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(
+                    'Cerrar',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18.0,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Establece un tamaño específico para el AlertDialog
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          // Ajusta el tamaño del AlertDialog
+          contentPadding: EdgeInsets.zero,
         );
       },
     );
