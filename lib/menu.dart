@@ -4,10 +4,10 @@ import 'package:flutter/widgets.dart';
 import 'package:pokemonapp/countdown_timer.dart';
 import 'package:pokemonapp/incubadora.dart';
 import 'package:pokemonapp/main_ocr.dart';
+import 'package:pokemonapp/nav_bar.dart';
 import 'dart:math' as math;
 import 'main.dart';
 import 'packs.dart';
-import 'package:pokemonapp/NavBar.dart';
 
 class RPSCustomPainter extends CustomPainter {
   @override
@@ -145,7 +145,9 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
 
     return Scaffold(
       drawer: NavBar(),
-      body: Stack(
+       body: Builder( // Usamos un Builder para obtener un contexto que contenga el Scaffold
+        builder: (BuildContext context) {
+          return Stack(
         children: [
           Positioned.fill(
             child: CustomPaint(
@@ -440,6 +442,16 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
               ],
             ),
           ),
+          Positioned(
+            left: MediaQuery.of(context).size.width * 0.02,
+            top: MediaQuery.of(context).size.height * 0.04,
+            child: IconButton(
+              icon: Icon(Icons.menu), // Icono de hamburguesa
+              onPressed: () {
+              Scaffold.of(context).openDrawer(); // Abre el Drawer
+              },
+            ),
+          ),
            Positioned(
             left: screenSize.width * 0.23,
             top: screenSize.height * 0.6,
@@ -448,7 +460,9 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
             }),
           ),
         ],
-      ),
+      );
+        }
+       )
     );
   }
 
