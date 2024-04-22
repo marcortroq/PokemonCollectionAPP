@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:pokemonapp/main.dart';
 import 'package:pokemonapp/main_ocr.dart';
 import 'menu.dart';
+import 'dart:convert';
+
 
 void main() {
   runApp(const Register());
@@ -424,7 +426,7 @@ class _MyHomePageState extends State<MyHomePage> {
       if (response.statusCode == 201) {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const MainScreen()),
+          MaterialPageRoute(builder: (context) => const MyApp()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
