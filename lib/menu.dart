@@ -4,11 +4,11 @@ import 'package:flutter/widgets.dart';
 import 'package:pokemonapp/countdown_timer.dart';
 import 'package:pokemonapp/incubadora.dart';
 import 'package:pokemonapp/main_ocr.dart';
+import 'package:pokemonapp/nav_bar.dart';
+import 'package:pokemonapp/pokedex.dart';
 import 'dart:math' as math;
 import 'main.dart';
 import 'packs.dart';
-import 'pokedex.dart';
-import 'package:pokemonapp/NavBar.dart';
 
 class RPSCustomPainter extends CustomPainter {
   @override
@@ -58,9 +58,9 @@ class RPSCustomPainter2 extends CustomPainter {
     final double offsetY = 12.0;
     final path = Path()
       ..moveTo(size.width * 0, size.height * 0.3116667 + offsetY)
-      ..lineTo(size.width * 0.5, size.height * 0.51)
-      ..lineTo(size.width * 1, size.height * 0.316667 + offsetY)
-      ..lineTo(size.width * 1, size.height * 1.25)
+      ..lineTo(size.width * 0.5, size.height * 0.51 )
+      ..lineTo(size.width * 1, size.height * 0.316667+ offsetY)
+      ..lineTo(size.width * 1, size.height * 1.25 )
       ..lineTo(size.width * 0, size.height * 1.25);
 
     final paintFill = Paint()
@@ -102,7 +102,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-
+    
     _animationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 300),
@@ -123,7 +123,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
-  @override
+   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _screen = MediaQuery.of(context).size; // Inicialización de _screen
@@ -131,7 +131,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    late final Size screenSize = MediaQuery.of(context).size;
+     late final Size screenSize = MediaQuery.of(context).size;
 
     // Calcula el tamaño de la imagen del fondo
     double backgroundWidth = screenSize.width * 1.2;
@@ -146,7 +146,9 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
 
     return Scaffold(
       drawer: NavBar(),
-      body: Stack(
+       body: Builder( // Usamos un Builder para obtener un contexto que contenga el Scaffold
+        builder: (BuildContext context) {
+          return Stack(
         children: [
           Positioned.fill(
             child: CustomPaint(
@@ -196,21 +198,21 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
             ),
           ),
           Positioned(
-            top: screenSize.height * 0.005,
-            left: (screenSize.width - 200) / 2,
+            top: screenSize.height * 0.005, 
+            left: (screenSize.width - 200) / 2, 
             child: Image.asset(
               'assets/barramoneda.png', // Ruta de tu imagen
-              width: screenSize.width * 0.5,
-              height: screenSize.height * 0.13,
+              width: screenSize.width * 0.5, 
+              height: screenSize.height * 0.13, 
             ),
           ),
           Positioned(
-            top: screenSize.height * 0.005,
-            left: (screenSize.width - -80) / 2,
+            top: screenSize.height * 0.005, 
+            left: (screenSize.width - -80) / 2, 
             child: Image.asset(
               'assets/barrapremium.png', // Ruta de tu imagen
-              width: screenSize.width * 0.5,
-              height: screenSize.height * 0.13,
+              width: screenSize.width * 0.5, 
+              height: screenSize.height * 0.13, 
             ),
           ),
           Column(
@@ -225,53 +227,48 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Padding(
-                            padding:
-                                EdgeInsets.only(top: screenSize.height * 0.05),
-                            child: _buildButton(
-                                "PACKS", "assets/pack.png", Packs(), context,
-                                topLeftRadius: 0, bottomRightRadius: 0)),
-                        Padding(
-                          padding:
-                              EdgeInsets.only(bottom: screenSize.height * 0.09),
+                          padding: EdgeInsets.only(top: screenSize.height * 0.05),
+                          child:
+                            _buildButton("PACKS", "assets/pack.png", Packs(), context, topLeftRadius: 0, bottomRightRadius: 0)
+                        ),
+                       Padding(
+                          padding: EdgeInsets.only(bottom: screenSize.height * 0.09),
                           child: Stack(
-                            children: [
-                              _buildButton("COLLECT", "assets/incubadora.png",
-                                  Incubadora(), context), // INCUBADORA
+                            children: [                              
+                              _buildButton("COLLECT", "assets/incubadora.png", Incubadora(), context), // INCUBADORA
                               CountdownTimer(), // Contador de cuenta atrás de 12 horas
                             ],
                           ),
                         ),
                         Padding(
-                            padding:
-                                EdgeInsets.only(top: screenSize.height * 0.05),
-                            child: _buildButton("POKEDEX",
-                                "assets/pokeball.png", Pokedex(), context,
-                                topRightRadius: 0,
-                                bottomLeftRadius: 0) //POKEDEX
-                            ),
+                          padding: EdgeInsets.only(top: screenSize.height * 0.05),
+                          child: 
+                            _buildButton("POKEDEX", "assets/pokeball.png", Pokedex(), context, topRightRadius: 0, bottomLeftRadius: 0) //POKEDEX
+                        ),
                       ],
                     ),
+                   
                   ],
                 ),
               ),
             ],
           ),
           Positioned(
-            left: MediaQuery.of(context).size.width * 0.42,
-            top: MediaQuery.of(context).size.height * 0.9,
-            child: GestureDetector(
-              onTap: () {
-                // Navegar a la otra pestaña al hacer clic en la imagen
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MainScreen()),
-                );
-              },
-              child: Image.asset(
-                'assets/OCR.png', // Reemplaza 'ruta/de/la/imagen.png' con la ruta de tu imagen
+                left: MediaQuery.of(context).size.width * 0.42, 
+                  top: MediaQuery.of(context).size.height * 0.9, 
+                child: GestureDetector(
+                  onTap: () {
+                    // Navegar a la otra pestaña al hacer clic en la imagen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => MainScreen()),
+                    );
+                  },
+                  child: Image.asset(
+                    'assets/OCR.png', // Reemplaza 'ruta/de/la/imagen.png' con la ruta de tu imagen
+                  ),
+                ),
               ),
-            ),
-          ),
           Positioned(
             left: (MediaQuery.of(context).size.width * 0.4) / 2,
             top: (MediaQuery.of(context).size.height * 0.28) / 2,
@@ -279,166 +276,166 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
               children: [
                 Image.asset(
                   'assets/hexMedallas.png',
-                  width: MediaQuery.of(context).size.width * 0.6,
-                  height: MediaQuery.of(context).size.height * 0.6,
+                 width: MediaQuery.of(context).size.width * 0.6,
+                height: MediaQuery.of(context).size.height * 0.6,
                   fit: BoxFit.contain,
                 ),
                 Positioned(
-                  left: MediaQuery.of(context).size.width * 0.17,
-                  top: MediaQuery.of(context).size.height * 0.21,
+                  left: MediaQuery.of(context).size.width * 0.17, 
+                  top: MediaQuery.of(context).size.height * 0.21, 
                   child: Image.asset(
                     'assets/MedallaRoca.png',
-                    width: MediaQuery.of(context).size.width * 0.09,
+                    width: MediaQuery.of(context).size.width * 0.09, 
                     height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: MediaQuery.of(context).size.width * 0.17,
-                  top: MediaQuery.of(context).size.height * 0.21,
+                  left: MediaQuery.of(context).size.width * 0.17, 
+                  top: MediaQuery.of(context).size.height * 0.21, 
                   child: Image.asset(
                     'assets/medallaRocaOut.png',
-                    width: MediaQuery.of(context).size.width * 0.09,
+                    width: MediaQuery.of(context).size.width * 0.09, 
                     height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: MediaQuery.of(context).size.width * 0.17,
+                  left: MediaQuery.of(context).size.width * 0.17, 
                   top: MediaQuery.of(context).size.height * 0.35,
                   child: Image.asset(
                     'assets/MedallaVolcan.png',
-                    width: MediaQuery.of(context).size.width * 0.09,
+                    width: MediaQuery.of(context).size.width * 0.09, 
                     height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: MediaQuery.of(context).size.width * 0.17,
-                  top: MediaQuery.of(context).size.height * 0.35,
+                  left: MediaQuery.of(context).size.width * 0.17, 
+                  top: MediaQuery.of(context).size.height * 0.35, 
                   child: Image.asset(
                     'assets/medallaVolcanOut.png',
-                    width: MediaQuery.of(context).size.width * 0.09,
+                    width: MediaQuery.of(context).size.width * 0.09, 
                     height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: MediaQuery.of(context).size.width * 0.245,
+                  left: MediaQuery.of(context).size.width * 0.245, 
                   top: MediaQuery.of(context).size.height * 0.25,
                   child: Image.asset(
                     'assets/MedallaAlma.png',
-                    width: MediaQuery.of(context).size.width * 0.09,
+                    width: MediaQuery.of(context).size.width * 0.09, 
                     height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: MediaQuery.of(context).size.width * 0.245,
+                  left: MediaQuery.of(context).size.width * 0.245, 
                   top: MediaQuery.of(context).size.height * 0.25,
                   child: Image.asset(
                     'assets/medallaAlmaout.png',
-                    width: MediaQuery.of(context).size.width * 0.09,
+                    width: MediaQuery.of(context).size.width * 0.09, 
                     height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: MediaQuery.of(context).size.width * 0.4,
-                  top: MediaQuery.of(context).size.height * 0.285,
+                  left: MediaQuery.of(context).size.width * 0.4, 
+                  top: MediaQuery.of(context).size.height * 0.285, 
                   child: Image.asset(
                     'assets/MedallaPantano.png',
-                    width: MediaQuery.of(context).size.width * 0.09,
+                    width: MediaQuery.of(context).size.width * 0.09, 
                     height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: MediaQuery.of(context).size.width * 0.4,
-                  top: MediaQuery.of(context).size.height * 0.285,
+                  left: MediaQuery.of(context).size.width * 0.4, 
+                  top: MediaQuery.of(context).size.height * 0.285, 
                   child: Image.asset(
                     'assets/medallaPantanoOut.png',
-                    width: MediaQuery.of(context).size.width * 0.09,
+                    width: MediaQuery.of(context).size.width * 0.09, 
                     height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: MediaQuery.of(context).size.width * 0.32,
+                  left: MediaQuery.of(context).size.width * 0.32, 
                   top: MediaQuery.of(context).size.height * 0.21,
                   child: Image.asset(
                     'assets/MedallaCascada.png',
-                    width: MediaQuery.of(context).size.width * 0.09,
+                    width: MediaQuery.of(context).size.width * 0.09, 
                     height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: MediaQuery.of(context).size.width * 0.32,
+                  left: MediaQuery.of(context).size.width * 0.32, 
                   top: MediaQuery.of(context).size.height * 0.21,
                   child: Image.asset(
                     'assets/medallaCascadaOut.png',
-                    width: MediaQuery.of(context).size.width * 0.09,
+                    width: MediaQuery.of(context).size.width * 0.09, 
                     height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: MediaQuery.of(context).size.width * 0.25,
-                  top: MediaQuery.of(context).size.height * 0.315,
+                  left: MediaQuery.of(context).size.width * 0.25,  
+                  top: MediaQuery.of(context).size.height * 0.315, 
                   child: Image.asset(
                     'assets/MedallaArcoiris.png',
-                    width: MediaQuery.of(context).size.width * 0.09,
+                    width: MediaQuery.of(context).size.width * 0.09, 
                     height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: MediaQuery.of(context).size.width * 0.25,
+                  left: MediaQuery.of(context).size.width * 0.25,  
                   top: MediaQuery.of(context).size.height * 0.315,
                   child: Image.asset(
                     'assets/medallaArcoirisout.png',
-                    width: MediaQuery.of(context).size.width * 0.09,
+                    width: MediaQuery.of(context).size.width * 0.09, 
                     height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: MediaQuery.of(context).size.width * 0.1,
-                  top: MediaQuery.of(context).size.height * 0.285,
+                  left: MediaQuery.of(context).size.width * 0.1,  
+                  top: MediaQuery.of(context).size.height * 0.285, 
                   child: Image.asset(
                     'assets/MedallaTrueno.png',
-                    width: MediaQuery.of(context).size.width * 0.09,
+                    width: MediaQuery.of(context).size.width * 0.09, 
                     height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: MediaQuery.of(context).size.width * 0.1,
-                  top: MediaQuery.of(context).size.height * 0.285,
+                  left: MediaQuery.of(context).size.width * 0.1,  
+                  top: MediaQuery.of(context).size.height * 0.285,  
                   child: Image.asset(
                     'assets/medallaTruenoOut.png',
-                    width: MediaQuery.of(context).size.width * 0.09,
+                    width: MediaQuery.of(context).size.width * 0.09, 
                     height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: MediaQuery.of(context).size.width * 0.32,
-                  top: MediaQuery.of(context).size.height * 0.35,
+                  left: MediaQuery.of(context).size.width * 0.32,  
+                  top: MediaQuery.of(context).size.height * 0.35, 
                   child: Image.asset(
                     'assets/MedallaTierra.png',
-                    width: MediaQuery.of(context).size.width * 0.09,
+                    width: MediaQuery.of(context).size.width * 0.09, 
                     height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
                 ),
                 Positioned(
-                  left: MediaQuery.of(context).size.width * 0.32,
-                  top: MediaQuery.of(context).size.height * 0.35,
+                  left: MediaQuery.of(context).size.width * 0.32,  
+                  top: MediaQuery.of(context).size.height * 0.35, 
                   child: Image.asset(
                     'assets/medallaTierraOut.png',
-                    width: MediaQuery.of(context).size.width * 0.09,
+                    width: MediaQuery.of(context).size.width * 0.09, 
                     height: MediaQuery.of(context).size.width * 0.09,
                     fit: BoxFit.contain,
                   ),
@@ -447,6 +444,16 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
             ),
           ),
           Positioned(
+            left: MediaQuery.of(context).size.width * 0.02,
+            top: MediaQuery.of(context).size.height * 0.04,
+            child: IconButton(
+              icon: Icon(Icons.menu), // Icono de hamburguesa
+              onPressed: () {
+              Scaffold.of(context).openDrawer(); // Abre el Drawer
+              },
+            ),
+          ),
+           Positioned(
             left: screenSize.width * 0.23,
             top: screenSize.height * 0.6,
             child: _buildRectangularButton("NUEVO BOTÓN", () {
@@ -454,110 +461,108 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
             }),
           ),
         ],
-      ),
+      );
+        }
+       )
     );
   }
 
   // Esta función genérica acepta cualquier tipo de pantalla como parámetro y navega a ella.
   void navigateToScreen<T>(BuildContext context, Widget screen) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => screen),
-    );
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => screen),
+  );
   }
 
-  Widget _buildButton(
-    String text,
-    String imagePath,
-    Widget screen,
-    BuildContext context, {
-    double? topLeftRadius,
-    double? topRightRadius,
-    double? bottomLeftRadius,
-    double? bottomRightRadius,
+  Widget _buildButton(String text, String imagePath, Widget screen, BuildContext context, {
+  double? topLeftRadius,
+  double? topRightRadius,
+  double? bottomLeftRadius,
+  double? bottomRightRadius,
   }) {
-    return Stack(
-      children: [
-        Container(
-          width: 110,
-          height: 148,
-          decoration: BoxDecoration(
+  return Stack(
+    children: [
+      Container(
+        width: 110,
+        height: 148,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(topLeftRadius ?? 25), // Usar el valor proporcionado o el predeterminado
+            topRight: Radius.circular(topRightRadius ?? 25),
+            bottomLeft: Radius.circular(bottomLeftRadius ?? 25),
+            bottomRight: Radius.circular(bottomRightRadius ?? 25),
+          ),
+          border: Border.all(
+            color: Colors.black, 
+            width: 1.5, 
+          ),
+          gradient: LinearGradient(
+            colors: [
+              Color.fromRGBO(207, 72, 72, 1),
+              Color.fromRGBO(224, 17, 17, 1),
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Positioned(
+              top: 113,
+              left: 10,
+              right: 10,
+              height: 1,
+              child: Container(
+                width: double.infinity,
+                color: Colors.white,
+              ),
+            ),
+            Positioned(
+              bottom: 4,
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 35,
+              child: Image.asset(
+                imagePath,
+                width: 67,
+                height: 90,
+              ),
+              
+            ),
+          ],
+        ),
+      ),
+      Positioned.fill(
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
             borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(topLeftRadius ??
-                  25), // Usar el valor proporcionado o el predeterminado
+              topLeft: Radius.circular(topLeftRadius ?? 25),
               topRight: Radius.circular(topRightRadius ?? 25),
               bottomLeft: Radius.circular(bottomLeftRadius ?? 25),
               bottomRight: Radius.circular(bottomRightRadius ?? 25),
             ),
-            border: Border.all(
-              color: Colors.black,
-              width: 1.5,
-            ),
-            gradient: LinearGradient(
-              colors: [
-                Color.fromRGBO(207, 72, 72, 1),
-                Color.fromRGBO(224, 17, 17, 1),
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Positioned(
-                top: 113,
-                left: 10,
-                right: 10,
-                height: 1,
-                child: Container(
-                  width: double.infinity,
-                  color: Colors.white,
-                ),
-              ),
-              Positioned(
-                bottom: 4,
-                child: Text(
-                  text,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 35,
-                child: Image.asset(
-                  imagePath,
-                  width: 67,
-                  height: 90,
-                ),
-              ),
-            ],
+            onTap: () {
+              // Aquí llamamos a la función navigateToScreen con la pantalla proporcionada.
+              navigateToScreen(context, screen);
+            },
           ),
         ),
-        Positioned.fill(
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(topLeftRadius ?? 25),
-                topRight: Radius.circular(topRightRadius ?? 25),
-                bottomLeft: Radius.circular(bottomLeftRadius ?? 25),
-                bottomRight: Radius.circular(bottomRightRadius ?? 25),
-              ),
-              onTap: () {
-                // Aquí llamamos a la función navigateToScreen con la pantalla proporcionada.
-                navigateToScreen(context, screen);
-              },
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
+}
 
-  Widget _buildRectangularButton(String text, VoidCallback onPressed) {
+Widget _buildRectangularButton(String text, VoidCallback onPressed) {
     return SizedBox(
       width: 215,
       height: 60,
