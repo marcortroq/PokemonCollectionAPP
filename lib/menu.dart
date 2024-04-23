@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:pokemonapp/countdown_timer.dart';
-import 'package:percent_indicator/circular_percent_indicator';
+import 'package:percent_indicator/percent_indicator.dart';
 import 'package:pokemonapp/incubadora.dart';
 import 'package:pokemonapp/main_ocr.dart';
 import 'package:pokemonapp/nav_bar.dart';
@@ -250,6 +250,9 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                 },
                 child: LinearPercentIndicator(
                   lineHeight: 40,
+                  percent: 0.5,
+                  progressColor: const Color.fromRGBO(229, 166, 94, 1),
+                  backgroundColor: const Color.fromRGBO(217, 217, 217, 1),
                 )),
           ),
           Positioned(
