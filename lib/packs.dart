@@ -216,7 +216,16 @@ class _PacksState extends State<Packs> {
   Widget _imageWithText(String imagePath, String text) {
     return GestureDetector(
       onTap: () {
-        _showPopUp(context, text);
+        String moneda = '';
+        String pack = '';
+        if (imagePath == 'assets/sobrepremium.png') {
+          moneda = 'assets/monedaPremium.png';
+          pack = "PREMIUM PACK";
+        } else {
+          moneda = 'assets/moneda.png';
+          pack = "BASIC PACK";
+        }
+        _showPopUp(context, text, moneda, pack);
       },
       child: Stack(
         alignment: Alignment.center,
@@ -243,7 +252,8 @@ class _PacksState extends State<Packs> {
     );
   }
 
-  Future<void> _showPopUp(BuildContext context, String numero) async {
+  Future<void> _showPopUp(
+      BuildContext context, String numero, String moneda, String pack) async {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -286,7 +296,7 @@ class _PacksState extends State<Packs> {
                   height: 60,
                   child: Center(
                     child: Text(
-                      'PREMIUM PACK',
+                      pack,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 24.0,
@@ -351,12 +361,13 @@ class _PacksState extends State<Packs> {
                   width: 150,
                   child: TextButton(
                     onPressed: () {
-                      // Acción al presionar el botón
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => open_pack()));
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        Image.asset('assets/monedaPremium.png'),
+                        Image.asset(moneda),
                         SizedBox(width: 5.0),
                         Text(
                           numero,
@@ -367,7 +378,7 @@ class _PacksState extends State<Packs> {
                           ),
                         ),
                         SizedBox(width: 5.0),
-                        Image.asset('assets/monedaPremium.png'),
+                        Image.asset(moneda),
                       ],
                     ),
                     style: ButtonStyle(
