@@ -133,12 +133,12 @@ class _PacksState extends State<Packs> {
   Widget _pokestoreContent() {
     final List<PackData> packData = [
       PackData(
-        title: 'SOBRES PREMIUM',
+        title: 'PREMIUM PACKS',
         images: ['assets/sobrepremium.png', 'assets/sobrepremium.png'],
         prices: ['550', '1000'],
       ),
       PackData(
-        title: 'SOBRES',
+        title: 'BASICS PACKS',
         images: ['assets/sobre.png', 'assets/sobre.png'],
         prices: ['1000', '1600'],
       ),
