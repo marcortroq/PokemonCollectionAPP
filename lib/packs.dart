@@ -248,59 +248,95 @@ class _PacksState extends State<Packs> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Colors.black,
+          backgroundColor: Color.fromRGBO(29, 30, 29, 1),
           content: Container(
             width: 300.0, // Ancho del contenedor
             height: 200.0, // Alto del contenedor
             decoration: BoxDecoration(
               borderRadius:
                   BorderRadius.circular(20.0), // Agrega bordes redondeados
-              gradient: LinearGradient(
-                colors: [
-                  const Color.fromRGBO(178, 168, 168, 1),
-                  const Color.fromRGBO(255, 255, 255, 1)
-                ], // Define el degradado de blanco a gris
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
+              border: Border.all(
+                  color: Color.fromRGBO(29, 30, 29, 1),
+                  width: 1.0), // Agrega el borde negro
             ),
-            padding: EdgeInsets.all(20.0), // Ajusta el relleno del contenedor
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Text(
-                  'Pop Up ejemplo',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 16.0),
-                Text(
-                  'Este es un Pop Up simple.',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16.0,
-                  ),
-                ),
-                SizedBox(height: 16.0),
                 Container(
-                  width: double
-                      .infinity, // Ancho del contenedor igual al del AlertDialog
-                  height: 50.0, // Altura del contenedor
-                  color: Colors.grey, // Color del contenedor gris
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(29, 30, 29, 1),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(15.0),
+                      topRight: Radius.circular(15.0),
+                    ),
+                    border: Border(
+                      bottom: BorderSide(
+                          color: Color.fromRGBO(29, 30, 29, 1),
+                          width: 1.0), // Borde inferior negro
+                    ),
+                  ),
+                  height: 60, // Espacio entre el negro y el gris
+                  child: Center(
+                    child: Text(
+                      'PREMIUM PACK',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20.0,
+                        fontFamily: 'sarpanch',
+                      ),
+                    ),
+                  ),
                 ),
-                SizedBox(height: 16.0),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text(
-                    'Cerrar',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 18.0,
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          const Color.fromRGBO(178, 168, 168, 1), // Gris
+                          const Color.fromRGBO(255, 255, 255, 1), // Blanco
+                          const Color.fromRGBO(255, 255, 255, 1), // Blanco
+                        ], // Define el degradado de blanco a gris
+                        stops: [
+                          0.0,
+                          0.4,
+                          1.0
+                        ], // Porcentajes de parada para los colores
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(20.0),
+                        bottomRight: Radius.circular(20.0),
+                      ),
+                      border: Border(
+                        top: BorderSide(
+                            color: Colors.black,
+                            width: 1.0), // Borde superior negro
+                      ),
+                    ),
+                    child: Center(
+                      child: TextButton(
+                        onPressed: () {
+                          // Acción al presionar el botón
+                        },
+                        child: Text(
+                          '1000',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18.0,
+                            fontFamily: 'sarpanch',
+                          ),
+                        ),
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              const Color.fromRGBO(29, 30, 29, 1)),
+                          padding:
+                              MaterialStateProperty.all<EdgeInsetsGeometry>(
+                                  EdgeInsets.symmetric(
+                                      vertical: 10.0, horizontal: 20.0)),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -308,9 +344,7 @@ class _PacksState extends State<Packs> {
             ),
           ),
           // Establece un tamaño específico para el AlertDialog
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
-          ),
+
           // Ajusta el tamaño del AlertDialog
           contentPadding: EdgeInsets.zero,
         );
