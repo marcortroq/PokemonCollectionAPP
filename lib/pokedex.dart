@@ -136,13 +136,6 @@ class _PokedexState extends State<Pokedex> {
     );
   }
 
-// Función para verificar si el usuario tiene la carta correspondiente al índice
-  bool userHasCardAtIndex(int index, List<dynamic> userCards) {
-    // Verificar si el JSON contiene una carta con el ID del Pokémon correspondiente al índice
-    bool hasCard = userCards.any((card) => card['id_pokemon'] == index + 1);
-    return hasCard;
-  }
-
   Widget _pokedexContent() {
     final usuarioProvider =
         Provider.of<UsuarioProvider>(context, listen: false);
@@ -207,6 +200,12 @@ class _PokedexState extends State<Pokedex> {
     );
   }
 
+  bool userHasCardAtIndex(int index, List<dynamic> userCards) {
+    // Verificar si el JSON contiene una carta con el ID del Pokémon correspondiente al índice
+    bool hasCard = userCards.any((card) => card['id_pokemon'] == index + 1);
+    return hasCard;
+  }
+
   void _showCenteredImage(BuildContext context, String imageUrl) {
     showDialog(
       context: context,
@@ -229,16 +228,103 @@ class _PokedexState extends State<Pokedex> {
     );
   }
 
+
+
+
   Widget _duplicatesContent() {
-    // Aquí deberías retornar el ListView con datos de los duplicados
-    return ListView(
-      children: [
-        ListTile(title: Text('Duplicado 2')),
-        ListTile(title: Text('Duplicado 2')),
-        ListTile(title: Text('Duplicado 3')),
-        // Agrega más elementos según
-      ],
-    );
+  final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
+  final usuario = usuarioProvider.usuario;
+  int idUsuario = usuario?.idUsuario ?? 0;
+
+  return FutureBuilder<List<dynamic>>(
+    future: fetchDuplicateCards(idUsuario),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return Center(child: CircularProgressIndicator());
+      } else if (snapshot.hasError) {
+        return Center(child: Text('Error: ${snapshot.error}'));
+      } else if (snapshot.data == null) {
+        return Center(child: Text('No se encontraron cartas duplicadas.'));
+      } else {
+        List<dynamic> duplicateCards = snapshot.data!;
+        return GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            mainAxisSpacing: 4.0,
+            crossAxisSpacing: 4.0,
+          ),
+          itemCount: duplicateCards.length,
+          itemBuilder: (context, index) {
+            String imageUrl = duplicateCards[index]['foto_carta'];
+            int duplicatesCount = (duplicateCards[index]['cantidad_repetidas'] ?? 0) - 1;
+
+            // Verificar si ya es una URL completa
+            if (!imageUrl.startsWith('http')) {
+              // Si no es una URL completa, construir la URL completa
+              imageUrl = 'http://20.162.113.208$imageUrl';
+            }
+
+            return Stack(
+              alignment: Alignment.center, // Alineación a la derecha
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    _showCenteredImage(context, imageUrl);
+
+                  },
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.fitHeight,
+                  ),
+                ),
+                if (duplicatesCount > 1) // Mostrar redonda solo si duplicatesCount es mayor que 0
+                  Positioned(
+                    top: 100,
+                    right: 50,
+                    child: Container(
+                      width: 25,
+                      padding: EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color.fromRGBO(244, 67, 54, 0.685),
+                      ),
+                      child: Align(
+            alignment: Alignment.center,
+            child: Text(
+              duplicatesCount.toString(),
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 9,
+              ),
+            ),
+                    ),
+                  ),
+                  )
+              ],
+            );
+          },
+        );
+      }
+    },
+  );
+}
+
+
+
+
+
+
+
+  Future<List<dynamic>> fetchDuplicateCards(int userId) async {
+    final response = await http.get(
+        Uri.parse('http://20.162.113.208:5000/api/cartas/usuario/dupes/$userId'));
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load duplicate cards');
+    }
   }
 
   Future<List<dynamic>> fetchUserCards(int userId) async {
