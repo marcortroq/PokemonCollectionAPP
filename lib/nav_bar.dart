@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 class NavBar extends StatefulWidget {
+  final Function(String) onProfileImageSelected; // Define el parámetro onProfileImageSelected
+
+  NavBar({required this.onProfileImageSelected});
   @override
   _NavBarState createState() => _NavBarState();
 }
@@ -14,6 +17,7 @@ class _NavBarState extends State<NavBar> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.grey[200],
           title: Text("Choose Profile Photo"),
           content: SingleChildScrollView(
             child: Column(
@@ -31,11 +35,12 @@ class _NavBarState extends State<NavBar> {
                     setState(() {
                       _selectedImage = 'assets/grow.png';
                     });
+                    widget.onProfileImageSelected('assets/grow.png'); // Aquí pasas la ruta de la imagen seleccionada
                     Navigator.pop(context, 'assets/grow.png');
                   },
                   child: Image.asset('assets/grow.png'),
                 ),
-                SizedBox(height: 50), // Espacio vertical entre las imágenes
+                SizedBox(height: 20), // Espacio vertical entre las imágenes
                 // Botón para seleccionar la segunda imagen
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -49,11 +54,12 @@ class _NavBarState extends State<NavBar> {
                     setState(() {
                       _selectedImage = 'assets/meowth.png';
                     });
+                    widget.onProfileImageSelected('assets/meowth.png'); // Aquí pasas la ruta de la imagen seleccionada
                     Navigator.pop(context, 'assets/meowth.png');
                   },
                   child: Image.asset('assets/meowth.png'),
                 ),
-                SizedBox(height: 10), // Espacio vertical entre las imágenes
+                SizedBox(height: 20), // Espacio vertical entre las imágenes
                 // Botón para seleccionar la tercera imagen
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -67,11 +73,12 @@ class _NavBarState extends State<NavBar> {
                     setState(() {
                       _selectedImage = 'assets/Charizard.png';
                     });
+                    widget.onProfileImageSelected('assets/Charizard.png');
                     Navigator.pop(context, 'assets/Charizard.png');
                   },
                   child: Image.asset('assets/Charizard.png'),
                 ),
-                SizedBox(height: 10), // Espacio vertical entre las imágenes
+                SizedBox(height: 20), // Espacio vertical entre las imágenes
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _selectedImage == 'assets/Rapidash.png'
@@ -84,11 +91,12 @@ class _NavBarState extends State<NavBar> {
                     setState(() {
                       _selectedImage = 'assets/Rapidash.png';
                     });
+                    widget.onProfileImageSelected('assets/Rapidash.png');
                     Navigator.pop(context, 'assets/Rapidash.png');
                   },
                   child: Image.asset('assets/Rapidash.png'),
                 ),
-                SizedBox(height: 10), // Espacio vertical entre las imágenes
+                SizedBox(height: 20), // Espacio vertical entre las imágenes
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _selectedImage == 'assets/Blastoise.png'
@@ -101,11 +109,12 @@ class _NavBarState extends State<NavBar> {
                     setState(() {
                       _selectedImage = 'assets/Blastoise.png';
                     });
+                    widget.onProfileImageSelected('assets/Blastoise.png');
                     Navigator.pop(context, 'assets/Blastoise.png');
                   },
                   child: Image.asset('assets/Blastoise.png'),
                 ),
-                SizedBox(height: 10), // Espacio vertical entre las imágenes
+                SizedBox(height: 20), // Espacio vertical entre las imágenes
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _selectedImage == 'assets/Rhydon.png'
@@ -118,6 +127,7 @@ class _NavBarState extends State<NavBar> {
                     setState(() {
                       _selectedImage = 'assets/Rhydon.png';
                     });
+                    widget.onProfileImageSelected('assets/Rhydon.png');
                     Navigator.pop(context, 'assets/Rhydon.png');
                   },
                   child: Image.asset('assets/Rhydon.png'),
@@ -136,23 +146,44 @@ class _NavBarState extends State<NavBar> {
     return Drawer(
       child: Column(
         children: <Widget>[
+          Container(
+            height: 250, // Ajusta la altura del DrawerHeader según sea necesario
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  Color.fromRGBO(224, 17, 17, 1),
+                  Color.fromRGBO(224, 17, 17, 1),
+                ],
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(height: 20), // Ajusta el espacio entre el borde superior y el texto
+                Text(
+                  'POKEMON PROFILE',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontFamily: "sarpanch",
+                  ),
+                  textAlign: TextAlign.center, // Centra el texto horizontalmente
+                ),
+                Image.asset(
+                  'assets/foto_entrenadores.png', // Ruta de la imagen de logout
+                  width: 100, // Ajusta el tamaño de la imagen según sea necesario
+                  height: 150,
+                ),
+              ],
+            ),
+          ),
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
               children: <Widget>[
-                DrawerHeader(
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(224, 17, 17, 1),
-                  ),
-                  child: Text(
-                    'POKEMON PROFILE',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontFamily: "sarpanch",
-                    ),
-                  ),
-                ),
                 ListTile(
                   title: Text(
                     'Profile photo',
@@ -207,7 +238,7 @@ class _NavBarState extends State<NavBar> {
                     fontFamily: "sarpanch",
                   ),
                 ),
-                SizedBox(width: 10), // Ajusta el espacio entre el texto y la imagen
+                 // Ajusta el espacio entre el texto y la imagen
                 Image.asset(
                   'assets/logout_icon.png', // Ruta de la imagen de logout
                   width: 24, // Ajusta el tamaño de la imagen según sea necesario

@@ -91,6 +91,7 @@ class Menu extends StatefulWidget {
 }
 
 class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
+  late String _selectedProfileImage = '';
   late AnimationController _animationController;
   late Animation<double> _animator;
   bool _drawerVisible = false;
@@ -145,7 +146,14 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
     double iconSize = screenSize.width * 0.1;
 
     return Scaffold(
-      drawer: NavBar(),
+      drawer: NavBar(
+        // Pasa una función que actualice _selectedProfileImage a NavBar
+        onProfileImageSelected: (String imagePath) {
+          setState(() {
+            _selectedProfileImage = imagePath;
+          });
+        },
+      ),
        body: Builder( // Usamos un Builder para obtener un contexto que contenga el Scaffold
         builder: (BuildContext context) {
           return Stack(
@@ -156,15 +164,17 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
             ),
           ),
           Positioned(
-            left: -backgroundWidth * 0.1,
-            bottom: screenSize.height * 0.06,
-            child: Image.asset(
-              'assets/grow.png',
-              width: backgroundWidth,
-              height: backgroundHeight,
-              fit: BoxFit.contain,
-            ),
-          ),
+                left: -backgroundWidth * 0.05,
+                bottom: screenSize.height * 0.06,
+                child: Image.asset(
+                  _selectedProfileImage.isNotEmpty
+                      ? _selectedProfileImage
+                      : 'assets/grow.png',
+                  width: backgroundWidth,
+                  height: backgroundHeight,
+                  fit: BoxFit.contain,
+                ),
+              ),
           Positioned(
             right: screenSize.width * 0.0,
             bottom: screenSize.height * 0.15,
