@@ -23,6 +23,7 @@ class Pokedex extends StatefulWidget {
 class _PokedexState extends State<Pokedex> {
   PageController _pageController = PageController(initialPage: 0);
   int _currentPageIndex = 0;
+  int inicio =1;
 
   @override
   void initState() {
@@ -272,7 +273,7 @@ class _PokedexState extends State<Pokedex> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    _showPopUp(context);
+                    _showPopUp(context, imageUrl,duplicatesCount);
 
                   },
                   child: Image.network(
@@ -361,149 +362,185 @@ class _PokedexState extends State<Pokedex> {
     }
   }
 
-  Future<void> _showPopUp(BuildContext context) async {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.transparent,
-          content: Container(
-            width: 300.0,
-            height: 230.0, // Ajusta la altura total del AlertDialog
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20.0),
-              gradient: LinearGradient(
-                colors: [
-                  const Color.fromRGBO(178, 168, 168, 1),
-                  const Color.fromRGBO(255, 255, 255, 1),
-                  const Color.fromRGBO(255, 255, 255, 1),
-                ],
-                stops: [0.0, 0.4, 1.0],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-              border: Border.all(color: Colors.black, width: 1.0),
+  Future<void> _showPopUp(BuildContext context, String imageUrl, int duplicatesCount) async {
+  return showDialog<void>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: Colors.transparent,
+        content: Container(
+          width: 300.0,
+          height: 430.0,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20.0),
+            gradient: LinearGradient(
+              colors: [
+                const Color.fromRGBO(178, 168, 168, 1),
+                const Color.fromRGBO(255, 255, 255, 1),
+                const Color.fromRGBO(255, 255, 255, 1),
+              ],
+              stops: [0.0, 0.4, 1.0],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Container(
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(29, 30, 29, 1),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(15.0),
-                      topRight: Radius.circular(15.0),
-                    ),
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Color.fromRGBO(29, 30, 29, 1),
-                        width: 1.0,
-                      ),
+            border: Border.all(color: Colors.black, width: 1.0),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                decoration: BoxDecoration(
+                  color: Color.fromRGBO(29, 30, 29, 1),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(15.0),
+                    topRight: Radius.circular(15.0),
+                  ),
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Color.fromRGBO(29, 30, 29, 1),
+                      width: 1.0,
                     ),
                   ),
-                  height: 60,
-                  child: Center(
-                    child: Text(
-                      'PREMIUM PACK',
+                ),
+                height: 60,
+                child: Center(
+                  child: Text(
+                    'SELL DUPLICATE',
+                    style: TextStyle(
+                      color: const Color.fromARGB(255, 173, 172, 172),
+                      fontSize: 24.0,
+                      fontFamily: 'sarpanch',
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 15.0),
+              Container(
+                height: 280,
+                width: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.0),
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [
+                      const Color.fromRGBO(208, 56, 56, 1),
+                      const Color.fromRGBO(255, 91, 91, 1),
+                    ],
+                  ),
+                  border: Border.all(
+                    color: Colors.black,
+                    width: 1.0,
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[                      
+                    SizedBox(
+                      height: 200,
+                      child: Image.network(
+                        imageUrl,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    SizedBox(height: 5.0),
+                    Text(
+                      'x$duplicatesCount', // Mostrar la cantidad de duplicados
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 24.0,
                         fontFamily: 'sarpanch',
                       ),
                     ),
-                  ),
+                  ],
                 ),
-                SizedBox(height: 15.0),
-                Container(
-                  height: 80,
-                  width: 200,
-                  decoration: BoxDecoration(
-                    borderRadius:
-                        BorderRadius.circular(10.0), // Bordes redondeados
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: [
-                        const Color.fromRGBO(208, 56, 56, 1), // Color inicial
-                        const Color.fromRGBO(255, 91, 91, 1), // Color final
-                      ],
-                    ),
-                    border: Border.all(
-                        color: Colors.black, width: 1.0), // Borde negro
-                  ),
-                  child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text(
-                          'Contains:',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18.0,
-                            fontFamily: 'sarpanch',
-                          ),
+              ),
+              SizedBox(height: 15.0),
+              Container(
+                width: 260, // Ajusta el ancho según sea necesario para acomodar los botones de suma y resta
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: 40, // Ancho del botón de resta
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Acción al presionar el botón de resta
+                        },
+                        style: ButtonStyle(
+                          minimumSize: MaterialStateProperty.all<Size>(Size(40, 40)),
+                          padding: MaterialStateProperty.all<EdgeInsetsGeometry>(EdgeInsets.all(0)), // Elimina el padding predeterminado
                         ),
-                        SizedBox(width: 5.0),
-                        SizedBox(
-                          height: 60,
-                          child: Image.asset(
-                            'assets/PortadaColor.png',
-                            fit: BoxFit.cover,
-                          ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0), // Ajusta el espacio vertical alrededor del icono
+                          child: Icon(Icons.remove),
                         ),
-                        SizedBox(width: 5.0),
-                        Text(
-                          'x4',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24.0,
-                            fontFamily: 'sarpanch',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(height: 15.0), // Espacio adicional si es necesario
-                Container(
-                  width: 150,
-                  child: TextButton(
-                    onPressed: () {
-                      // Acción al presionar el botón
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Image.asset('assets/monedaPremium.png'),
-                        SizedBox(width: 5.0),
-                        Text(
-                          '1000',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20.0,
-                            fontFamily: 'sarpanch',
-                          ),
-                        ),
-                        SizedBox(width: 5.0),
-                        Image.asset('assets/monedaPremium.png'),
-                      ],
-                    ),
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                        const Color.fromRGBO(29, 30, 29, 1),
-                      ),
-                      padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                        EdgeInsets.zero,
                       ),
                     ),
-                  ),
+                    SizedBox(width: 10), // Espacio entre el botón de resta y el TextButton
+                    Container(
+                      width: 150, // Ancho del TextButton
+                      child: TextButton(
+                        onPressed: () {
+                          // Acción al presionar el botón
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Image.asset('assets/monedaPremium.png'),
+                            SizedBox(width: 5.0),
+                            Text(
+                              '1000',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20.0,
+                                fontFamily: 'sarpanch',
+                              ),
+                            ),
+                            SizedBox(width: 5.0),
+                            Image.asset('assets/monedaPremium.png'),
+                          ],
+                        ),
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                            const Color.fromRGBO(29, 30, 29, 1),
+                          ),
+                          padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                            EdgeInsets.zero,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 10), // Espacio entre el TextButton y el botón de suma
+                    Container(
+                      width: 40, // Ancho del botón de suma
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Acción al presionar el botón de suma
+                        },
+                        style: ButtonStyle(
+                          minimumSize: MaterialStateProperty.all<Size>(Size(40, 40)),
+                          padding: MaterialStateProperty.all<EdgeInsetsGeometry>(EdgeInsets.all(0)), // Elimina el padding predeterminado
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0), // Ajusta el espacio vertical alrededor del icono
+                          child: Icon(Icons.add),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-          contentPadding: EdgeInsets.zero,
-        );
-      },
-    );
-  }
+        ),
+        contentPadding: EdgeInsets.zero,
+      );
+    },
+  );
+}
+
+
+
+
 }
