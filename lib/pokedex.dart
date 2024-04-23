@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:typed_data';
@@ -7,6 +8,8 @@ import 'usuario_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() {
+  
+
   runApp(MaterialApp(
     home: Pokedex(),
   ));
@@ -269,7 +272,7 @@ class _PokedexState extends State<Pokedex> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    _showCenteredImage(context, imageUrl);
+                    _showPopUp(context);
 
                   },
                   child: Image.network(
@@ -356,5 +359,151 @@ class _PokedexState extends State<Pokedex> {
     } else {
       throw Exception('Failed to load user cards');
     }
+  }
+
+  Future<void> _showPopUp(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.transparent,
+          content: Container(
+            width: 300.0,
+            height: 230.0, // Ajusta la altura total del AlertDialog
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20.0),
+              gradient: LinearGradient(
+                colors: [
+                  const Color.fromRGBO(178, 168, 168, 1),
+                  const Color.fromRGBO(255, 255, 255, 1),
+                  const Color.fromRGBO(255, 255, 255, 1),
+                ],
+                stops: [0.0, 0.4, 1.0],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+              border: Border.all(color: Colors.black, width: 1.0),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Container(
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(29, 30, 29, 1),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(15.0),
+                      topRight: Radius.circular(15.0),
+                    ),
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Color.fromRGBO(29, 30, 29, 1),
+                        width: 1.0,
+                      ),
+                    ),
+                  ),
+                  height: 60,
+                  child: Center(
+                    child: Text(
+                      'PREMIUM PACK',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24.0,
+                        fontFamily: 'sarpanch',
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 15.0),
+                Container(
+                  height: 80,
+                  width: 200,
+                  decoration: BoxDecoration(
+                    borderRadius:
+                        BorderRadius.circular(10.0), // Bordes redondeados
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [
+                        const Color.fromRGBO(208, 56, 56, 1), // Color inicial
+                        const Color.fromRGBO(255, 91, 91, 1), // Color final
+                      ],
+                    ),
+                    border: Border.all(
+                        color: Colors.black, width: 1.0), // Borde negro
+                  ),
+                  child: Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          'Contains:',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18.0,
+                            fontFamily: 'sarpanch',
+                          ),
+                        ),
+                        SizedBox(width: 5.0),
+                        SizedBox(
+                          height: 60,
+                          child: Image.asset(
+                            'assets/PortadaColor.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        SizedBox(width: 5.0),
+                        Text(
+                          'x4',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24.0,
+                            fontFamily: 'sarpanch',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 15.0), // Espacio adicional si es necesario
+                Container(
+                  width: 150,
+                  child: TextButton(
+                    onPressed: () {
+                      // Acción al presionar el botón
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Image.asset('assets/monedaPremium.png'),
+                        SizedBox(width: 5.0),
+                        Text(
+                          '1000',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20.0,
+                            fontFamily: 'sarpanch',
+                          ),
+                        ),
+                        SizedBox(width: 5.0),
+                        Image.asset('assets/monedaPremium.png'),
+                      ],
+                    ),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                        const Color.fromRGBO(29, 30, 29, 1),
+                      ),
+                      padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                        EdgeInsets.zero,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          contentPadding: EdgeInsets.zero,
+        );
+      },
+    );
   }
 }
