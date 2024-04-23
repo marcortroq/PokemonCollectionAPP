@@ -360,7 +360,7 @@ class _MyHomePageState extends State<MyHomePage> {
       );
       return;
     }
-    else if (contrasena.length <= 6) {
+    else if (contrasena.length <= 5) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('La contraseña debe tener más de 6 caracteres.'),
