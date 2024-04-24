@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:pokemonapp/countdown_timer.dart';
-import 'package:percent_indicator/percent_indicator.dart';
 import 'package:pokemonapp/incubadora.dart';
 import 'package:pokemonapp/main_ocr.dart';
 import 'package:pokemonapp/nav_bar.dart';
@@ -209,7 +208,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
           ),
           Positioned(
             top: screenSize.height * 0.005,
-            left: (screenSize.width - 180) / 2,
+            left: (screenSize.width - 200) / 2,
             child: Image.asset(
               'assets/barramoneda.png', // Ruta de tu imagen
               width: screenSize.width * 0.5,
@@ -218,49 +217,12 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
           ),
           Positioned(
             top: screenSize.height * 0.005,
-            left: (screenSize.width - -70) / 2,
+            left: (screenSize.width - -80) / 2,
             child: Image.asset(
               'assets/barrapremium.png', // Ruta de tu imagen
               width: screenSize.width * 0.5,
               height: screenSize.height * 0.13,
             ),
-          ),
-          /*
-          Positioned(
-            top: screenSize.height * 0.005,
-            left: (screenSize.width - screenSize.width * 1.15) / 2,
-            child: GestureDetector(
-              onTap: () {
-                Scaffold.of(context).openDrawer(); // Abre el Drawer
-              },
-              child: Image.asset(
-                'assets/experiencia.png',
-                width: screenSize.width * 0.5,
-                height: screenSize.height * 0.13,
-              ),
-            ),
-          ),
-          */
-          Positioned(
-            top: screenSize.height * 0.005,
-            left: (screenSize.width - screenSize.width * 1.15) / 2,
-            child: GestureDetector(
-                onTap: () {
-                  Scaffold.of(context).openDrawer(); // Abre el Drawer
-                },
-                child: LinearPercentIndicator(
-                  lineHeight: 40,
-                  percent: 0.5,
-                  progressColor: const Color.fromRGBO(229, 166, 94, 1),
-                  backgroundColor: const Color.fromRGBO(217, 217, 217, 1),
-                )),
-          ),
-          Positioned(
-            left: screenSize.width * 0.23,
-            top: screenSize.height * 0.6,
-            child: _buildRectangularButton("NUEVO BOTÓN", () {
-              print("Botón rectangular presionado");
-            }),
           ),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -494,6 +456,23 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                 )
               ],
             ),
+          ),
+          Positioned(
+            left: MediaQuery.of(context).size.width * 0.02,
+            top: MediaQuery.of(context).size.height * 0.04,
+            child: IconButton(
+              icon: Icon(Icons.menu), // Icono de hamburguesa
+              onPressed: () {
+                Scaffold.of(context).openDrawer(); // Abre el Drawer
+              },
+            ),
+          ),
+          Positioned(
+            left: screenSize.width * 0.23,
+            top: screenSize.height * 0.6,
+            child: _buildRectangularButton("NUEVO BOTÓN", () {
+              print("Botón rectangular presionado");
+            }),
           ),
         ],
       );
