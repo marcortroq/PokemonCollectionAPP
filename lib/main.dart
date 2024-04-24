@@ -14,11 +14,11 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []); // Oculta la barra de navegación
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+      overlays: []); // Oculta la barra de navegación
 
   runApp(const MyApp());
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
