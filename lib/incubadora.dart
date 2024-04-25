@@ -44,7 +44,12 @@ class _StateIncubadora extends State<Incubadora> {
     final Size screenSize = MediaQuery.of(context).size;
     final double screenWidth = screenSize.width;
 
-    return GestureDetector(
+    return WillPopScope(
+      onWillPop: () async {
+        // Devuelve false para evitar que la acción de retroceso tenga efecto
+        return false;
+      },
+      child: GestureDetector(
       onTap: () {
         if (clickedImagesCount == totalImages) {
           // Navegar a otra pantalla cuando se hayan hecho clic en todas las imágenes
@@ -83,7 +88,7 @@ class _StateIncubadora extends State<Incubadora> {
           ],
         ),
       ),
-    );
+    )    );
   }
 
   Widget _buildBackground() {
