@@ -37,6 +37,7 @@ class MyApp extends StatelessWidget {
         // Puedes agregar más providers aquí si es necesario
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'PokemonAPP',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSwatch().copyWith(
