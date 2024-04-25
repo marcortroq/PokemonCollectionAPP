@@ -175,6 +175,9 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
           _selectedProfileImage = imagePath;
         });
       },
+      xpPer: XpPer,
+     level: level,
+      
     ), body: Builder(builder: (BuildContext context) {
       return Stack(
         children: [
@@ -282,19 +285,19 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                     height: screenSize.height * 0.13,
                   ),
                   Positioned(
-                    top:
-                        44, // Ajusta la posición del texto según tus necesidades
-                    left:
-                        97, // Ajusta la posición del texto según tus necesidades
+                    top: screenSize.height * 0.057, // Ajusta la posición del texto según tus necesidades
+                    left: (screenSize.width - (level > 9 ? 220 : 215)) / 2, 
+                    // Ajusta la posición del texto según tus necesidades
                     child: Text(
                       level.toString(),
                       style: TextStyle(
                         fontSize:
-                            16, // Ajusta el tamaño de la fuente según tus necesidades
+                            12, // Ajusta el tamaño de la fuente según tus necesidades
                         fontWeight: FontWeight
                             .bold, // Ajusta el peso de la fuente según tus necesidades
                         color: Colors
-                            .black, // Ajusta el color del texto según tus necesidades
+                            .black, 
+                            fontFamily: 'Pokemon-Solid',// Ajusta el color del texto según tus necesidades
                       ),
                     ),
                   ),
@@ -537,7 +540,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
           ),
           Positioned(
             left: screenSize.width * 0.23,
-            top: screenSize.height * 0.6,
+            top: screenSize.height * 0.58,
             child: _buildRectangularButton("NUEVO BOTÓN", () {
               print("Botón rectangular presionado");
             }),

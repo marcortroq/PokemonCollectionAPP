@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:pokemonapp/main.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class NavBar extends StatefulWidget {
-  final Function(String) onProfileImageSelected; // Define el parámetro onProfileImageSelected
+  final Function(String) onProfileImageSelected;
+  final double xpPer; // Agregamos xpPer como un parámetro al constructor
+  final int level;
+  
 
-  NavBar({required this.onProfileImageSelected});
+  NavBar({required this.onProfileImageSelected, required this.xpPer, required this.level});
+
   @override
   _NavBarState createState() => _NavBarState();
+
 }
 
 class _NavBarState extends State<NavBar> {
@@ -143,6 +150,7 @@ class _NavBarState extends State<NavBar> {
 
   @override
   Widget build(BuildContext context) {
+    double xpPer = widget.xpPer;
     return Drawer(
       child: Column(
         children: <Widget>[
@@ -185,8 +193,40 @@ class _NavBarState extends State<NavBar> {
               padding: EdgeInsets.zero,
               children: <Widget>[
                 ListTile(
+                    title: Text(
+                      'Level :  ${widget.level}',
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 0, 0, 0),
+                        fontSize: 19,
+                        fontFamily: "sarpanch",
+                      ),
+                    ),
+                    subtitle: Container(
+                       padding: const EdgeInsets.only(top: 8.0),
+                      width: MediaQuery.of(context).size.width / 4,
+                      child: LinearPercentIndicator(
+                        width: MediaQuery.of(context).size.width / 1.6,
+                        animation: true,
+                        lineHeight: 20.0,
+                        animationDuration: 2500,
+                        percent: xpPer,
+                        center: Text(
+                              '${(xpPer * 100).toStringAsFixed(0)}%', // Muestra el porcentaje en el centro de la barra
+                              style: TextStyle(
+                                color: Colors.black, // Puedes ajustar el color del texto según sea necesario
+                                fontSize: 16, // Puedes ajustar el tamaño de fuente según sea necesario
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                        linearStrokeCap: LinearStrokeCap.roundAll,
+                        progressColor: const Color.fromRGBO(229, 166, 94, 1),
+                        backgroundColor: const Color.fromRGBO(217, 217, 217, 1),
+                      ),
+                    ),
+                  ),
+                ListTile(
                   title: Text(
-                    'Profile photo',
+                    'PokePhoto',
                     style: TextStyle(
                       color: Color.fromARGB(255, 0, 0, 0),
                       fontSize: 19,
@@ -247,8 +287,8 @@ class _NavBarState extends State<NavBar> {
               ],
             ),
             onTap: () {
-              // Aquí puedes agregar la lógica para manejar el tap en el botón de logout
-              // Por ejemplo, puedes manejar el logout del usuario
+                Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => MyApp()));
             },
           ),
         ],
