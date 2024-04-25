@@ -229,7 +229,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Padding(
-                padding: const EdgeInsets.only(top: 569),
+                padding: const EdgeInsets.only(top: 510),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -242,7 +242,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                             _buildButton("PACKS", "assets/pack.png", Packs(), context, topLeftRadius: 0, bottomRightRadius: 0)
                         ),
                        Padding(
-                          padding: EdgeInsets.only(bottom: screenSize.height * 0.09),
+                          padding: EdgeInsets.only(bottom: screenSize.height * 0.07),
                           child: Stack(
                             children: [                              
                               _buildButton("COLLECT", "assets/incubadora.png", Incubadora(), context), // INCUBADORA

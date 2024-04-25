@@ -63,38 +63,38 @@ class _NavBarState extends State<NavBar> {
                 // Botón para seleccionar la tercera imagen
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _selectedImage == 'assets/Charizard.png'
+                    backgroundColor: _selectedImage == 'assets/Slowbro.png'
                         ? Color.fromRGBO(179, 179, 179, 1)
                         : null,
-                    elevation: _selectedImage == 'assets/Charizard.png' ? 8.0 : 0.0, // Añade elevación al botón seleccionado
+                    elevation: _selectedImage == 'assets/Slowbro.png' ? 8.0 : 0.0, // Añade elevación al botón seleccionado
                   ),
                   onPressed: () {
                     // Aquí puedes manejar la lógica cuando el usuario selecciona la tercera imagen
                     setState(() {
-                      _selectedImage = 'assets/Charizard.png';
+                      _selectedImage = 'assets/Slowbro.png';
                     });
-                    widget.onProfileImageSelected('assets/Charizard.png');
-                    Navigator.pop(context, 'assets/Charizard.png');
+                    widget.onProfileImageSelected('assets/Slowbro.png');
+                    Navigator.pop(context, 'assets/Slowbro.png');
                   },
-                  child: Image.asset('assets/Charizard.png'),
+                  child: Image.asset('assets/Slowbro.png'),
                 ),
                 SizedBox(height: 20), // Espacio vertical entre las imágenes
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _selectedImage == 'assets/Rapidash.png'
+                    backgroundColor: _selectedImage == 'assets/Sandshrew.png'
                         ? Color.fromRGBO(179, 179, 179, 1)
                         : null,
-                    elevation: _selectedImage == 'assets/Rapidash.png' ? 8.0 : 0.0, // Añade elevación al botón seleccionado
+                    elevation: _selectedImage == 'assets/Sandshrew.png' ? 8.0 : 0.0, // Añade elevación al botón seleccionado
                   ),
                   onPressed: () {
                     // Aquí puedes manejar la lógica cuando el usuario selecciona la tercera imagen
                     setState(() {
-                      _selectedImage = 'assets/Rapidash.png';
+                      _selectedImage = 'assets/Sandshrew.png';
                     });
-                    widget.onProfileImageSelected('assets/Rapidash.png');
-                    Navigator.pop(context, 'assets/Rapidash.png');
+                    widget.onProfileImageSelected('assets/Sandshrew.png');
+                    Navigator.pop(context, 'assets/Sandshrew.png');
                   },
-                  child: Image.asset('assets/Rapidash.png'),
+                  child: Image.asset('assets/Sandshrew.png'),
                 ),
                 SizedBox(height: 20), // Espacio vertical entre las imágenes
                 ElevatedButton(
@@ -117,20 +117,20 @@ class _NavBarState extends State<NavBar> {
                 SizedBox(height: 20), // Espacio vertical entre las imágenes
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _selectedImage == 'assets/Rhydon.png'
+                    backgroundColor: _selectedImage == 'assets/Marowak.png'
                         ? Color.fromRGBO(179, 179, 179, 1)
                         : null,
-                    elevation: _selectedImage == 'assets/Rhydon.png' ? 8.0 : 0.0, // Añade elevación al botón seleccionado
+                    elevation: _selectedImage == 'assets/Marowak.png' ? 8.0 : 0.0, // Añade elevación al botón seleccionado
                   ),
                   onPressed: () {
                     // Aquí puedes manejar la lógica cuando el usuario selecciona la tercera imagen
                     setState(() {
-                      _selectedImage = 'assets/Rhydon.png';
+                      _selectedImage = 'assets/Marowak.png';
                     });
-                    widget.onProfileImageSelected('assets/Rhydon.png');
-                    Navigator.pop(context, 'assets/Rhydon.png');
+                    widget.onProfileImageSelected('assets/Marowak.png');
+                    Navigator.pop(context, 'assets/Marowak.png');
                   },
-                  child: Image.asset('assets/Rhydon.png'),
+                  child: Image.asset('assets/Marowak.png'),
                 ),
                 // Puedes agregar más botones para las otras imágenes según sea necesario
               ],
