@@ -29,6 +29,11 @@ class _PokedexState extends State<Pokedex> {
 
   @override
   Widget build(BuildContext context) {
+    late final Size screenSize = MediaQuery.of(context).size;
+
+    // Calcula el tamaño de la imagen del fondo
+    double backgroundWidth = screenSize.width * 1.2;
+    double backgroundHeight = screenSize.height * 1.2;
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
@@ -41,6 +46,24 @@ class _PokedexState extends State<Pokedex> {
                 ),
                 fit: BoxFit.fill,
               ),
+            ),
+          ),
+           Positioned(
+            top: screenSize.height * 0.005, 
+            left: (screenSize.width - 200) / 2, 
+            child: Image.asset(
+              'assets/barramoneda.png', // Ruta de tu imagen
+              width: screenSize.width * 0.5, 
+              height: screenSize.height * 0.13, 
+            ),
+          ),
+          Positioned(
+            top: screenSize.height * 0.005, 
+            left: (screenSize.width - -80) / 2, 
+            child: Image.asset(
+              'assets/barrapremium.png', // Ruta de tu imagen
+              width: screenSize.width * 0.5, 
+              height: screenSize.height * 0.13, 
             ),
           ),
           _labels(context),

@@ -348,6 +348,14 @@ class _MyHomePageState extends State<MyHomePage> {
   void _checkUserExistenceAndRegister() async {
     String nombreUsuario = _usernameController.text;
     String contrasena = _passwordController.text;
+
+    // Expresión regular para verificar el formato de correo electrónico
+  RegExp regExp = RegExp(
+    r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+    caseSensitive: false,
+    multiLine: false,
+  );
+
     if (_emailController.text.isEmpty ||
         _usernameController.text.isEmpty ||
         _passwordController.text.isEmpty ||
@@ -376,7 +384,18 @@ class _MyHomePageState extends State<MyHomePage> {
           duration: Duration(seconds: 2),
         ),
       );
+      return;
     }
+    else if (!regExp.hasMatch(_emailController.text)) { // Verificar formato de correo electrónico
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('El correo electrónico no es válido.'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+    return;
+  }
+
     else{
       try {
         var response = await http.get(
