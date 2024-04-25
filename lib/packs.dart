@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:pokemonapp/bar.dart';
 import 'package:pokemonapp/usuario.dart';
 import 'package:provider/provider.dart';
 import 'open_pack.dart';
@@ -16,6 +17,7 @@ class Packs extends StatefulWidget {
 class _PacksState extends State<Packs> {
   PageController _pageController = PageController(initialPage: 0);
   int _currentPageIndex = 0;
+  int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -38,24 +40,6 @@ class _PacksState extends State<Packs> {
               ),
             ),
           ),
-          Positioned(
-            top: screenSize.height * 0.005, 
-            left: (screenSize.width - 200) / 2, 
-            child: Image.asset(
-              'assets/barramoneda.png', // Ruta de tu imagen
-              width: screenSize.width * 0.5, 
-              height: screenSize.height * 0.13, 
-            ),
-          ),
-          Positioned(
-            top: screenSize.height * 0.005, 
-            left: (screenSize.width - -80) / 2, 
-            child: Image.asset(
-              'assets/barrapremium.png', // Ruta de tu imagen
-              width: screenSize.width * 0.5, 
-              height: screenSize.height * 0.13, 
-            ),
-          ),
           _labels(context),
           Positioned(
             top: 150,
@@ -74,6 +58,19 @@ class _PacksState extends State<Packs> {
                 _pokestoreContent(),
                 _myPacksContent(),
               ],
+            ),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 20,
+            child: CustomNavBar(
+              currentIndex: _currentIndex,
+              onTap: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
             ),
           ),
         ],
