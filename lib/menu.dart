@@ -9,6 +9,9 @@ import 'package:pokemonapp/pokedex.dart';
 import 'dart:math' as math;
 import 'main.dart';
 import 'packs.dart';
+import 'usuario_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class RPSCustomPainter extends CustomPainter {
   @override
@@ -133,6 +136,26 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     late final Size screenSize = MediaQuery.of(context).size;
+    final usuarioProvider =
+        Provider.of<UsuarioProvider>(context, listen: false);
+    final usuario = usuarioProvider.usuario;
+    int Usuarioxp = usuario?.xp ?? 0;
+    double XpLevel = 100.0; // Inicialmente, el valor de XpLevel es 100.0
+    double XpPer;
+    int level = 1;
+
+    while (Usuarioxp >= XpLevel) {
+      // Mientras el usuario alcance el nivel actual, actualizamos XpLevel multiplicándolo por 2.25
+      XpLevel *= 2.25;
+      level += 1;
+    }
+    print("Siguiente Nivel: " +
+        XpLevel.toString() +
+        "Nivel Actual " +
+        level.toString());
+
+// Calculamos el progreso del usuario como un porcentaje
+    XpPer = Usuarioxp / XpLevel;
 
     // Calcula el tamaño de la imagen del fondo
     double backgroundWidth = screenSize.width * 1.2;
@@ -152,9 +175,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
           _selectedProfileImage = imagePath;
         });
       },
-    ), body: Builder(
-        // Usamos un Builder para obtener un contexto que contenga el Scaffold
-        builder: (BuildContext context) {
+    ), body: Builder(builder: (BuildContext context) {
       return Stack(
         children: [
           Positioned.fill(
@@ -224,11 +245,68 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
               height: screenSize.height * 0.13,
             ),
           ),
+          Positioned(
+            top: screenSize.height * 0.057,
+            left: (screenSize.width - 380) / 2,
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                    color: Colors.black, width: 1.5), // Define el borde negro
+                borderRadius:
+                    BorderRadius.circular(25.0), // Define el radio del borde
+              ),
+              child: new LinearPercentIndicator(
+                width: MediaQuery.of(context).size.width / 4,
+                animation: true,
+                lineHeight: 20.0,
+                animationDuration: 2500,
+                percent: XpPer,
+                linearStrokeCap: LinearStrokeCap.roundAll,
+                progressColor: const Color.fromRGBO(229, 166, 94, 1),
+                backgroundColor: const Color.fromRGBO(217, 217, 217, 1),
+              ),
+            ),
+          ),
+          Positioned(
+            top: screenSize.height * 0.005,
+            left: (screenSize.width - 560) / 2,
+            child: GestureDetector(
+              onTap: () {
+                Scaffold.of(context).openDrawer(); // Abre el Drawer
+              },
+              child: Stack(
+                children: [
+                  Image.asset(
+                    'assets/xpStar.png', // Ruta de tu imagen
+                    width: screenSize.width * 0.5,
+                    height: screenSize.height * 0.13,
+                  ),
+                  Positioned(
+                    top:
+                        44, // Ajusta la posición del texto según tus necesidades
+                    left:
+                        97, // Ajusta la posición del texto según tus necesidades
+                    child: Text(
+                      level.toString(),
+                      style: TextStyle(
+                        fontSize:
+                            16, // Ajusta el tamaño de la fuente según tus necesidades
+                        fontWeight: FontWeight
+                            .bold, // Ajusta el peso de la fuente según tus necesidades
+                        color: Colors
+                            .black, // Ajusta el color del texto según tus necesidades
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Padding(
-                padding: const EdgeInsets.only(top: 569),
+                padding: const EdgeInsets.only(top: 510),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -243,7 +321,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                                 topLeftRadius: 0, bottomRightRadius: 0)),
                         Padding(
                           padding:
-                              EdgeInsets.only(bottom: screenSize.height * 0.09),
+                              EdgeInsets.only(bottom: screenSize.height * 0.07),
                           child: Stack(
                             children: [
                               _buildButton("COLLECT", "assets/incubadora.png",
@@ -455,16 +533,6 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                   ),
                 )
               ],
-            ),
-          ),
-          Positioned(
-            left: MediaQuery.of(context).size.width * 0.02,
-            top: MediaQuery.of(context).size.height * 0.04,
-            child: IconButton(
-              icon: Icon(Icons.menu), // Icono de hamburguesa
-              onPressed: () {
-                Scaffold.of(context).openDrawer(); // Abre el Drawer
-              },
             ),
           ),
           Positioned(
