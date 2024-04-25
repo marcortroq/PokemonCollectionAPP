@@ -50,26 +50,82 @@ class _PokedexState extends State<Pokedex> {
                 ),
                 fit: BoxFit.fill,
               ),
+            ),            
+          ),          
+          Positioned(
+            top: screenSize.height * 0.005,
+            left: (screenSize.width - 200) / 2,
+            child: Stack(
+              children: [
+                Image.asset(
+                  'assets/barramoneda.png',
+                  width: screenSize.width * 0.5,
+                  height: screenSize.height * 0.13,
+                ),
+                Positioned(
+                  top: 43,
+                  left: 92,
+                  child: FutureBuilder<int>(
+                    future: obtenerNumeroMonedas(context), // Llama a la función asíncrona aquí
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator(); // Muestra un indicador de carga mientras espera
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}'); // Muestra un mensaje de error si algo sale mal
+                      } else {
+                        // Aquí puedes devolver el Text widget con el valor obtenido
+                        return Text(
+                          snapshot.data.toString(),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ),
+              ],
             ),
-          ),
-           Positioned(
-            top: screenSize.height * 0.005, 
-            left: (screenSize.width - 200) / 2, 
-            child: Image.asset(
-              'assets/barramoneda.png', // Ruta de tu imagen
-              width: screenSize.width * 0.5, 
-              height: screenSize.height * 0.13, 
-            ),
-          ),
+          ),           
           Positioned(
             top: screenSize.height * 0.005, 
             left: (screenSize.width - -80) / 2, 
-            child: Image.asset(
-              'assets/barrapremium.png', // Ruta de tu imagen
-              width: screenSize.width * 0.5, 
-              height: screenSize.height * 0.13, 
+            child: Stack(
+              children: [
+                Image.asset(
+                  'assets/barrapremium.png',
+                  width: screenSize.width * 0.5,
+                  height: screenSize.height * 0.13,
+                ),
+                Positioned(
+                  top: 43,
+                  left: 92,
+                  child: FutureBuilder<int>(
+                    future: obtenerNumeroMonedasPremium(context), // Llama a la función asíncrona aquí
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator(); // Muestra un indicador de carga mientras espera
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}'); // Muestra un mensaje de error si algo sale mal
+                      } else {
+                        // Aquí puedes devolver el Text widget con el valor obtenido
+                        return Text(
+                          snapshot.data.toString(),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ),
+              ],
             ),
-          ),
+          ),          
           _labels(context),
           Positioned(
             top: 150,
@@ -93,6 +149,37 @@ class _PokedexState extends State<Pokedex> {
       ),
     );
   }
+
+Future<int> obtenerNumeroMonedas(BuildContext context) async {
+  final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
+  final usuario = usuarioProvider.usuario;
+  int idUsuario = usuario?.idUsuario ?? 0;
+
+  try {
+    Map<String, dynamic> data = await fetchUserCoins(idUsuario);
+    int monedasNormales = data['monedas'] ?? 0;
+    return monedasNormales;
+  } catch (error) {
+    print(error);
+    return 0; // o lanzar una excepción, dependiendo del caso
+  }
+}
+
+Future<int> obtenerNumeroMonedasPremium(BuildContext context) async {
+  final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
+  final usuario = usuarioProvider.usuario;
+  int idUsuario = usuario?.idUsuario ?? 0;
+
+  try {
+    Map<String, dynamic> data = await fetchUserCoins(idUsuario);
+    int monedasEspeciales = data['cantidad_pokecoins'] ?? 0;
+    return monedasEspeciales;
+  } catch (error) {
+    print(error);
+    return 0; // o lanzar una excepción, dependiendo del caso
+  }
+}
+
 
   Widget _labels(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -340,7 +427,16 @@ class _PokedexState extends State<Pokedex> {
 
 
 
+Future<Map<String, dynamic>> fetchUserCoins(int userId) async {
+    final response = await http.get(
+        Uri.parse('http://20.162.113.208:5000/api/tienda/$userId'));
 
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load user coins');
+    }
+  }
 
 
   Future<List<dynamic>> fetchDuplicateCards(int userId) async {
@@ -578,10 +674,4 @@ class _PokedexState extends State<Pokedex> {
     },
   );
 }
-
-
-
-
-
-
 }
