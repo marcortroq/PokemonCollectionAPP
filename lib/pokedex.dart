@@ -348,7 +348,21 @@ class _PokedexState extends State<Pokedex> {
         'http://20.162.113.208:5000/api/cartas/usuario/dupes/$userId'));
 
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      // Decodificar la respuesta JSON
+      List<dynamic> jsonData = json.decode(response.body);
+
+      // Obtener la lista de cartas duplicadas
+      List<dynamic> duplicateCards = [];
+      for (var item in jsonData) {
+        for (var carta in item['cartas_repetidas']) {
+          duplicateCards.add({
+            'foto_carta': carta['foto_carta'],
+            'cantidad_repetidas': item['cantidad_repetidas'],
+          });
+        }
+      }
+
+      return duplicateCards;
     } else {
       throw Exception('Failed to load duplicate cards');
     }
