@@ -542,6 +542,7 @@ class _PokedexState extends State<Pokedex> {
                                 try {
                                   await updateMonedas(idUsuario, precioTotal);
                                   print('Monedas actualizadas correctamente');
+                                  deletePokedexEntry;
                                 } catch (error) {
                                   print(
                                       'Error al actualizar las monedas: $error');
@@ -629,11 +630,25 @@ class _PokedexState extends State<Pokedex> {
         'cantidad_pokecoins': 0, // No modificamos las pokecoins en este caso
       }),
     );
-
     if (response.statusCode == 200) {
       print('Monedas actualizadas correctamente');
     } else {
       throw Exception('Failed to update monedas');
     }
   }
+
+  Future<void> deletePokedexEntry(int idPokedex) async {
+  final url = Uri.parse('http://20.162.113.208:5000/api/pokedex/delete/$idPokedex');
+  final response = await http.delete(
+    url,
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+  );
+  if (response.statusCode == 200) {
+    print('La entrada de la Pokedex ha sido eliminada correctamente');
+  } else {
+    throw Exception('Error al eliminar la entrada de la Pokedex');
+  }
+}
 }
