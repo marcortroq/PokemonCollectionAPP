@@ -1,18 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:pokemonapp/bar.dart';
 import 'package:pokemonapp/countdown_timer.dart';
 import 'package:pokemonapp/incubadora.dart';
 import 'package:pokemonapp/main_ocr.dart';
 import 'package:pokemonapp/nav_bar.dart';
 import 'package:pokemonapp/pokedex.dart';
 import 'dart:math' as math;
+import 'package:http/http.dart' as http;
 import 'main.dart';
 import 'packs.dart';
 import 'usuario_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'dart:convert';
+
 
 class RPSCustomPainter extends CustomPainter {
   @override
@@ -141,7 +143,23 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
         Provider.of<UsuarioProvider>(context, listen: false);
     final usuario = usuarioProvider.usuario;
     int Usuarioxp = usuario?.xp ?? 0;
-    int _currentIndex = 0;
+    double XpLevel = 100.0; // Inicialmente, el valor de XpLevel es 100.0
+    double XpPer;
+    int level = 1;
+    int userId = 0;
+
+    while (Usuarioxp >= XpLevel) {
+      // Mientras el usuario alcance el nivel actual, actualizamos XpLevel multiplicándolo por 2.25
+      XpLevel *= 2.25;
+      level += 1;
+    }
+    print("Siguiente Nivel: " +
+        XpLevel.toString() +
+        "Nivel Actual " +
+        level.toString());
+
+// Calculamos el progreso del usuario como un porcentaje
+    XpPer = Usuarioxp / XpLevel;
 
     // Calcula el tamaño de la imagen del fondo
     double backgroundWidth = screenSize.width * 1.2;
@@ -161,6 +179,9 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
           _selectedProfileImage = imagePath;
         });
       },
+      xpPer: XpPer,
+     level: level,
+      
     ), body: Builder(builder: (BuildContext context) {
       return Stack(
         children: [
@@ -214,16 +235,78 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
             ),
           ),
           Positioned(
-            left: 0,
-            right: 0,
-            top: 20,
-            child: CustomNavBar(
-              currentIndex: _currentIndex,
-              onTap: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
+            top: screenSize.height * 0.005,
+            left: (screenSize.width - 200) / 2,
+            child: Image.asset(
+              'assets/barramoneda.png', // Ruta de tu imagen
+              width: screenSize.width * 0.5,
+              height: screenSize.height * 0.13,
+            ),
+          ),
+          Positioned(
+            top: screenSize.height * 0.005,
+            left: (screenSize.width - -80) / 2,
+            child: Image.asset(
+              'assets/barrapremium.png', // Ruta de tu imagen
+              width: screenSize.width * 0.5,
+              height: screenSize.height * 0.13,
+            ),
+          ),
+          Positioned(
+            top: screenSize.height * 0.057,
+            left: (screenSize.width - 380) / 2,
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                    color: Colors.black, width: 1.5), // Define el borde negro
+                borderRadius:
+                    BorderRadius.circular(25.0), // Define el radio del borde
+              ),
+              child: new LinearPercentIndicator(
+                width: MediaQuery.of(context).size.width / 4,
+                animation: true,
+                lineHeight: 20.0,
+                animationDuration: 2500,
+                percent: XpPer,
+                linearStrokeCap: LinearStrokeCap.roundAll,
+                progressColor: const Color.fromRGBO(229, 166, 94, 1),
+                backgroundColor: const Color.fromRGBO(217, 217, 217, 1),
+              ),
+            ),
+          ),
+          Positioned(
+            top: screenSize.height * 0.005,
+            left: (screenSize.width - 560) / 2,
+            child: GestureDetector(
+              onTap: () {
+                Scaffold.of(context).openDrawer(); // Abre el Drawer
               },
+              child: Stack(
+                children: [
+                  Image.asset(
+                    'assets/xpStar.png', // Ruta de tu imagen
+                    width: screenSize.width * 0.5,
+                    height: screenSize.height * 0.13,
+                  ),
+                  Positioned(
+                    top: screenSize.height * 0.057, // Ajusta la posición del texto según tus necesidades
+                    left: (screenSize.width - (level > 9 ? 220 : 215)) / 2, 
+                    // Ajusta la posición del texto según tus necesidades
+                    child: Text(
+                      level.toString(),
+                      style: TextStyle(
+                        fontSize:
+                            12, // Ajusta el tamaño de la fuente según tus necesidades
+                        fontWeight: FontWeight
+                            .bold, // Ajusta el peso de la fuente según tus necesidades
+                        color: Colors
+                            .black, 
+                            fontFamily: 'Pokemon-Solid',// Ajusta el color del texto según tus necesidades
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           Column(
@@ -255,13 +338,63 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                           ),
                         ),
                         Padding(
-                            padding:
-                                EdgeInsets.only(top: screenSize.height * 0.05),
-                            child: _buildButton("POKEDEX",
-                                "assets/pokeball.png", Pokedex(), context,
-                                topRightRadius: 0,
-                                bottomLeftRadius: 0) //POKEDEX
-                            ),
+                          padding: EdgeInsets.only(top: screenSize.height * 0.05),
+                          child: Stack(
+                            children: [
+                              // Botón POKEDEX
+                              Positioned(
+                                 // Ajusta la posición horizontal del botón
+                                child: _buildButton(
+                                  "POKEDEX",
+                                  "assets/pokeball.png",
+                                  Pokedex(),
+                                  context,
+                                  topRightRadius: 0,
+                                  bottomLeftRadius: 0,
+                                ),
+                              ),
+                              // Imagen adicional
+                             Positioned(
+                                right: screenSize.height * 0.0165,
+                                top: screenSize.height * 0.024,
+                                child: Stack(
+                                  children: [
+                                    Image.asset(
+                                      "assets/CollectionCircle.png", // Ruta de la imagen adicional
+                                      width: 40, // Ajusta el tamaño de la imagen según sea necesario
+                                      height: 40,
+                                    ),
+                                    FutureBuilder<List<dynamic>>(
+                                      future: fetchUserCards(userId), // Llama a la función para obtener las cartas del usuario
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState == ConnectionState.waiting) {
+                                          // Muestra un indicador de carga mientras se espera la respuesta
+                                          return CircularProgressIndicator();
+                                        } else if (snapshot.hasError) {
+                                          // Si hay un error, muestra un mensaje de error
+                                          return Text('Error: ${snapshot.error}');
+                                        } else {
+                                          // Si la llamada fue exitosa, muestra el número de cartas
+                                          int cardCount = snapshot.data!.length; // Obtiene el número de cartas
+                                          return Center(
+                                            child: Text(
+                                              '$cardCount', // Muestra el número de cartas
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -461,7 +594,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
           ),
           Positioned(
             left: screenSize.width * 0.23,
-            top: screenSize.height * 0.6,
+            top: screenSize.height * 0.58,
             child: _buildRectangularButton("NUEVO BOTÓN", () {
               print("Botón rectangular presionado");
             }),
@@ -602,7 +735,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
               width: 2,
             ),
           ),
-          child: Container(            
+          child: Container(
             alignment: Alignment.center,
             child: Text(
               'Play',
@@ -618,6 +751,48 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
     );
   }
 }
+
+
+Future<List<dynamic>> fetchUserCards(int userId) async {
+    print("PRUEBA PARA SABER SI HACE LA LLAMADA");
+    final response = await http.get(
+        Uri.parse('http://20.162.113.208:5000/api/cartas/usuario/$userId'));
+    print("TIENE RESPUESTA");
+
+    if (response.statusCode == 200) {
+      print(json.decode(response.body));
+      List<dynamic> userCards = json.decode(response.body);
+
+      while (!json.encode(userCards).contains(']')) {
+        await Future.delayed(Duration(
+            seconds: 1)); // Esperar un segundo antes de verificar nuevamente
+        final updatedResponse = await http.get(
+            Uri.parse('http://20.162.113.208:5000/api/cartas/usuario/$userId'));
+        print("TIENE RESPUESTA");
+
+        if (updatedResponse.statusCode == 200) {
+          print(json.decode(updatedResponse.body));
+          userCards = json.decode(updatedResponse.body);
+        } else {
+          throw Exception('Failed to load user cards');
+        }
+      }
+
+      return userCards;
+    } else {
+      throw Exception('Failed to load user cards');
+    }
+  }
+Future<int> countUserCards(int userId) async {
+  try {
+    final List<dynamic> userCards = await fetchUserCards(userId);
+    return userCards.length;
+  } catch (e) {
+    print('Error counting user cards: $e');
+    return 0; // Si ocurre un error, se devuelve 0
+  }
+}
+
 
 void main() {
   runApp(MaterialApp(
