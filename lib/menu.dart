@@ -7,11 +7,14 @@ import 'package:pokemonapp/main_ocr.dart';
 import 'package:pokemonapp/nav_bar.dart';
 import 'package:pokemonapp/pokedex.dart';
 import 'dart:math' as math;
+import 'package:http/http.dart' as http;
 import 'main.dart';
 import 'packs.dart';
 import 'usuario_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'dart:convert';
+
 
 class RPSCustomPainter extends CustomPainter {
   @override
@@ -143,6 +146,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
     double XpLevel = 100.0; // Inicialmente, el valor de XpLevel es 100.0
     double XpPer;
     int level = 1;
+    int userId = 0;
 
     while (Usuarioxp >= XpLevel) {
       // Mientras el usuario alcance el nivel actual, actualizamos XpLevel multiplicándolo por 2.25
@@ -334,13 +338,63 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                           ),
                         ),
                         Padding(
-                            padding:
-                                EdgeInsets.only(top: screenSize.height * 0.05),
-                            child: _buildButton("POKEDEX",
-                                "assets/pokeball.png", Pokedex(), context,
-                                topRightRadius: 0,
-                                bottomLeftRadius: 0) //POKEDEX
-                            ),
+                          padding: EdgeInsets.only(top: screenSize.height * 0.05),
+                          child: Stack(
+                            children: [
+                              // Botón POKEDEX
+                              Positioned(
+                                 // Ajusta la posición horizontal del botón
+                                child: _buildButton(
+                                  "POKEDEX",
+                                  "assets/pokeball.png",
+                                  Pokedex(),
+                                  context,
+                                  topRightRadius: 0,
+                                  bottomLeftRadius: 0,
+                                ),
+                              ),
+                              // Imagen adicional
+                             Positioned(
+                                right: screenSize.height * 0.0165,
+                                top: screenSize.height * 0.024,
+                                child: Stack(
+                                  children: [
+                                    Image.asset(
+                                      "assets/CollectionCircle.png", // Ruta de la imagen adicional
+                                      width: 40, // Ajusta el tamaño de la imagen según sea necesario
+                                      height: 40,
+                                    ),
+                                    FutureBuilder<List<dynamic>>(
+                                      future: fetchUserCards(userId), // Llama a la función para obtener las cartas del usuario
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState == ConnectionState.waiting) {
+                                          // Muestra un indicador de carga mientras se espera la respuesta
+                                          return CircularProgressIndicator();
+                                        } else if (snapshot.hasError) {
+                                          // Si hay un error, muestra un mensaje de error
+                                          return Text('Error: ${snapshot.error}');
+                                        } else {
+                                          // Si la llamada fue exitosa, muestra el número de cartas
+                                          int cardCount = snapshot.data!.length; // Obtiene el número de cartas
+                                          return Center(
+                                            child: Text(
+                                              '$cardCount', // Muestra el número de cartas
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -697,6 +751,48 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
     );
   }
 }
+
+
+Future<List<dynamic>> fetchUserCards(int userId) async {
+    print("PRUEBA PARA SABER SI HACE LA LLAMADA");
+    final response = await http.get(
+        Uri.parse('http://20.162.113.208:5000/api/cartas/usuario/$userId'));
+    print("TIENE RESPUESTA");
+
+    if (response.statusCode == 200) {
+      print(json.decode(response.body));
+      List<dynamic> userCards = json.decode(response.body);
+
+      while (!json.encode(userCards).contains(']')) {
+        await Future.delayed(Duration(
+            seconds: 1)); // Esperar un segundo antes de verificar nuevamente
+        final updatedResponse = await http.get(
+            Uri.parse('http://20.162.113.208:5000/api/cartas/usuario/$userId'));
+        print("TIENE RESPUESTA");
+
+        if (updatedResponse.statusCode == 200) {
+          print(json.decode(updatedResponse.body));
+          userCards = json.decode(updatedResponse.body);
+        } else {
+          throw Exception('Failed to load user cards');
+        }
+      }
+
+      return userCards;
+    } else {
+      throw Exception('Failed to load user cards');
+    }
+  }
+Future<int> countUserCards(int userId) async {
+  try {
+    final List<dynamic> userCards = await fetchUserCards(userId);
+    return userCards.length;
+  } catch (e) {
+    print('Error counting user cards: $e');
+    return 0; // Si ocurre un error, se devuelve 0
+  }
+}
+
 
 void main() {
   runApp(MaterialApp(
