@@ -8,7 +8,6 @@ import 'package:pokemonapp/main_ocr.dart';
 import 'dart:math' as math;
 import 'main.dart';
 import 'packs.dart';
-import 'UnityGamePage.dart';
 import 'package:pokemonapp/NavBar.dart';
 
 class RPSCustomPainter extends CustomPainter {
@@ -554,10 +553,10 @@ Widget _buildRectangularButton(String text, BuildContext context) {
     child: ElevatedButton(
       onPressed: () {
         // Navegar a UnityGamePage al presionar el botón
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => UnityGamePage()),
-        );
+        //Navigator.push(
+          //context,
+          //MaterialPageRoute(builder: (context) => UnityGamePage()),
+        //);
       },
       style: ElevatedButton.styleFrom(
         shape: RoundedRectangleBorder(
