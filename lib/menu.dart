@@ -602,7 +602,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
               width: 2,
             ),
           ),
-          child: Container(
+          child: Container(            
             alignment: Alignment.center,
             child: Text(
               'Play',

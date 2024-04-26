@@ -380,9 +380,30 @@ class _PacksState extends State<Packs> {
                 Container(
                   width: 150,
                   child: TextButton(
-                    onPressed: () {
+                    onPressed: () async{
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) => open_pack()));
+                          
+                          final usuarioProvider =
+                                    Provider.of<UsuarioProvider>(context,
+                                        listen: false);
+                                final usuario = usuarioProvider.usuario;
+                                int idUsuario = usuario?.idUsuario ?? 0;             
+                                int numeros=int.parse(numero);  
+                                final precioTotal = numeros*-1; 
+                                                                                                                    
+                                try {
+                                  if(pack == "PREMIUM PACK"){
+                                  await updateMonedasPremium(idUsuario, 0,precioTotal);
+                                  }else{
+                                  await updateMonedasPremium(idUsuario, precioTotal,0);
+                                  }
+                                  print('Monedas actualizadas correctamente');
+                                } catch (error) {
+                                  print(
+                                      'Error al actualizar las monedas: $error');
+                                }
+                          
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -534,6 +555,26 @@ class _PacksState extends State<Packs> {
       );
     }
     return images;
+  }
+  Future<void> updateMonedasPremium(int idUsuario, int cantidadMonedas,int cantidadpokecoins) async {
+    final url = Uri.parse('http://20.162.113.208:5000/api/tienda');
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'id_usuario': idUsuario,
+        'monedas': cantidadMonedas,
+        'cantidad_pokecoins': cantidadpokecoins, // No modificamos las pokecoins en este caso
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Monedas actualizadas correctamente');
+    } else {
+      throw Exception('Failed to update monedas');
+    }
   }
 }
 
