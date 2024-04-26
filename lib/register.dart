@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:pokemonapp/main.dart';
 import 'package:pokemonapp/main_ocr.dart';
 import 'menu.dart';
+import 'dart:convert';
+
 
 void main() {
   runApp(const Register());
@@ -346,6 +348,14 @@ class _MyHomePageState extends State<MyHomePage> {
   void _checkUserExistenceAndRegister() async {
     String nombreUsuario = _usernameController.text;
     String contrasena = _passwordController.text;
+
+    // Expresión regular para verificar el formato de correo electrónico
+  RegExp regExp = RegExp(
+    r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+    caseSensitive: false,
+    multiLine: false,
+  );
+
     if (_emailController.text.isEmpty ||
         _usernameController.text.isEmpty ||
         _passwordController.text.isEmpty ||
@@ -358,7 +368,7 @@ class _MyHomePageState extends State<MyHomePage> {
       );
       return;
     }
-    else if (contrasena.length <= 6) {
+    else if (contrasena.length <= 5) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('La contraseña debe tener más de 6 caracteres.'),
@@ -374,7 +384,18 @@ class _MyHomePageState extends State<MyHomePage> {
           duration: Duration(seconds: 2),
         ),
       );
+      return;
     }
+    else if (!regExp.hasMatch(_emailController.text)) { // Verificar formato de correo electrónico
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('El correo electrónico no es válido.'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+    return;
+  }
+
     else{
       try {
         var response = await http.get(
@@ -424,7 +445,7 @@ class _MyHomePageState extends State<MyHomePage> {
       if (response.statusCode == 201) {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const MainScreen()),
+          MaterialPageRoute(builder: (context) => const MyApp()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

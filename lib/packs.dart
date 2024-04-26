@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:pokemonapp/bar.dart';
 import 'package:pokemonapp/usuario.dart';
 import 'package:provider/provider.dart';
 import 'open_pack.dart';
@@ -16,9 +17,15 @@ class Packs extends StatefulWidget {
 class _PacksState extends State<Packs> {
   PageController _pageController = PageController(initialPage: 0);
   int _currentPageIndex = 0;
+  int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
+    late final Size screenSize = MediaQuery.of(context).size;
+
+    // Calcula el tamaño de la imagen del fondo
+    double backgroundWidth = screenSize.width * 1.2;
+    double backgroundHeight = screenSize.height * 1.2;
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
@@ -51,6 +58,19 @@ class _PacksState extends State<Packs> {
                 _pokestoreContent(),
                 _myPacksContent(),
               ],
+            ),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 20,
+            child: CustomNavBar(
+              currentIndex: _currentIndex,
+              onTap: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
             ),
           ),
         ],
@@ -133,12 +153,12 @@ class _PacksState extends State<Packs> {
   Widget _pokestoreContent() {
     final List<PackData> packData = [
       PackData(
-        title: 'SOBRES PREMIUM',
+        title: 'PREMIUM PACKS',
         images: ['assets/sobrepremium.png', 'assets/sobrepremium.png'],
         prices: ['550', '1000'],
       ),
       PackData(
-        title: 'SOBRES',
+        title: 'BASICS PACKS',
         images: ['assets/sobre.png', 'assets/sobre.png'],
         prices: ['1000', '1600'],
       ),
@@ -214,27 +234,210 @@ class _PacksState extends State<Packs> {
   }
 
   Widget _imageWithText(String imagePath, String text) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Image.asset(
-          imagePath,
-          width: 170,
-          fit: BoxFit.contain,
-        ),
-        Positioned(
-          child: Text(
-            text,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontFamily: 'sarpanch',
+    return GestureDetector(
+      onTap: () {
+        String moneda = '';
+        String pack = '';
+        if (imagePath == 'assets/sobrepremium.png') {
+          moneda = 'assets/monedaPremium.png';
+          pack = "PREMIUM PACK";
+        } else {
+          moneda = 'assets/moneda.png';
+          pack = "BASIC PACK";
+        }
+        _showPopUp(context, text, moneda, pack);
+      },
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Image.asset(
+            imagePath,
+            width: 170,
+            fit: BoxFit.contain,
+          ),
+          Positioned(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontFamily: 'sarpanch',
+              ),
+            ),
+            top: 110,
+            left: 63,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showPopUp(
+      BuildContext context, String numero, String moneda, String pack) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.transparent,
+          content: Container(
+            width: 300.0,
+            height: 230.0, // Ajusta la altura total del AlertDialog
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20.0),
+              gradient: LinearGradient(
+                colors: [
+                  const Color.fromRGBO(178, 168, 168, 1),
+                  const Color.fromRGBO(255, 255, 255, 1),
+                  const Color.fromRGBO(255, 255, 255, 1),
+                ],
+                stops: [0.0, 0.4, 1.0],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+              border: Border.all(color: Colors.black, width: 1.0),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Container(
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(29, 30, 29, 1),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(15.0),
+                      topRight: Radius.circular(15.0),
+                    ),
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Color.fromRGBO(29, 30, 29, 1),
+                        width: 1.0,
+                      ),
+                    ),
+                  ),
+                  height: 60,
+                  child: Center(
+                    child: Text(
+                      pack,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24.0,
+                        fontFamily: 'sarpanch',
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 15.0),
+                Container(
+                  height: 80,
+                  width: 200,
+                  decoration: BoxDecoration(
+                    borderRadius:
+                        BorderRadius.circular(10.0), // Bordes redondeados
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [
+                        const Color.fromRGBO(208, 56, 56, 1), // Color inicial
+                        const Color.fromRGBO(255, 91, 91, 1), // Color final
+                      ],
+                    ),
+                    border: Border.all(
+                        color: Colors.black, width: 1.0), // Borde negro
+                  ),
+                  child: Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          'Contains:',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18.0,
+                            fontFamily: 'sarpanch',
+                          ),
+                        ),
+                        SizedBox(width: 5.0),
+                        SizedBox(
+                          height: 60,
+                          child: Image.asset(
+                            'assets/PortadaColor.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        SizedBox(width: 5.0),
+                        Text(
+                          'x4',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24.0,
+                            fontFamily: 'sarpanch',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 15.0), // Espacio adicional si es necesario
+                Container(
+                  width: 150,
+                  child: TextButton(
+                    onPressed: () async{
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => open_pack()));
+                          
+                          final usuarioProvider =
+                                    Provider.of<UsuarioProvider>(context,
+                                        listen: false);
+                                final usuario = usuarioProvider.usuario;
+                                int idUsuario = usuario?.idUsuario ?? 0;             
+                                int numeros=int.parse(numero);  
+                                final precioTotal = numeros*-1; 
+                                                                                                                    
+                                try {
+                                  if(pack == "PREMIUM PACK"){
+                                  await updateMonedasPremium(idUsuario, 0,precioTotal);
+                                  }else{
+                                  await updateMonedasPremium(idUsuario, precioTotal,0);
+                                  }
+                                  print('Monedas actualizadas correctamente');
+                                } catch (error) {
+                                  print(
+                                      'Error al actualizar las monedas: $error');
+                                }
+                          
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Image.asset(moneda),
+                        SizedBox(width: 5.0),
+                        Text(
+                          numero,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20.0,
+                            fontFamily: 'sarpanch',
+                          ),
+                        ),
+                        SizedBox(width: 5.0),
+                        Image.asset(moneda),
+                      ],
+                    ),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all<Color>(
+                        const Color.fromRGBO(29, 30, 29, 1),
+                      ),
+                      padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                        EdgeInsets.zero,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          top: 110,
-          left: 63,
-        ),
-      ],
+          contentPadding: EdgeInsets.zero,
+        );
+      },
     );
   }
 
@@ -310,9 +513,8 @@ class _PacksState extends State<Packs> {
         return -1; // Retornar un valor por defecto o manejar el error de otra manera
       }
     } catch (e) {
-      // Error al realizar la solicitud, maneja el error según sea necesario
       print('Error en la solicitud: $e');
-      return -1; // Retornar un valor por defecto o manejar el error de otra manera
+      return -1;
     }
   }
 
@@ -323,7 +525,6 @@ class _PacksState extends State<Packs> {
     try {
       final response = await http.post(
         Uri.parse(url),
-        // No necesitamos enviar ningún cuerpo en esta solicitud POST
       );
 
       if (response.statusCode == 200) {
@@ -354,6 +555,26 @@ class _PacksState extends State<Packs> {
       );
     }
     return images;
+  }
+  Future<void> updateMonedasPremium(int idUsuario, int cantidadMonedas,int cantidadpokecoins) async {
+    final url = Uri.parse('http://20.162.113.208:5000/api/tienda');
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'id_usuario': idUsuario,
+        'monedas': cantidadMonedas,
+        'cantidad_pokecoins': cantidadpokecoins, // No modificamos las pokecoins en este caso
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Monedas actualizadas correctamente');
+    } else {
+      throw Exception('Failed to update monedas');
+    }
   }
 }
 
