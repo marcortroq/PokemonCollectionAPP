@@ -8,6 +8,7 @@ import 'package:pokemonapp/main_ocr.dart';
 import 'dart:math' as math;
 import 'main.dart';
 import 'packs.dart';
+import 'UnityGamePage.dart';
 import 'package:pokemonapp/NavBar.dart';
 
 class RPSCustomPainter extends CustomPainter {
@@ -444,9 +445,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
            Positioned(
             left: screenSize.width * 0.23,
             top: screenSize.height * 0.6,
-            child: _buildRectangularButton("NUEVO BOTÓN", () {
-              print("Botón rectangular presionado");
-            }),
+            child: _buildRectangularButton("Play", context),
           ),
         ],
       ),
@@ -548,53 +547,61 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
   );
 }
 
-Widget _buildRectangularButton(String text, VoidCallback onPressed) {
-    return SizedBox(
-      width: 215,
-      height: 60,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(13.0),
-          ),
-          padding: EdgeInsets.zero,
-          elevation: 0,
+Widget _buildRectangularButton(String text, BuildContext context) {
+  return SizedBox(
+    width: 215,
+    height: 60,
+    child: ElevatedButton(
+      onPressed: () {
+        // Navegar a UnityGamePage al presionar el botón
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => UnityGamePage()),
+        );
+      },
+      style: ElevatedButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(13.0),
         ),
-        child: Ink(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                const Color.fromRGBO(66, 9, 9, 1),
-                const Color.fromRGBO(160, 0, 0, 1),
-                const Color.fromRGBO(221, 19, 19, 1),
-                const Color.fromRGBO(160, 0, 0, 1),
-                const Color.fromRGBO(66, 9, 9, 1),
-              ],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-            borderRadius: BorderRadius.circular(13.0),
-            border: Border.all(
-              color: Colors.black,
-              width: 2,
-            ),
+        padding: EdgeInsets.zero,
+        elevation: 0,
+      ),
+      child: Ink(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              const Color.fromRGBO(66, 9, 9, 1),
+              const Color.fromRGBO(160, 0, 0, 1),
+              const Color.fromRGBO(221, 19, 19, 1),
+              const Color.fromRGBO(160, 0, 0, 1),
+              const Color.fromRGBO(66, 9, 9, 1),
+            ],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
           ),
-          child: Container(
-            alignment: Alignment.center,
-            child: Text(
-              'Play',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 30,
-                fontFamily: 'Pokemon-Solid',
-              ),
+          borderRadius: BorderRadius.circular(13.0),
+          border: Border.all(
+            color: Colors.black,
+            width: 2,
+          ),
+        ),
+        child: Container(
+          alignment: Alignment.center,
+          child: Text(
+            text,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 30,
+              fontFamily: 'Pokemon-Solid',
             ),
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
+
 }
 
 void main() {
