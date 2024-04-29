@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:pokemonapp/bar.dart';
 import 'package:pokemonapp/countdown_timer.dart';
 import 'package:pokemonapp/incubadora.dart';
 import 'package:pokemonapp/main_ocr.dart';
@@ -143,24 +144,8 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
     final usuario = usuarioProvider.usuario;
     int Usuarioxp = usuario?.xp ?? 0;
     int idusuario = usuario?.idUsuario ?? 0;
-    double XpLevel = 100.0; // Inicialmente, el valor de XpLevel es 100.0
-    double XpPer;
-    int level = 1;
-    int userId = 0;
-
-    while (Usuarioxp >= XpLevel) {
-      // Mientras el usuario alcance el nivel actual, actualizamos XpLevel multiplicándolo por 2.25
-      XpLevel *= 2.25;
-      level += 1;
-    }
-    print("Siguiente Nivel: " +
-        XpLevel.toString() +
-        "Nivel Actual " +
-        level.toString());
-
-// Calculamos el progreso del usuario como un porcentaje
-    XpPer = Usuarioxp / XpLevel;
-
+    int _currentIndex =0;
+   
     // Calcula el tamaño de la imagen del fondo
     double backgroundWidth = screenSize.width * 1.2;
     double backgroundHeight = screenSize.height * 1.2;
@@ -172,146 +157,78 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
     double buttonHeight = screenSize.height * 0.1;
     double iconSize = screenSize.width * 0.1;
 
-    return Scaffold(
-        drawer: NavBar(
-          // Pasa una función que actualice _selectedProfileImage a NavBar
-          onProfileImageSelected: (String imagePath) {
-            setState(() {
-              _selectedProfileImage = imagePath;
-            });
-          },
-          xpPer: XpPer,
-          level: level,
-        ),
-        body: Builder(builder: (BuildContext context) {
-          return Stack(
-            children: [
-              Positioned.fill(
-                child: CustomPaint(
-                  painter: RPSCustomPainter(),
-                ),
+    return Scaffold(drawer: NavBar(
+      // Pasa una función que actualice _selectedProfileImage a NavBar
+      onProfileImageSelected: (String imagePath) {
+        setState(() {
+          _selectedProfileImage = imagePath;
+        });
+      }, 
+    ), body: Builder(builder: (BuildContext context) {
+      return Stack(
+        children: [
+          Positioned.fill(
+            child: CustomPaint(
+              painter: RPSCustomPainter(),
+            ),
+          ),
+          Positioned(
+            left: -backgroundWidth * 0.05,
+            bottom: screenSize.height * 0.06,
+            child: Image.asset(
+              _selectedProfileImage.isNotEmpty
+                  ? _selectedProfileImage
+                  : 'assets/grow.png',
+              width: backgroundWidth,
+              height: backgroundHeight,
+              fit: BoxFit.contain,
+            ),
+          ),
+          Positioned(
+            right: screenSize.width * 0.0,
+            bottom: screenSize.height * 0.15,
+            child: CustomPaint(
+              size: Size(screenSize.width, screenSize.width * 1.5),
+              painter: RPSCustomPainter2(),
+            ),
+          ),
+          Positioned(
+            right: screenSize.width * 0.0,
+            bottom: screenSize.height * 0.44,
+            child: Transform.rotate(
+              angle: 65 * math.pi / 180,
+              child: Container(
+                width: screenSize.width * 0.065,
+                height: screenSize.height * 0.316,
+                color: Color.fromRGBO(29, 30, 29, 1),
               ),
-              Positioned(
-                left: -backgroundWidth * 0.05,
-                bottom: screenSize.height * 0.06,
-                child: Image.asset(
-                  _selectedProfileImage.isNotEmpty
-                      ? _selectedProfileImage
-                      : 'assets/grow.png',
-                  width: backgroundWidth,
-                  height: backgroundHeight,
-                  fit: BoxFit.contain,
-                ),
+            ),
+          ),
+          Positioned(
+            left: screenSize.width * 0.0,
+            bottom: screenSize.height * 0.44,
+            child: Transform.rotate(
+              angle: -65 * math.pi / 180,
+              child: Container(
+                width: screenSize.width * 0.065,
+                height: screenSize.height * 0.316,
+                color: Color.fromRGBO(29, 30, 29, 1),
               ),
-              Positioned(
-                right: screenSize.width * 0.0,
-                bottom: screenSize.height * 0.15,
-                child: CustomPaint(
-                  size: Size(screenSize.width, screenSize.width * 1.5),
-                  painter: RPSCustomPainter2(),
-                ),
-              ),
-              Positioned(
-                right: screenSize.width * 0.0,
-                bottom: screenSize.height * 0.44,
-                child: Transform.rotate(
-                  angle: 65 * math.pi / 180,
-                  child: Container(
-                    width: screenSize.width * 0.065,
-                    height: screenSize.height * 0.316,
-                    color: Color.fromRGBO(29, 30, 29, 1),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: screenSize.width * 0.0,
-                bottom: screenSize.height * 0.44,
-                child: Transform.rotate(
-                  angle: -65 * math.pi / 180,
-                  child: Container(
-                    width: screenSize.width * 0.065,
-                    height: screenSize.height * 0.316,
-                    color: Color.fromRGBO(29, 30, 29, 1),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: screenSize.height * 0.005,
-                left: (screenSize.width - 200) / 2,
-                child: Image.asset(
-                  'assets/barramoneda.png', // Ruta de tu imagen
-                  width: screenSize.width * 0.5,
-                  height: screenSize.height * 0.13,
-                ),
-              ),
-              Positioned(
-                top: screenSize.height * 0.005,
-                left: (screenSize.width - -80) / 2,
-                child: Image.asset(
-                  'assets/barrapremium.png', // Ruta de tu imagen
-                  width: screenSize.width * 0.5,
-                  height: screenSize.height * 0.13,
-                ),
-              ),
-              Positioned(
-                top: screenSize.height * 0.057,
-                left: (screenSize.width - 380) / 2,
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                        color: Colors.black,
-                        width: 1.5), // Define el borde negro
-                    borderRadius: BorderRadius.circular(
-                        25.0), // Define el radio del borde
-                  ),
-                  child: new LinearPercentIndicator(
-                    width: MediaQuery.of(context).size.width / 4,
-                    animation: true,
-                    lineHeight: 20.0,
-                    animationDuration: 2500,
-                    percent: XpPer,
-                    linearStrokeCap: LinearStrokeCap.roundAll,
-                    progressColor: const Color.fromRGBO(229, 166, 94, 1),
-                    backgroundColor: const Color.fromRGBO(217, 217, 217, 1),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: screenSize.height * 0.005,
-                left: (screenSize.width - 560) / 2,
-                child: GestureDetector(
-                  onTap: () {
-                    Scaffold.of(context).openDrawer(); // Abre el Drawer
-                  },
-                  child: Stack(
-                    children: [
-                      Image.asset(
-                        'assets/xpStar.png', // Ruta de tu imagen
-                        width: screenSize.width * 0.5,
-                        height: screenSize.height * 0.13,
-                      ),
-                      Positioned(
-                        top: screenSize.height *
-                            0.057, // Ajusta la posición del texto según tus necesidades
-                        left: (screenSize.width - (level > 9 ? 220 : 215)) / 2,
-                        // Ajusta la posición del texto según tus necesidades
-                        child: Text(
-                          level.toString(),
-                          style: TextStyle(
-                            fontSize:
-                                12, // Ajusta el tamaño de la fuente según tus necesidades
-                            fontWeight: FontWeight
-                                .bold, // Ajusta el peso de la fuente según tus necesidades
-                            color: Colors.black,
-                            fontFamily:
-                                'Pokemon-Solid', // Ajusta el color del texto según tus necesidades
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+            ),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 20,
+            child: CustomNavBar(
+              currentIndex: _currentIndex,
+              onTap: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+            ),
+          ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

@@ -126,8 +126,8 @@ class CustomNavBar extends StatelessWidget {
                     height: screenSize.height * 0.13,
                   ),
                   Positioned(
-                    top: 44,
-                    left: 57,
+                    top: screenSize.height*0.053,
+                    left: screenSize.height*0.065,
                     child: FutureBuilder<int>(
                       future: obtenerNumeroMonedas(
                           context), // Llama a la función asíncrona aquí
@@ -165,8 +165,8 @@ class CustomNavBar extends StatelessWidget {
                     height: screenSize.height * 0.13,
                   ),
                   Positioned(
-                    top: 45,
-                    left: 44,
+                    top: screenSize.height*0.055,
+                    left: screenSize.height*0.055,
                     child: FutureBuilder<int>(
                       future: obtenerNumeroMonedasPremium(
                           context), // Llama a la función asíncrona aquí
