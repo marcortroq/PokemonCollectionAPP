@@ -43,6 +43,7 @@ dependencies:
   permission_handler: ^11.3.0
   crypto: ^3.0.3
   percent_indicator: ^3.4.0
+  shared_preferences: ^2.0.0
   
   
 
