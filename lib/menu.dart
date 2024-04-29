@@ -15,6 +15,7 @@ import 'usuario_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'dart:convert';
+import 'package:pokemonapp/game/main.dart';
 
 class RPSCustomPainter extends CustomPainter {
   @override
@@ -535,9 +536,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
               Positioned(
                 left: screenSize.width * 0.23,
                 top: screenSize.height * 0.58,
-                child: _buildRectangularButton("NUEVO BOTÓN", () {
-                  print("Botón rectangular presionado");
-                }),
+                child: _buildRectangularButton(context, MyAppGame()),
               ),
             ],
           );
@@ -652,12 +651,19 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
     );
   }
 
-  Widget _buildRectangularButton(String text, VoidCallback onPressed) {
+  Widget _buildRectangularButton(BuildContext context, Widget screen) {
     return SizedBox(
       width: 215,
       height: 60,
       child: ElevatedButton(
-        onPressed: onPressed,
+        onPressed: () {
+          // Navegar a la pantalla deseada
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => screen()), // Llama a la pantalla aquí
+          );
+        },
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(13.0),
@@ -687,7 +693,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
           child: Container(
             alignment: Alignment.center,
             child: Text(
-              'Play',
+              'PLAY',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 30,

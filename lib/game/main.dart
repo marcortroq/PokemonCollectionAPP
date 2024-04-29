@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:pokemonapp/main.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(MyAppGame());
 }
 
-class MyApp extends StatelessWidget {
+class MyAppGame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatefulWidget{
+class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -23,8 +23,6 @@ class HomePage extends StatefulWidget{
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      
-    );
+    return Scaffold();
   }
 }
