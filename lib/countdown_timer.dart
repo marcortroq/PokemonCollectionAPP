@@ -11,9 +11,9 @@ class CountdownTimer extends StatefulWidget {
   }
 }
 
-class _CountdownTimerState extends State {
+class _CountdownTimerState extends State<CountdownTimer> {
   Timer? _timer;
-  int _secondsRemaining = 4200; // Cambiado para que inicie en 0
+  int _secondsRemaining = 4200; // Cambiado a 6 horas en segundos
 
   @override
   void initState() {
@@ -48,7 +48,7 @@ class _CountdownTimerState extends State {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _secondsRemaining = prefs.getInt('timer') ??
-          43200; // Si no hay tiempo guardado, establecer en 12 horas
+          21600; // Si no hay tiempo guardado, establecer en 6 horas
     });
     _startTimer(); // Iniciar el temporizador después de cargar el tiempo
   }
