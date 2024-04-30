@@ -390,7 +390,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                 left: (MediaQuery.of(context).size.width * 0.4) / 2,
                 top: (MediaQuery.of(context).size.height * 0.28) / 2,
                 child: FutureBuilder<List<Map<String, dynamic>>>(
-                  future: fetchMedallasByUserId(1),
+                  future: fetchMedallasByUserId(userId),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       // Si está esperando la respuesta de la API, muestra un indicador de carga
