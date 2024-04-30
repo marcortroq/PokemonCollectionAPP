@@ -699,5 +699,4 @@ Future<void> deletePokedexEntry(int idPokedexEntry) async {
 }
 
 
-  
 }
