@@ -15,6 +15,7 @@ import 'usuario_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'dart:convert';
+import 'package:pokemonapp/game/main.dart';
 
 class RPSCustomPainter extends CustomPainter {
   @override
@@ -105,6 +106,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
   late Size _screen;
   double _maxSlide = 200.0;
   double _startingPos = 0.0;
+  final countdownTimer = CountdownTimer();
 
   @override
   void initState() {
@@ -138,6 +140,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    bool activate = true;
     late final Size screenSize = MediaQuery.of(context).size;
     final usuarioProvider =
         Provider.of<UsuarioProvider>(context, listen: false);
@@ -155,7 +158,6 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
       XpLevel *= 2.25;
       level += 1;
     }
-    
 
 // Calculamos el progreso del usuario como un porcentaje
     XpPer = Usuarioxp / XpLevel;
@@ -170,7 +172,6 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
     double buttonWidth = screenSize.width * 0.35;
     double buttonHeight = screenSize.height * 0.1;
     double iconSize = screenSize.width * 0.1;
-    
 
     return Scaffold(
         drawer: NavBar(
@@ -237,18 +238,18 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                 ),
               ),
               Positioned(
-            left: 0,
-            right: 0,
-            top: 20,
-            child: CustomNavBar(
-              currentIndex: _currentIndex,
-              onTap: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
-            ),
-          ),
+                left: 0,
+                right: 0,
+                top: 20,
+                child: CustomNavBar(
+                  currentIndex: _currentIndex,
+                  onTap: (index) {
+                    setState(() {
+                      _currentIndex = index;
+                    });
+                  },
+                ),
+              ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -264,7 +265,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                                 padding: EdgeInsets.only(
                                     top: screenSize.height * 0.05),
                                 child: _buildButton("PACKS", "assets/pack.png",
-                                    Packs(), context,
+                                    Packs(), activate = true, context,
                                     topLeftRadius: 0, bottomRightRadius: 0)),
                             Padding(
                               padding: EdgeInsets.only(
@@ -272,16 +273,19 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                               child: Stack(
                                 children: [
                                   _buildButton(
-                                    CountdownTimer().getSecondsRemaining() != 0
+                                    countdownTimer.getSecondsRemaining() != 0
                                         ? "READY IN"
                                         : "COLLECT",
-                                    CountdownTimer().getSecondsRemaining() != 0
+                                    countdownTimer.getSecondsRemaining() != 0
                                         ? "assets/incubadoraOFF.png"
                                         : "assets/incubadora.png",
                                     Incubadora(),
+                                    countdownTimer.getSecondsRemaining() != 0
+                                        ? activate = false
+                                        : activate = true,
                                     context,
                                   ), // INCUBADORA
-                                  CountdownTimer(), // Contador de cuenta atrás de 12 horas
+                                  countdownTimer, // Contador de cuenta atrás de 12 horas
                                 ],
                               ),
                             ),
@@ -297,6 +301,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                                       "POKEDEX",
                                       "assets/pokeball.png",
                                       Pokedex(),
+                                      activate = true,
                                       context,
                                       topRightRadius: 0,
                                       bottomLeftRadius: 0,
@@ -379,186 +384,159 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                   ),
                 ),
               ),
+
+              // En tu widget donde quieres mostrar la medalla
               Positioned(
                 left: (MediaQuery.of(context).size.width * 0.4) / 2,
                 top: (MediaQuery.of(context).size.height * 0.28) / 2,
-                child: Stack(
-                  children: [
-                    Image.asset(
-                      'assets/hexMedallas.png',
-                      width: MediaQuery.of(context).size.width * 0.6,
-                      height: MediaQuery.of(context).size.height * 0.6,
-                      fit: BoxFit.contain,
-                    ),
-                    Positioned(
-                      left: MediaQuery.of(context).size.width * 0.17,
-                      top: MediaQuery.of(context).size.height * 0.21,
-                      child: Image.asset(
-                        'assets/MedallaRoca.png',
-                        width: MediaQuery.of(context).size.width * 0.09,
-                        height: MediaQuery.of(context).size.width * 0.09,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    Positioned(
-                      left: MediaQuery.of(context).size.width * 0.17,
-                      top: MediaQuery.of(context).size.height * 0.21,
-                      child: Image.asset(
-                        'assets/medallaRocaOut.png',
-                        width: MediaQuery.of(context).size.width * 0.09,
-                        height: MediaQuery.of(context).size.width * 0.09,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    Positioned(
-                      left: MediaQuery.of(context).size.width * 0.17,
-                      top: MediaQuery.of(context).size.height * 0.35,
-                      child: Image.asset(
-                        'assets/MedallaVolcan.png',
-                        width: MediaQuery.of(context).size.width * 0.09,
-                        height: MediaQuery.of(context).size.width * 0.09,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    Positioned(
-                      left: MediaQuery.of(context).size.width * 0.17,
-                      top: MediaQuery.of(context).size.height * 0.35,
-                      child: Image.asset(
-                        'assets/medallaVolcanOut.png',
-                        width: MediaQuery.of(context).size.width * 0.09,
-                        height: MediaQuery.of(context).size.width * 0.09,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    Positioned(
-                      left: MediaQuery.of(context).size.width * 0.245,
-                      top: MediaQuery.of(context).size.height * 0.25,
-                      child: Image.asset(
-                        'assets/MedallaAlma.png',
-                        width: MediaQuery.of(context).size.width * 0.09,
-                        height: MediaQuery.of(context).size.width * 0.09,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    Positioned(
-                      left: MediaQuery.of(context).size.width * 0.245,
-                      top: MediaQuery.of(context).size.height * 0.25,
-                      child: Image.asset(
-                        'assets/medallaAlmaout.png',
-                        width: MediaQuery.of(context).size.width * 0.09,
-                        height: MediaQuery.of(context).size.width * 0.09,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    Positioned(
-                      left: MediaQuery.of(context).size.width * 0.4,
-                      top: MediaQuery.of(context).size.height * 0.285,
-                      child: Image.asset(
-                        'assets/MedallaPantano.png',
-                        width: MediaQuery.of(context).size.width * 0.09,
-                        height: MediaQuery.of(context).size.width * 0.09,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    Positioned(
-                      left: MediaQuery.of(context).size.width * 0.4,
-                      top: MediaQuery.of(context).size.height * 0.285,
-                      child: Image.asset(
-                        'assets/medallaPantanoOut.png',
-                        width: MediaQuery.of(context).size.width * 0.09,
-                        height: MediaQuery.of(context).size.width * 0.09,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    Positioned(
-                      left: MediaQuery.of(context).size.width * 0.32,
-                      top: MediaQuery.of(context).size.height * 0.21,
-                      child: Image.asset(
-                        'assets/MedallaCascada.png',
-                        width: MediaQuery.of(context).size.width * 0.09,
-                        height: MediaQuery.of(context).size.width * 0.09,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    Positioned(
-                      left: MediaQuery.of(context).size.width * 0.32,
-                      top: MediaQuery.of(context).size.height * 0.21,
-                      child: Image.asset(
-                        'assets/medallaCascadaOut.png',
-                        width: MediaQuery.of(context).size.width * 0.09,
-                        height: MediaQuery.of(context).size.width * 0.09,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    Positioned(
-                      left: MediaQuery.of(context).size.width * 0.25,
-                      top: MediaQuery.of(context).size.height * 0.315,
-                      child: Image.asset(
-                        'assets/MedallaArcoiris.png',
-                        width: MediaQuery.of(context).size.width * 0.09,
-                        height: MediaQuery.of(context).size.width * 0.09,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    Positioned(
-                      left: MediaQuery.of(context).size.width * 0.25,
-                      top: MediaQuery.of(context).size.height * 0.315,
-                      child: Image.asset(
-                        'assets/medallaArcoirisout.png',
-                        width: MediaQuery.of(context).size.width * 0.09,
-                        height: MediaQuery.of(context).size.width * 0.09,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    Positioned(
-                      left: MediaQuery.of(context).size.width * 0.1,
-                      top: MediaQuery.of(context).size.height * 0.285,
-                      child: Image.asset(
-                        'assets/MedallaTrueno.png',
-                        width: MediaQuery.of(context).size.width * 0.09,
-                        height: MediaQuery.of(context).size.width * 0.09,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    Positioned(
-                      left: MediaQuery.of(context).size.width * 0.1,
-                      top: MediaQuery.of(context).size.height * 0.285,
-                      child: Image.asset(
-                        'assets/medallaTruenoOut.png',
-                        width: MediaQuery.of(context).size.width * 0.09,
-                        height: MediaQuery.of(context).size.width * 0.09,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    Positioned(
-                      left: MediaQuery.of(context).size.width * 0.32,
-                      top: MediaQuery.of(context).size.height * 0.35,
-                      child: Image.asset(
-                        'assets/MedallaTierra.png',
-                        width: MediaQuery.of(context).size.width * 0.09,
-                        height: MediaQuery.of(context).size.width * 0.09,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    Positioned(
-                      left: MediaQuery.of(context).size.width * 0.32,
-                      top: MediaQuery.of(context).size.height * 0.35,
-                      child: Image.asset(
-                        'assets/medallaTierraOut.png',
-                        width: MediaQuery.of(context).size.width * 0.09,
-                        height: MediaQuery.of(context).size.width * 0.09,
-                        fit: BoxFit.contain,
-                      ),
-                    )
-                  ],
+                child: FutureBuilder<List<Map<String, dynamic>>>(
+                  future: fetchMedallasByUserId(userId),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      // Si está esperando la respuesta de la API, muestra un indicador de carga
+                      return CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      // Si hay un error al obtener la medalla, muestra un mensaje de error
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      // Si la respuesta de la API es exitosa, verifica si el usuario tiene la medalla de roca
+                      // Itera sobre la lista de mapas para encontrar las medallas
+                      final List<Map<String, dynamic>> medallas =
+                          snapshot.data!;
+                      bool tieneMedallaRoca = medallas.any(
+                          (medalla) => medalla['medalla'] == 'Medalla Roca');
+                      bool tieneMedallaCascada = medallas.any(
+                          (medalla) => medalla['medalla'] == 'Medalla Cascada');
+                      bool tieneMedallaTrueno = medallas.any(
+                          (medalla) => medalla['medalla'] == 'Medalla Trueno');
+                      bool tieneMedallaArcoiris = medallas.any((medalla) =>
+                          medalla['medalla'] == 'Medalla Arcoiris');
+                      bool tieneMedallaAlma = medallas.any(
+                          (medalla) => medalla['medalla'] == 'Medalla Alma');
+                      bool tieneMedallaPantano = medallas.any(
+                          (medalla) => medalla['medalla'] == 'Medalla Pantano');
+                      bool tieneMedallaTierra = medallas.any(
+                          (medalla) => medalla['medalla'] == 'Medalla Tierra');
+                      bool tieneMedallaVolcan = medallas.any(
+                          (medalla) => medalla['medalla'] == 'Medalla Volcan');
+
+                      // Repite este proceso para las demás medalla
+
+                      return Stack(
+                        children: [
+                          Image.asset(
+                            'assets/hexMedallas.png',
+                            width: MediaQuery.of(context).size.width * 0.6,
+                            height: MediaQuery.of(context).size.height * 0.6,
+                            fit: BoxFit.contain,
+                          ),
+                          Positioned(
+                            left: MediaQuery.of(context).size.width * 0.17,
+                            top: MediaQuery.of(context).size.height * 0.21,
+                            child: Image.asset(
+                              tieneMedallaRoca
+                                  ? 'assets/MedallaRoca.png'
+                                  : 'assets/medallaRocaOut.png',
+                              width: MediaQuery.of(context).size.width * 0.09,
+                              height: MediaQuery.of(context).size.width * 0.09,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                          Positioned(
+                            left: MediaQuery.of(context).size.width * 0.17,
+                            top: MediaQuery.of(context).size.height * 0.35,
+                            child: Image.asset(
+                              tieneMedallaAlma
+                                  ? 'assets/MedallaVolcan.png'
+                                  : 'assets/medallaVolcanOut.png',
+                              width: MediaQuery.of(context).size.width * 0.09,
+                              height: MediaQuery.of(context).size.width * 0.09,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                          Positioned(
+                            left: MediaQuery.of(context).size.width * 0.245,
+                            top: MediaQuery.of(context).size.height * 0.25,
+                            child: Image.asset(
+                              tieneMedallaVolcan
+                                  ? 'assets/MedallaAlma.png'
+                                  : 'assets/medallaAlmaout.png',
+                              width: MediaQuery.of(context).size.width * 0.09,
+                              height: MediaQuery.of(context).size.width * 0.09,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                          Positioned(
+                            left: MediaQuery.of(context).size.width * 0.4,
+                            top: MediaQuery.of(context).size.height * 0.285,
+                            child: Image.asset(
+                              tieneMedallaPantano
+                                  ? 'assets/MedallaPantano.png'
+                                  : 'assets/medallaPantanoOut.png',
+                              width: MediaQuery.of(context).size.width * 0.09,
+                              height: MediaQuery.of(context).size.width * 0.09,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                          Positioned(
+                            left: MediaQuery.of(context).size.width * 0.32,
+                            top: MediaQuery.of(context).size.height * 0.21,
+                            child: Image.asset(
+                              tieneMedallaCascada
+                                  ? 'assets/MedallaCascada.png'
+                                  : 'assets/medallaCascadaOut.png',
+                              width: MediaQuery.of(context).size.width * 0.09,
+                              height: MediaQuery.of(context).size.width * 0.09,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                          Positioned(
+                            left: MediaQuery.of(context).size.width * 0.25,
+                            top: MediaQuery.of(context).size.height * 0.315,
+                            child: Image.asset(
+                              tieneMedallaArcoiris
+                                  ? 'assets/MedallaArcoiris.png'
+                                  : 'assets/medallaArcoirisout.png',
+                              width: MediaQuery.of(context).size.width * 0.09,
+                              height: MediaQuery.of(context).size.width * 0.09,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                          Positioned(
+                            left: MediaQuery.of(context).size.width * 0.1,
+                            top: MediaQuery.of(context).size.height * 0.285,
+                            child: Image.asset(
+                              tieneMedallaTrueno
+                                  ? 'assets/MedallaTrueno.png'
+                                  : 'assets/medallaTruenoOut.png',
+                              width: MediaQuery.of(context).size.width * 0.09,
+                              height: MediaQuery.of(context).size.width * 0.09,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                          Positioned(
+                            left: MediaQuery.of(context).size.width * 0.32,
+                            top: MediaQuery.of(context).size.height * 0.35,
+                            child: Image.asset(
+                              tieneMedallaTierra
+                                  ? 'assets/MedallaTierra.png'
+                                  : 'assets/medallaTierraOut.png',
+                              width: MediaQuery.of(context).size.width * 0.09,
+                              height: MediaQuery.of(context).size.width * 0.09,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                  },
                 ),
               ),
+
               Positioned(
                 left: screenSize.width * 0.23,
                 top: screenSize.height * 0.58,
-                child: _buildRectangularButton("NUEVO BOTÓN", () {
-                  print("Botón rectangular presionado");
-                }),
+                child: _buildRectangularButton(context, MyAppGame()),
               ),
             ],
           );
@@ -577,6 +555,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
     String text,
     String imagePath,
     Widget screen,
+    bool activate,
     BuildContext context, {
     double? topLeftRadius,
     double? topRightRadius,
@@ -654,8 +633,16 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                 bottomRight: Radius.circular(bottomRightRadius ?? 25),
               ),
               onTap: () {
-                // Aquí llamamos a la función navigateToScreen con la pantalla proporcionada.
-                navigateToScreen(context, screen);
+                if (activate == false) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content:
+                          Text('Vuelve más tarde para abrir la incubadora.'),
+                    ),
+                  );
+                } else {
+                  navigateToScreen(context, screen);
+                }
               },
             ),
           ),
@@ -664,12 +651,19 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
     );
   }
 
-  Widget _buildRectangularButton(String text, VoidCallback onPressed) {
+  Widget _buildRectangularButton(BuildContext context, Widget screen) {
     return SizedBox(
       width: 215,
       height: 60,
       child: ElevatedButton(
-        onPressed: onPressed,
+        onPressed: () {
+          // Navegar a la pantalla deseada
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => screen), // Llama a la pantalla aquí
+          );
+        },
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(13.0),
@@ -751,6 +745,19 @@ Future<String> countUserCards(int userId) async {
   } catch (e) {
     print('Error counting user cards: $e');
     return '0'; // Si ocurre un error, se devuelve 0
+  }
+}
+
+Future<List<Map<String, dynamic>>> fetchMedallasByUserId(int userId) async {
+  final response = await http.get(
+      Uri.parse('http://20.162.113.208:5000/api/medallas/usuario/$userId'));
+
+  if (response.statusCode == 200) {
+    // Si la solicitud es exitosa, parsea el JSON y devuelve la lista de medallas como una lista de mapas de cadenas dinámicas
+    return List<Map<String, dynamic>>.from(json.decode(response.body));
+  } else {
+    // Si hay un error, lanza una excepción
+    throw Exception('Failed to load data');
   }
 }
 
