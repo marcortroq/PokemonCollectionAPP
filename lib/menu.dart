@@ -144,8 +144,22 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
     final usuario = usuarioProvider.usuario;
     int Usuarioxp = usuario?.xp ?? 0;
     int idusuario = usuario?.idUsuario ?? 0;
-    int _currentIndex =0;
-   
+    double XpLevel = 100.0; // Inicialmente, el valor de XpLevel es 100.0
+    double XpPer;
+    int level = 1;
+    int userId = 0;
+    int _currentIndex = 0;
+
+    while (Usuarioxp >= XpLevel) {
+      // Mientras el usuario alcance el nivel actual, actualizamos XpLevel multiplicándolo por 2.25
+      XpLevel *= 2.25;
+      level += 1;
+    }
+    
+
+// Calculamos el progreso del usuario como un porcentaje
+    XpPer = Usuarioxp / XpLevel;
+
     // Calcula el tamaño de la imagen del fondo
     double backgroundWidth = screenSize.width * 1.2;
     double backgroundHeight = screenSize.height * 1.2;
@@ -156,67 +170,73 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
     double buttonWidth = screenSize.width * 0.35;
     double buttonHeight = screenSize.height * 0.1;
     double iconSize = screenSize.width * 0.1;
+    
 
-    return Scaffold(drawer: NavBar(
-      // Pasa una función que actualice _selectedProfileImage a NavBar
-      onProfileImageSelected: (String imagePath) {
-        setState(() {
-          _selectedProfileImage = imagePath;
-        });
-      }, 
-    ), body: Builder(builder: (BuildContext context) {
-      return Stack(
-        children: [
-          Positioned.fill(
-            child: CustomPaint(
-              painter: RPSCustomPainter(),
-            ),
-          ),
-          Positioned(
-            left: -backgroundWidth * 0.05,
-            bottom: screenSize.height * 0.06,
-            child: Image.asset(
-              _selectedProfileImage.isNotEmpty
-                  ? _selectedProfileImage
-                  : 'assets/grow.png',
-              width: backgroundWidth,
-              height: backgroundHeight,
-              fit: BoxFit.contain,
-            ),
-          ),
-          Positioned(
-            right: screenSize.width * 0.0,
-            bottom: screenSize.height * 0.15,
-            child: CustomPaint(
-              size: Size(screenSize.width, screenSize.width * 1.5),
-              painter: RPSCustomPainter2(),
-            ),
-          ),
-          Positioned(
-            right: screenSize.width * 0.0,
-            bottom: screenSize.height * 0.44,
-            child: Transform.rotate(
-              angle: 65 * math.pi / 180,
-              child: Container(
-                width: screenSize.width * 0.065,
-                height: screenSize.height * 0.316,
-                color: Color.fromRGBO(29, 30, 29, 1),
+    return Scaffold(
+        drawer: NavBar(
+          // Pasa una función que actualice _selectedProfileImage a NavBar
+          onProfileImageSelected: (String imagePath) {
+            setState(() {
+              _selectedProfileImage = imagePath;
+            });
+          },
+          xpPer: XpPer,
+          level: level,
+          idusuario: idusuario,
+        ),
+        body: Builder(builder: (BuildContext context) {
+          return Stack(
+            children: [
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: RPSCustomPainter(),
+                ),
               ),
-            ),
-          ),
-          Positioned(
-            left: screenSize.width * 0.0,
-            bottom: screenSize.height * 0.44,
-            child: Transform.rotate(
-              angle: -65 * math.pi / 180,
-              child: Container(
-                width: screenSize.width * 0.065,
-                height: screenSize.height * 0.316,
-                color: Color.fromRGBO(29, 30, 29, 1),
+              Positioned(
+                left: -backgroundWidth * 0.05,
+                bottom: screenSize.height * 0.06,
+                child: Image.asset(
+                  _selectedProfileImage.isNotEmpty
+                      ? _selectedProfileImage
+                      : 'assets/grow.png',
+                  width: backgroundWidth,
+                  height: backgroundHeight,
+                  fit: BoxFit.contain,
+                ),
               ),
-            ),
-          ),
-          Positioned(
+              Positioned(
+                right: screenSize.width * 0.0,
+                bottom: screenSize.height * 0.15,
+                child: CustomPaint(
+                  size: Size(screenSize.width, screenSize.width * 1.5),
+                  painter: RPSCustomPainter2(),
+                ),
+              ),
+              Positioned(
+                right: screenSize.width * 0.0,
+                bottom: screenSize.height * 0.44,
+                child: Transform.rotate(
+                  angle: 65 * math.pi / 180,
+                  child: Container(
+                    width: screenSize.width * 0.065,
+                    height: screenSize.height * 0.316,
+                    color: Color.fromRGBO(29, 30, 29, 1),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: screenSize.width * 0.0,
+                bottom: screenSize.height * 0.44,
+                child: Transform.rotate(
+                  angle: -65 * math.pi / 180,
+                  child: Container(
+                    width: screenSize.width * 0.065,
+                    height: screenSize.height * 0.316,
+                    color: Color.fromRGBO(29, 30, 29, 1),
+                  ),
+                ),
+              ),
+              Positioned(
             left: 0,
             right: 0,
             top: 20,

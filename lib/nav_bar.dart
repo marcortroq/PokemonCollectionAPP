@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:pokemonapp/main.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:pokemonapp/menu.dart';
 
 class NavBar extends StatefulWidget {
   final Function(String) onProfileImageSelected;
   final double xpPer; // Agregamos xpPer como un parámetro al constructor
   final int level;
+  final int idusuario;
   
 
-  NavBar({required this.onProfileImageSelected, required this.xpPer, required this.level});
+  NavBar({required this.onProfileImageSelected, required this.xpPer, required this.level, required this.idusuario});
 
   @override
   _NavBarState createState() => _NavBarState();
@@ -88,20 +90,20 @@ class _NavBarState extends State<NavBar> {
                 SizedBox(height: 20), // Espacio vertical entre las imágenes
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _selectedImage == 'assets/Sandshrew.png'
+                    backgroundColor: _selectedImage == 'assets/nidoking.png'
                         ? Color.fromRGBO(179, 179, 179, 1)
                         : null,
-                    elevation: _selectedImage == 'assets/Sandshrew.png' ? 8.0 : 0.0, // Añade elevación al botón seleccionado
+                    elevation: _selectedImage == 'assets/nidoking.png' ? 8.0 : 0.0, // Añade elevación al botón seleccionado
                   ),
                   onPressed: () {
                     // Aquí puedes manejar la lógica cuando el usuario selecciona la tercera imagen
                     setState(() {
-                      _selectedImage = 'assets/Sandshrew.png';
+                      _selectedImage = 'assets/nidoking.png';
                     });
-                    widget.onProfileImageSelected('assets/Sandshrew.png');
-                    Navigator.pop(context, 'assets/Sandshrew.png');
+                    widget.onProfileImageSelected('assets/nidoking.png');
+                    Navigator.pop(context, 'assets/nidoking.png');
                   },
-                  child: Image.asset('assets/Sandshrew.png'),
+                  child: Image.asset('assets/nidoking.png'),
                 ),
                 SizedBox(height: 20), // Espacio vertical entre las imágenes
                 ElevatedButton(
@@ -151,6 +153,7 @@ class _NavBarState extends State<NavBar> {
   @override
   Widget build(BuildContext context) {
     double xpPer = widget.xpPer;
+    int idusuario = widget.idusuario;
     return Drawer(
       child: Column(
         children: <Widget>[
@@ -238,18 +241,40 @@ class _NavBarState extends State<NavBar> {
                     _showProfilePhotosPopup(context);
                   },
                 ),
-                ListTile(
-                  title: Text(
-                    'Collection %',
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 0, 0, 0),
-                      fontSize: 19,
-                      fontFamily: "sarpanch",
-                    ),
+               ListTile(
+            title: Row(
+              children: <Widget>[
+                Text(
+                  'Collection ',
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 0, 0, 0),
+                    fontSize: 19,
+                    fontFamily: "sarpanch",
                   ),
-                  onTap: () {
-                    // Aquí puedes agregar la lógica para manejar el tap en el segundo ítem del Drawer
+                ),
+                FutureBuilder<String>(
+                  future: countUserCards(idusuario), // Llama a la función para obtener el número de cartas de usuario
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      // Si se obtiene el número de cartas de usuario, calcula el porcentaje
+                      double collectionPercentage = int.parse(snapshot.data!) / 151;
+                      return Text(
+                        ' (${(collectionPercentage * 100).toStringAsFixed(2)}%)', // Muestra el porcentaje de la colección en relación con 151 Pokémon
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 0, 0, 0),
+                          fontSize: 19,
+                          fontFamily: "sarpanch",
+                        ),
+                      );
+                    } else {
+                      // Mientras se carga el número de cartas de usuario, muestra un indicador de carga
+                      return CircularProgressIndicator();
+                    }
                   },
+                ),
+              ],
+            ),
+                  
                 ),
                 ListTile(
                     title: Text(
