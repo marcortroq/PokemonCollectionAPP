@@ -661,7 +661,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => screen()), // Llama a la pantalla aquí
+                builder: (context) => screen), // Llama a la pantalla aquí
           );
         },
         style: ElevatedButton.styleFrom(
@@ -693,7 +693,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
           child: Container(
             alignment: Alignment.center,
             child: Text(
-              'PLAY',
+              'Play',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 30,
