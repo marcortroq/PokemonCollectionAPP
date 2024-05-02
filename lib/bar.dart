@@ -13,8 +13,7 @@ class CustomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final usuarioProvider =
-        Provider.of<UsuarioProvider>(context, listen: false);
+    final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
     final usuario = usuarioProvider.usuario;
     int Usuarioxp = usuario?.xp ?? 0;
     double XpLevel = 100.0; // Inicialmente, el valor de XpLevel es 100.0
