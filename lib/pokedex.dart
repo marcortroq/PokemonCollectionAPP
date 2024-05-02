@@ -576,7 +576,7 @@ for (int i = pokedexEntryCount - 1; i >= 0 && i >= pokedexEntryCount - currentCo
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
-                                  Image.asset('assets/monedaPremium.png'),
+                                  Image.asset('assets/moneda.png'),
                                   SizedBox(width: 5.0),
                                   Text(
                                     '${precio * currentCount}',
@@ -587,7 +587,7 @@ for (int i = pokedexEntryCount - 1; i >= 0 && i >= pokedexEntryCount - currentCo
                                     ),
                                   ),
                                   SizedBox(width: 5.0),
-                                  Image.asset('assets/monedaPremium.png'),
+                                  Image.asset('assets/moneda.png'),
                                 ],
                               ),
                               style: ButtonStyle(
