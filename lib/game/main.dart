@@ -60,40 +60,66 @@ class _HomePageState extends State<HomePage> {
     [0.75, -0.20000000000000007],
     [1.0, -0.20000000000000007],
     [1.25, -0.20000000000000007],
+    [-1.0, -0.20000000000000007],
+    [0.0, 1.7999999999999998],
+    [-0.25, 1.7999999999999998],
+    [-0.5, 1.7999999999999998],
+    [-0.5, 1.5499999999999998],
+    [-0.75, 1.5499999999999998],
+    [-1.0, 1.5499999999999998],
+    [-1.25, 1.5499999999999998],
+    [-1.5, 1.5499999999999998],
+    [-1.75, 1.5499999999999998],
+    [-1.75, 1.2999999999999998],
+    [-2.0, 1.2999999999999998],
   ];
 
   void moveUp() {
     boyDirection = 'Up';
-    setState(() {
-      mapy += step;
-    });
-    animateWalk();
+    if (currentLocation == 'littleroot') {
+      if (canMoveTo(boyDirection, noMansLandLittleroot, mapx, mapy)) {
+        setState(() {
+          mapy += step;
+        });
+      }
+      animateWalk();
+    }
   }
 
   void moveDown() {
     boyDirection = 'Down';
-    setState(() {
-      mapy -= step;
-    });
-    animateWalk();
+    if (currentLocation == 'littleroot') {
+      if (canMoveTo(boyDirection, noMansLandLittleroot, mapx, mapy)) {
+        setState(() {
+          mapy -= step;
+        });
+      }
+      animateWalk();
+    }
   }
 
   void moveLeft() {
     boyDirection = 'Left';
-    if (currentLocation == 'LittleRoot') {
-      setState(() {
-        mapx += step;
-      });
+    if (currentLocation == 'littleroot') {
+      if (canMoveTo(boyDirection, noMansLandLittleroot, mapx, mapy)) {
+        setState(() {
+          mapx += step;
+        });
+      }
       animateWalk();
     }
   }
 
   void moveRight() {
     boyDirection = 'Right';
-    setState(() {
-      mapx -= step;
-    });
-    animateWalk();
+    if (currentLocation == 'littleroot') {
+      if (canMoveTo(boyDirection, noMansLandLittleroot, mapx, mapy)) {
+        setState(() {
+          mapx -= step;
+        });
+      }
+      animateWalk();
+    }
   }
 
   void pressedA() {}
@@ -114,7 +140,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  bool canMoveTo(String direction, var noMansLand, double x, doubley) {
+  bool canMoveTo(String direction, var noMansLand, double x, double y) {
     double stepX = 0;
     double stepY = 0;
 
@@ -134,12 +160,13 @@ class _HomePageState extends State<HomePage> {
 
     for (int i = 0; i < noMansLand.length; i++) {
       if ((cleanNum(noMansLand[i][0]) == cleanNum(x + stepX)) &&
-          (cleanNum(noMansLand[i][0]) == cleanNum(x + stepY))) {
+          (cleanNum(noMansLand[i][1]) == cleanNum(y + stepY))) { // Corrección aquí
         return false;
       }
     }
-    return false;
+    return true; // Cambiado de false a true
   }
+
 
   @override
   Widget build(BuildContext context) {
