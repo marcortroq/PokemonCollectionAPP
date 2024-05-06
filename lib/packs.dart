@@ -70,7 +70,7 @@ class _PacksState extends State<Packs> {
                 setState(() {
                   _currentIndex = index;
                 });
-              },
+              }, coins: 0,
             ),
           ),
         ],

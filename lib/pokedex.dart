@@ -24,11 +24,21 @@ class _PokedexState extends State<Pokedex> {
   int _currentPageIndex = 0;
   int inicio = 1;
   int _currentIndex = 0;
+  late CustomNavBar _customNavBar;
   @override
-  void initState() {
-    super.initState();
-    // Aquí podrías inicializar _pokemonIds con las IDs de los Pokémon del usuario
-  }
+void initState() {
+  super.initState();
+  _customNavBar = CustomNavBar(
+  currentIndex: _currentIndex,
+  coins: 0, // Inicializa el valor con 0 o el valor real de las monedas
+  onTap: (index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  },
+);
+
+}
 
   @override
   Widget build(BuildContext context) {
@@ -40,20 +50,7 @@ class _PokedexState extends State<Pokedex> {
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
-        children: [
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: CustomNavBar(
-              currentIndex: _currentIndex,
-              onTap: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
-            ),
-          ),
+        children: [          
           Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -84,18 +81,11 @@ class _PokedexState extends State<Pokedex> {
             ),
           ),
           Positioned(
-            left: 0,
-            right: 0,
-            top: 20,
-            child: CustomNavBar(
-              currentIndex: _currentIndex,
-              onTap: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
-            ),
-          ),
+          left: 0,
+          right: 0,
+          top: 20,
+          child: _customNavBar, // Utilizamos la variable almacenada
+        ),
         ],
       ),
     );
@@ -541,38 +531,28 @@ class _PokedexState extends State<Pokedex> {
                           Container(
                             width: 150,
                             child: TextButton(
-                              onPressed: () async {                                
-  final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
-  final usuario = usuarioProvider.usuario;
-  int idUsuario = usuario?.idUsuario ?? 0;
-  final precioTotal = precio * currentCount;
+                            onPressed: () async {
+                                final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
+                                final usuario = usuarioProvider.usuario;
+                                int idUsuario = usuario?.idUsuario ?? 0;
+                                final precioTotal = precio * currentCount;
 
-  try {
- // Obtener las entradas relevantes de la Pokédex para currentCount
-List<int> pokedexEntries = await mostrarPokedex(idUsuario, cardNumber);
+                                try {
+                                  List<int> pokedexEntries = await mostrarPokedex(idUsuario, cardNumber);
+                                  int pokedexEntryCount = pokedexEntries.length;
 
-// Obtener la cantidad de entradas de la Pokédex
-int pokedexEntryCount = pokedexEntries.length;
-
-// Eliminar las entradas de la Pokédex
-for (int i = pokedexEntryCount - 1; i >= 0 && i >= pokedexEntryCount - currentCount; i--) {
-  int idPokedexEntry = pokedexEntries[i];
-  await deletePokedexEntry(idPokedexEntry);
-}
-
-
-
-
-
-    // Actualizar las monedas
-    await updateMonedas(idUsuario, precioTotal);
-    print('Monedas actualizadas correctamente');                                  
-  } catch (error) {
-    print('Error al actualizar las monedas: $error');
-  }
-  Navigator.of(context).pop();
-},
-
+                                  for (int i = pokedexEntryCount - 1; i >= 0 && i >= pokedexEntryCount - currentCount; i--) {
+                                    int idPokedexEntry = pokedexEntries[i];
+                                    await deletePokedexEntry(idPokedexEntry);
+                                  }
+                                  await updateMonedas(idUsuario, precioTotal);
+                                  updateCoins();
+                                  _duplicatesContent(); // Llama a la función para actualizar las monedas y _customNavBar
+                                  Navigator.of(context).pop();
+                                } catch (error) {
+                                  print('Error al actualizar las monedas: $error');
+                                }
+                              },
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
@@ -640,6 +620,35 @@ for (int i = pokedexEntryCount - 1; i >= 0 && i >= pokedexEntryCount - currentCo
       },
     );
   }
+void updateCoins() async {
+  final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
+  final usuario = usuarioProvider.usuario;
+  int idUsuario = usuario?.idUsuario ?? 0;
+  final updatedCoins = await fetchUserCoins(idUsuario);
+  setState(() {
+    _customNavBar = CustomNavBar(
+      currentIndex: _currentIndex,
+      coins: updatedCoins['monedas'], // Actualiza el número de monedas en _customNavBar
+      onTap: (index) {
+        setState(() {
+          _currentIndex = index;
+        });
+      },
+    );
+  });
+}
+
+  Future<Map<String, dynamic>> fetchUserCoins(int userId) async {
+    final response = await http
+        .get(Uri.parse('http://20.162.113.208:5000/api/tienda/$userId'));
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load user coins');
+    }
+  }
+}
 
   Future<void> updateMonedas(int idUsuario, int cantidadMonedas) async {
     final url = Uri.parse('http://20.162.113.208:5000/api/tienda');
@@ -699,4 +708,3 @@ Future<void> deletePokedexEntry(int idPokedexEntry) async {
 }
 
 
-}

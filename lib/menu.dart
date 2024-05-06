@@ -124,6 +124,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
         _extraHeight = (_screen.height - _screen.width) * _animator.value;
       });
     });
+    
   }
 
   @override
@@ -247,7 +248,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                     setState(() {
                       _currentIndex = index;
                     });
-                  },
+                  }, coins:0,
                 ),
               ),
               Column(
