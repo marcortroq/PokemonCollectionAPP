@@ -91,16 +91,16 @@ class CustomNavBar extends StatelessWidget {
                             Image.asset(
                               alignment: Alignment.centerLeft,
                               'assets/xpStar.png',
-                              width: MediaQuery.of(context).size.width * 0.31,
+                              width: MediaQuery.of(context).size.width * 0.28,
                               height: MediaQuery.of(context).size.height * 0.13,
                             ),
                             Positioned(
-                              top: 44,
-                              left: 11,
+                              top: screenSize.height*0.053,
+                              left: screenSize.height*0.008,
                               child: Text(
                                 level.toString(),
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black,
                                 ),
