@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pokemonapp/bar.dart';
+import 'package:pokemonapp/menu.dart';
 import 'package:pokemonapp/usuario.dart';
 import 'package:provider/provider.dart';
 import 'open_pack.dart';
@@ -18,64 +19,80 @@ class _PacksState extends State<Packs> {
   PageController _pageController = PageController(initialPage: 0);
   int _currentPageIndex = 0;
   int _currentIndex = 0;
+  late CustomNavBar _customNavBar;
+  void initState() {
+    super.initState();
+    _customNavBar = CustomNavBar(
+      currentIndex: _currentIndex,
+      coins: 0, // Inicializa el valor con 0 o el valor real de las monedas
+      onTap: (index) {
+        setState(() {
+          _currentIndex = index;
+        });
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     late final Size screenSize = MediaQuery.of(context).size;
 
-    // Calcula el tamaño de la imagen del fondo
+// Calcula el tamaño de la imagen del fondo
     double backgroundWidth = screenSize.width * 1.2;
     double backgroundHeight = screenSize.height * 1.2;
-    return Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(
-                  'assets/fondosec.png',
+    return WillPopScope(
+        onWillPop: () async {
+          // Llama a la función updateCoins() cuando el usuario haga clic en "hacia atrás"
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Menu()),
+          );
+
+          return false; // Retorna true para permitir la acción de retroceso
+        },
+        child: Scaffold(
+          body: Stack(
+            fit: StackFit.expand,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(
+                      'assets/fondosec.png',
+                    ),
+                    fit: BoxFit.fill,
+                  ),
                 ),
-                fit: BoxFit.fill,
               ),
-            ),
+              _labels(context),
+              Positioned(
+                top: 150,
+                left: 0,
+                right: 0,
+                bottom:
+                    0, // Ajuste para ocupar todo el espacio menos el área de los labels
+                child: PageView(
+                  controller: _pageController,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentPageIndex = index;
+                    });
+                  },
+                  children: [
+                    _pokestoreContent(),
+                    _myPacksContent(),
+                  ],
+                ),
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                top: 20,
+                child: _customNavBar, // Utilizamos la variable almacenada
+              ),
+            ],
           ),
-          _labels(context),
-          Positioned(
-            top: 150,
-            left: 0,
-            right: 0,
-            bottom:
-                0, // Ajuste para ocupar todo el espacio menos el área de los labels
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentPageIndex = index;
-                });
-              },
-              children: [
-                _pokestoreContent(),
-                _myPacksContent(),
-              ],
-            ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 20,
-            child: CustomNavBar(
-              currentIndex: _currentIndex,
-              onTap: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              }, coins: 0,
-            ),
-          ),
-        ],
-      ),
-    );
+        ));
   }
 
   Widget _labels(BuildContext context) {
@@ -380,30 +397,27 @@ class _PacksState extends State<Packs> {
                 Container(
                   width: 150,
                   child: TextButton(
-                    onPressed: () async{
+                    onPressed: () async {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) => open_pack()));
-                          
-                          final usuarioProvider =
-                                    Provider.of<UsuarioProvider>(context,
-                                        listen: false);
-                                final usuario = usuarioProvider.usuario;
-                                int idUsuario = usuario?.idUsuario ?? 0;             
-                                int numeros=int.parse(numero);  
-                                final precioTotal = numeros*-1; 
-                                                                                                                    
-                                try {
-                                  if(pack == "PREMIUM PACK"){
-                                  await updateMonedasPremium(idUsuario, 0,precioTotal);
-                                  }else{
-                                  await updateMonedasPremium(idUsuario, precioTotal,0);
-                                  }
-                                  print('Monedas actualizadas correctamente');
-                                } catch (error) {
-                                  print(
-                                      'Error al actualizar las monedas: $error');
-                                }
-                          
+
+                      final usuarioProvider =
+                          Provider.of<UsuarioProvider>(context, listen: false);
+                      final usuario = usuarioProvider.usuario;
+                      int idUsuario = usuario?.idUsuario ?? 0;
+                      int numeros = int.parse(numero);
+                      final precioTotal = numeros * -1;
+
+                      try {
+                        if (pack == "PREMIUM PACK") {
+                          await updateMonedasPremium(idUsuario, 0, precioTotal);
+                        } else {
+                          await updateMonedasPremium(idUsuario, precioTotal, 0);
+                        }
+                        print('Monedas actualizadas correctamente');
+                      } catch (error) {
+                        print('Error al actualizar las monedas: $error');
+                      }
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -556,7 +570,9 @@ class _PacksState extends State<Packs> {
     }
     return images;
   }
-  Future<void> updateMonedasPremium(int idUsuario, int cantidadMonedas,int cantidadpokecoins) async {
+
+  Future<void> updateMonedasPremium(
+      int idUsuario, int cantidadMonedas, int cantidadpokecoins) async {
     final url = Uri.parse('http://20.162.113.208:5000/api/tienda');
     final response = await http.post(
       url,
@@ -566,7 +582,8 @@ class _PacksState extends State<Packs> {
       body: jsonEncode(<String, dynamic>{
         'id_usuario': idUsuario,
         'monedas': cantidadMonedas,
-        'cantidad_pokecoins': cantidadpokecoins, // No modificamos las pokecoins en este caso
+        'cantidad_pokecoins':
+            cantidadpokecoins, // No modificamos las pokecoins en este caso
       }),
     );
 

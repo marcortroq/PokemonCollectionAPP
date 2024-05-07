@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -106,7 +108,6 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
   late Size _screen;
   double _maxSlide = 200.0;
   double _startingPos = 0.0;
-  final countdownTimer = CountdownTimer();
 
   @override
   void initState() {
@@ -124,7 +125,6 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
         _extraHeight = (_screen.height - _screen.width) * _animator.value;
       });
     });
-    
   }
 
   @override
@@ -173,6 +173,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
     double buttonWidth = screenSize.width * 0.35;
     double buttonHeight = screenSize.height * 0.1;
     double iconSize = screenSize.width * 0.1;
+    final _CountdownTo1415State countdownTimer = _CountdownTo1415State();
 
     return Scaffold(
         drawer: NavBar(
@@ -248,7 +249,8 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                     setState(() {
                       _currentIndex = index;
                     });
-                  }, coins:0,
+                  },
+                  coins: 0,
                 ),
               ),
               Column(
@@ -286,7 +288,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                                         : activate = true,
                                     context,
                                   ), // INCUBADORA
-                                  countdownTimer, // Contador de cuenta atrás de 12 horas
+                                  _CountdownTo1415(), // Mostrar el tiempo restante hasta las 14:15
                                 ],
                               ),
                             ),
@@ -758,7 +760,7 @@ Future<List<Map<String, dynamic>>> fetchMedallasByUserId(int userId) async {
     return List<Map<String, dynamic>>.from(json.decode(response.body));
   } else {
     // Si hay un error, lanza una excepción
-     return [];
+    return [];
   }
 }
 
@@ -766,4 +768,87 @@ void main() {
   runApp(MaterialApp(
     home: Menu(),
   ));
+}
+
+class _CountdownTo1415 extends StatefulWidget {
+  @override
+  _CountdownTo1415State createState() => _CountdownTo1415State();
+}
+
+class _CountdownTo1415State extends State<_CountdownTo1415> {
+  late Timer _timer;
+  late Duration _timeUntil1415;
+  late int _secondsRemaining =
+      0; // Agregar variable para almacenar los segundos restantes
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  void _startTimer() {
+    DateTime now = DateTime.now();
+    DateTime fourteenFifteenToday =
+        DateTime(now.year, now.month, now.day, 14, 15);
+    DateTime fourteenFifteenTomorrow =
+        fourteenFifteenToday.add(Duration(days: 1));
+
+    if (now.isBefore(fourteenFifteenToday)) {
+      _timeUntil1415 = fourteenFifteenToday.difference(now);
+    } else {
+      _timeUntil1415 = fourteenFifteenTomorrow.difference(now);
+    }
+
+    _secondsRemaining =
+        _timeUntil1415.inSeconds; // Almacenar los segundos restantes
+
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          if (_timeUntil1415.inSeconds > 0) {
+            _timeUntil1415 -= Duration(seconds: 1);
+            _secondsRemaining =
+                _timeUntil1415.inSeconds; // Actualizar los segundos restantes
+          } else {
+            _timer.cancel();
+          }
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: 5,
+      right: -9,
+      child: Container(
+        width: 100,
+        child: Text(
+          _formatDuration(_timeUntil1415),
+          style: TextStyle(
+              fontSize: 20, color: Colors.white, fontFamily: 'Sarpanch'),
+        ),
+      ),
+    );
+  }
+
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
+  }
+
+  // Método público para obtener los segundos restantes
+  int getSecondsRemaining() {
+    return _secondsRemaining;
+  }
 }

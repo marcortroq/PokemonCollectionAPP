@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:pokemonapp/bar.dart';
+import 'package:pokemonapp/menu.dart';
 import 'dart:typed_data';
 import 'package:pokemonapp/usuario.dart';
 import 'usuario_provider.dart';
@@ -26,67 +27,77 @@ class _PokedexState extends State<Pokedex> {
   int _currentIndex = 0;
   late CustomNavBar _customNavBar;
   @override
-void initState() {
-  super.initState();
-  _customNavBar = CustomNavBar(
-  currentIndex: _currentIndex,
-  coins: 0, // Inicializa el valor con 0 o el valor real de las monedas
-  onTap: (index) {
-    setState(() {
-      _currentIndex = index;
-    });
-  },
-);
-
-}
+  void initState() {
+    super.initState();
+    _customNavBar = CustomNavBar(
+      currentIndex: _currentIndex,
+      coins: 0, // Inicializa el valor con 0 o el valor real de las monedas
+      onTap: (index) {
+        setState(() {
+          _currentIndex = index;
+        });
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     late final Size screenSize = MediaQuery.of(context).size;
 
-    // Calcula el tamaño de la imagen del fondo
+// Calcula el tamaño de la imagen del fondo
     double backgroundWidth = screenSize.width * 1.2;
     double backgroundHeight = screenSize.height * 1.2;
-    return Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
-        children: [          
-          Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(
-                  'assets/fondosec.png',
+    return WillPopScope(
+      onWillPop: () async {
+        // Llama a la función updateCoins() cuando el usuario haga clic en "hacia atrás"
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Menu()),
+        );
+        updateCoins();
+        return false; // Retorna true para permitir la acción de retroceso
+      },
+      child: Scaffold(
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(
+                    'assets/fondosec.png',
+                  ),
+                  fit: BoxFit.fill,
                 ),
-                fit: BoxFit.fill,
               ),
             ),
-          ),
-          _labels(context),
-          Positioned(
-            top: 150,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentPageIndex = index;
-                });
-              },
-              children: [
-                _pokedexContent(),
-                _duplicatesContent(),
-              ],
+            _labels(context),
+            Positioned(
+              top: 150,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: PageView(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentPageIndex = index;
+                  });
+                },
+                children: [
+                  _pokedexContent(),
+                  _duplicatesContent(),
+                ],
+              ),
             ),
-          ),
-          Positioned(
-          left: 0,
-          right: 0,
-          top: 20,
-          child: _customNavBar, // Utilizamos la variable almacenada
+            Positioned(
+              left: 0,
+              right: 0,
+              top: 20,
+              child: _customNavBar, // Utilizamos la variable almacenada
+            ),
+          ],
         ),
-        ],
       ),
     );
   }
@@ -257,7 +268,7 @@ void initState() {
         Provider.of<UsuarioProvider>(context, listen: false);
     final usuario = usuarioProvider.usuario;
     int idUsuario = usuario?.idUsuario ?? 0;
-    int pokemon=59;
+    int pokemon = 59;
 
     return FutureBuilder<List<dynamic>>(
       future: fetchDuplicateCards(idUsuario),
@@ -280,8 +291,9 @@ void initState() {
             itemBuilder: (context, index) {
               String imageUrl = duplicateCards[index]['foto_carta'];
               int duplicatesCount =
-                  (duplicateCards[index]['cantidad_repetidas'] ?? 0)-1 ;
- int cardNumber = int.parse(imageUrl.split('/').last.split('.').first);
+                  (duplicateCards[index]['cantidad_repetidas'] ?? 0) - 1;
+              int cardNumber =
+                  int.parse(imageUrl.split('/').last.split('.').first);
               // Verificar si ya es una URL completa
               if (!imageUrl.startsWith('http')) {
                 // Si no es una URL completa, construir la URL completa
@@ -291,13 +303,13 @@ void initState() {
               return Stack(
                 alignment: Alignment.center, // Alineación a la derecha
                 children: [
-                  GestureDetector(                    
+                  GestureDetector(
                     onTap: () {
-                       mostrarPokedex(idUsuario,cardNumber );
-                      _showPopUp(context, imageUrl, duplicatesCount, cardNumber);
+                      mostrarPokedex(idUsuario, cardNumber);
+                      _showPopUp(
+                          context, imageUrl, duplicatesCount, cardNumber);
 
-                       print('Número de la carta: $cardNumber');
-                      
+                      print('Número de la carta: $cardNumber');
                     },
                     child: Image.network(
                       imageUrl,
@@ -339,33 +351,30 @@ void initState() {
   }
 
   Future<List<dynamic>> fetchDuplicateCards(int userId) async {
-  final response = await http.get(Uri.parse(
-      'http://20.162.113.208:5000/api/cartas/usuario/dupes/$userId'));
+    final response = await http.get(Uri.parse(
+        'http://20.162.113.208:5000/api/cartas/usuario/dupes/$userId'));
 
-  if (response.statusCode == 200) {
-    // Decodificar la respuesta JSON
-    List<dynamic> jsonData = json.decode(response.body);
+    if (response.statusCode == 200) {
+      // Decodificar la respuesta JSON
+      List<dynamic> jsonData = json.decode(response.body);
 
-    // Obtener la lista de cartas duplicadas
-    List<dynamic> duplicateCards = [];
-    for (var item in jsonData) {
-      for (var carta in item['cartas_repetidas']) {
-        duplicateCards.add({
-          'id_pokemon': carta['id_pokemon'],
-          'foto_carta': carta['foto_carta'],
-          'cantidad_repetidas': item['cantidad_repetidas'],
-        });
+      // Obtener la lista de cartas duplicadas
+      List<dynamic> duplicateCards = [];
+      for (var item in jsonData) {
+        for (var carta in item['cartas_repetidas']) {
+          duplicateCards.add({
+            'id_pokemon': carta['id_pokemon'],
+            'foto_carta': carta['foto_carta'],
+            'cantidad_repetidas': item['cantidad_repetidas'],
+          });
+        }
       }
+
+      return duplicateCards;
+    } else {
+      throw Exception('Failed to load duplicate cards');
     }
-
-    
-
-    return duplicateCards;
-  } else {
-    throw Exception('Failed to load duplicate cards');
   }
-}
-    
 
   Future<List<dynamic>> fetchUserCards(int userId) async {
     print("PRUEBA PARA SABER SI HACE LA LLAMADA");
@@ -399,7 +408,11 @@ void initState() {
   }
 
   Future<void> _showPopUp(
-      BuildContext context, String imageUrl, int duplicatesCount ,int cardNumber,) async {
+    BuildContext context,
+    String imageUrl,
+    int duplicatesCount,
+    int cardNumber,
+  ) async {
     int currentCount = 1; // Inicialmente, siempre mostrará 1
     int precio = 15;
 
@@ -531,17 +544,24 @@ void initState() {
                           Container(
                             width: 150,
                             child: TextButton(
-                            onPressed: () async {
-                                final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
+                              onPressed: () async {
+                                final usuarioProvider =
+                                    Provider.of<UsuarioProvider>(context,
+                                        listen: false);
                                 final usuario = usuarioProvider.usuario;
                                 int idUsuario = usuario?.idUsuario ?? 0;
                                 final precioTotal = precio * currentCount;
 
                                 try {
-                                  List<int> pokedexEntries = await mostrarPokedex(idUsuario, cardNumber);
+                                  List<int> pokedexEntries =
+                                      await mostrarPokedex(
+                                          idUsuario, cardNumber);
                                   int pokedexEntryCount = pokedexEntries.length;
 
-                                  for (int i = pokedexEntryCount - 1; i >= 0 && i >= pokedexEntryCount - currentCount; i--) {
+                                  for (int i = pokedexEntryCount - 1;
+                                      i >= 0 &&
+                                          i >= pokedexEntryCount - currentCount;
+                                      i--) {
                                     int idPokedexEntry = pokedexEntries[i];
                                     await deletePokedexEntry(idPokedexEntry);
                                   }
@@ -550,7 +570,8 @@ void initState() {
                                   _duplicatesContent(); // Llama a la función para actualizar las monedas y _customNavBar
                                   Navigator.of(context).pop();
                                 } catch (error) {
-                                  print('Error al actualizar las monedas: $error');
+                                  print(
+                                      'Error al actualizar las monedas: $error');
                                 }
                               },
                               child: Row(
@@ -620,23 +641,26 @@ void initState() {
       },
     );
   }
-void updateCoins() async {
-  final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
-  final usuario = usuarioProvider.usuario;
-  int idUsuario = usuario?.idUsuario ?? 0;
-  final updatedCoins = await fetchUserCoins(idUsuario);
-  setState(() {
-    _customNavBar = CustomNavBar(
-      currentIndex: _currentIndex,
-      coins: updatedCoins['monedas'], // Actualiza el número de monedas en _customNavBar
-      onTap: (index) {
-        setState(() {
-          _currentIndex = index;
-        });
-      },
-    );
-  });
-}
+
+  void updateCoins() async {
+    final usuarioProvider =
+        Provider.of<UsuarioProvider>(context, listen: false);
+    final usuario = usuarioProvider.usuario;
+    int idUsuario = usuario?.idUsuario ?? 0;
+    final updatedCoins = await fetchUserCoins(idUsuario);
+    setState(() {
+      _customNavBar = CustomNavBar(
+        currentIndex: _currentIndex,
+        coins: updatedCoins[
+            'monedas'], // Actualiza el número de monedas en _customNavBar
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+      );
+    });
+  }
 
   Future<Map<String, dynamic>> fetchUserCoins(int userId) async {
     final response = await http
@@ -650,29 +674,30 @@ void updateCoins() async {
   }
 }
 
-  Future<void> updateMonedas(int idUsuario, int cantidadMonedas) async {
-    final url = Uri.parse('http://20.162.113.208:5000/api/tienda');
-    final response = await http.post(
-      url,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, dynamic>{
-        'id_usuario': idUsuario,
-        'monedas': cantidadMonedas,
-        'cantidad_pokecoins': 0, // No modificamos las pokecoins en este caso
-      }),
-    );
-    if (response.statusCode == 200) {
-      print('Monedas actualizadas correctamente');
-    } else {
-      throw Exception('Failed to update monedas');
-    }
-  } 
+Future<void> updateMonedas(int idUsuario, int cantidadMonedas) async {
+  final url = Uri.parse('http://20.162.113.208:5000/api/tienda');
+  final response = await http.post(
+    url,
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, dynamic>{
+      'id_usuario': idUsuario,
+      'monedas': cantidadMonedas,
+      'cantidad_pokecoins': 0, // No modificamos las pokecoins en este caso
+    }),
+  );
+  if (response.statusCode == 200) {
+    print('Monedas actualizadas correctamente');
+  } else {
+    throw Exception('Failed to update monedas');
+  }
+}
 
-  Future<List<int>> mostrarPokedex(int userId, int idPokemon) async {
-  final url = Uri.parse('http://20.162.113.208:5000/api/pokedex/user/$userId/pokemon/$idPokemon');
-  
+Future<List<int>> mostrarPokedex(int userId, int idPokemon) async {
+  final url = Uri.parse(
+      'http://20.162.113.208:5000/api/pokedex/user/$userId/pokemon/$idPokemon');
+
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
@@ -688,13 +713,15 @@ void updateCoins() async {
     return pokedexEntries;
   } else {
     // Si la solicitud no fue exitosa, puedes manejarlo de acuerdo a tus necesidades
-    print('Hubo un error al obtener los datos de la Pokédex. Código de estado: ${response.statusCode}');
+    print(
+        'Hubo un error al obtener los datos de la Pokédex. Código de estado: ${response.statusCode}');
     throw Exception('Failed to fetch Pokédex entries');
   }
 }
 
 Future<void> deletePokedexEntry(int idPokedexEntry) async {
-  final url = Uri.parse('http://20.162.113.208:5000/api/pokedex/delete/$idPokedexEntry');
+  final url = Uri.parse(
+      'http://20.162.113.208:5000/api/pokedex/delete/$idPokedexEntry');
 
   final response = await http.delete(url);
 
@@ -703,8 +730,7 @@ Future<void> deletePokedexEntry(int idPokedexEntry) async {
     print('La entrada de la Pokedex ha sido eliminada correctamente');
   } else {
     // Si el borrado no fue exitoso, puedes manejarlo aquí
-    print('Hubo un error al eliminar la entrada de la Pokedex. Código de estado: ${response.statusCode}');
+    print(
+        'Hubo un error al eliminar la entrada de la Pokedex. Código de estado: ${response.statusCode}');
   }
 }
-
-
