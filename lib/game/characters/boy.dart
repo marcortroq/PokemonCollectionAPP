@@ -12,9 +12,10 @@ class MyBoy extends StatelessWidget {
   Widget build(BuildContext context) {
     if (location == 'littleroot') {
       height = 15;      
-    }else if (location == 'pokelab'){
-      height = 20;
-    }else if (location == 'battlefinishedscreen' || location == 'attackoptions' || location == 'battlefinishedscreen'){
+    }else if (location == 'pokelab' || location == 'pinkhouse' || location == 'bluehouse' || location == 'upbluehouse' || location == 'uppinkhouse'){
+      height = 25;
+    }
+    else if (location == 'battlefinishedscreen' || location == 'attackoptions' || location == 'battlefinishedscreen'){
       height = 0;
     }
 
