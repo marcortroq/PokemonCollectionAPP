@@ -3,13 +3,11 @@ import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:pokemonapp/bar.dart';
+import 'package:pokemonapp/menu.dart';
 import 'dart:typed_data';
 import 'package:pokemonapp/usuario.dart';
 import 'usuario_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:percent_indicator/linear_percent_indicator.dart';
-
-
 
 void main() {
   runApp(MaterialApp(
@@ -27,105 +25,79 @@ class _PokedexState extends State<Pokedex> {
   int _currentPageIndex = 0;
   int inicio = 1;
   int _currentIndex = 0;
-  bool _ordenarPorLetras = false;
+  late CustomNavBar _customNavBar;
   @override
   void initState() {
     super.initState();
-    
-    Future<List<dynamic>> _fetchUserCardsOrderedByName(int userId) async {
-  final response = await http.get(
-      Uri.parse('http://20.162.113.208:5000/api/cartas/usuario/$userId'));
-
-  if (response.statusCode == 200) {
-    // Decodificar la respuesta JSON
-    List<dynamic> jsonData = json.decode(response.body);
-
-    // Ordenar las cartas por el nombre del Pokémon
-    jsonData.sort((a, b) => a['NOMBRE_POKEMON'].compareTo(b['NOMBRE_POKEMON']));
-
-    return jsonData;
-  } else {
-    throw Exception('Failed to load user cards');
-  }
-}
-
-    // Aquí podrías inicializar _pokemonIds con las IDs de los Pokémon del usuario
+    _customNavBar = CustomNavBar(
+      currentIndex: _currentIndex,
+      coins: 0, // Inicializa el valor con 0 o el valor real de las monedas
+      onTap: (index) {
+        setState(() {
+          _currentIndex = index;
+        });
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     late final Size screenSize = MediaQuery.of(context).size;
-final usuarioProvider =
-        Provider.of<UsuarioProvider>(context, listen: false);
-    final usuario = usuarioProvider.usuario;
-    // Calcula el tamaño de la imagen del fondo
+
+// Calcula el tamaño de la imagen del fondo
     double backgroundWidth = screenSize.width * 1.2;
     double backgroundHeight = screenSize.height * 1.2;
-    int idusuario = usuario?.idUsuario ?? 0;
-    return Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: CustomNavBar(
-              currentIndex: _currentIndex,
-              onTap: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
-            ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(
-                  'assets/fondosec.png',
+    return WillPopScope(
+      onWillPop: () async {
+        // Llama a la función updateCoins() cuando el usuario haga clic en "hacia atrás"
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Menu()),
+        );
+        updateCoins();
+        return false; // Retorna true para permitir la acción de retroceso
+      },
+      child: Scaffold(
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(
+                    'assets/fondosec.png',
+                  ),
+                  fit: BoxFit.fill,
                 ),
-                fit: BoxFit.fill,
               ),
             ),
-          ),
-          _labels(context),
-        
-
-
-          Positioned(
-            top: 160,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentPageIndex = index;
-                });
-              },
-              children: [
-                _pokedexContent(),
-                _duplicatesContent(),
-              ],
+            _labels(context),
+            Positioned(
+              top: 150,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: PageView(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentPageIndex = index;
+                  });
+                },
+                children: [
+                  _pokedexContent(),
+                  _duplicatesContent(),
+                ],
+              ),
             ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            top: 20,
-            child: CustomNavBar(
-              currentIndex: _currentIndex,
-              onTap: (index) {
-                setState(() {
-                  _currentIndex = index;
-                });
-              },
+            Positioned(
+              left: 0,
+              right: 0,
+              top: 20,
+              child: _customNavBar, // Utilizamos la variable almacenada
             ),
-          ),
-
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -200,142 +172,68 @@ final usuarioProvider =
   }
 
   Widget _pokedexContent() {
-  final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
-  final usuario = usuarioProvider.usuario;
-  int idUsuario = usuario?.idUsuario ?? 0;
+    final usuarioProvider =
+        Provider.of<UsuarioProvider>(context, listen: false);
+    final usuario = usuarioProvider.usuario;
+    int idUsuario = usuario?.idUsuario ?? 0;
 
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Row(
-        children: [
-          SizedBox(width: 15,
-          height: 5),
-          Positioned(
-            left: MediaQuery.of(context).size.height * 1.1, // Ajusta la posición horizontal según sea necesario
-            top: MediaQuery.of(context).size.height * 0.01, // Ajusta la posición vertical según sea necesario
-            child: FutureBuilder<String>(
-              future: countUserCards(idUsuario), // Pasa el ID del usuario
-              builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                } else {
-                  if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    return Text(
-                      '${snapshot.data} / 151',
-                      style: TextStyle(fontSize: 24, fontFamily: 'Sarpanch'),
-                    );
-                  }
-                }
-              },
+    return FutureBuilder<List<dynamic>>(
+      future: fetchUserCards(idUsuario), // Cambia 1 por el ID del usuario
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (snapshot.data == null) {
+          // Agregar verificación de nulidad aquí
+          return Center(child: Text('No se encontraron cartas de usuario.'));
+        } else {
+          List<dynamic> userCards = snapshot.data!;
+          return GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              mainAxisSpacing: 4.0,
+              crossAxisSpacing: 4.0,
             ),
-          ),
-          SizedBox(width: 20), // Espacio entre los dos Positioned
-          Positioned(
-            left: MediaQuery.of(context).size.height * 0.15, // Ajusta la posición horizontal según sea necesario
-            top: MediaQuery.of(context).size.height * 0.018, // Ajusta la posición vertical según sea necesario
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: Colors.black,
-                  width: 1.5,
-                ), // Define el borde negro
-                borderRadius: BorderRadius.circular(25.0), // Define el radio del borde
-              ),
-              child: FutureBuilder<String>(
-                future: countUserCards(idUsuario), // Pasa el ID del usuario
-                builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  } else {
-                    if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else {
-                      int collectedCards = int.parse(snapshot.data ?? '0');
-                      double progress = collectedCards / 151; // Calcula el progreso como el número de cartas recolectadas dividido por 151
-                      return LinearPercentIndicator(
-                        width: MediaQuery.of(context).size.width / 1.6,
-                        animation: true,
-                        lineHeight: 20.0,
-                        animationDuration: 2500,
-                        percent: progress,
-                        linearStrokeCap: LinearStrokeCap.roundAll,
-                        progressColor: const Color.fromRGBO(229, 166, 94, 1),
-                        backgroundColor: const Color.fromRGBO(217, 217, 217, 1),
-                      );
-                    }
-                  }
-                },
-              ),
-            ),
-          ),
-        ],
-      ),
-      SizedBox(height: 10),
-      Expanded(
-        child: FutureBuilder<List<dynamic>>(
-          future: fetchUserCards(idUsuario), // Cambia 1 por el ID del usuario
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
-            } else if (snapshot.data == null) {
-              // Agregar verificación de nulidad aquí
-              return Center(child: Text('No se encontraron cartas de usuario.'));
-            } else {
-              List<dynamic> userCards = snapshot.data!;
-
-              return GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  mainAxisSpacing: 4.0,
-                  crossAxisSpacing: 4.0,
-                ),
-                itemCount: 151, // Mostrar 151 cartas
-                itemBuilder: (context, index) {
-                  bool userHasCard = userHasCardAtIndex(index, userCards);
-                  String imageUrl;
+            itemCount: 151, // Mostrar 151 cartas
+            itemBuilder: (context, index) {
+              bool userHasCard = userHasCardAtIndex(index, userCards);
+              String imageUrl;
+              if (userHasCard) {
+                String baseUrl = 'http://20.162.113.208';
+                String imagePath =
+                    '/FOTOS_CARTAS/${index + 1}.png'; // La imagen sigue el formato de ID de Pokémon
+                imageUrl = baseUrl + imagePath;
+              } else {
+                // Si el usuario no tiene la carta, cargar la imagen estática desde assets
+                imageUrl = 'assets/ContraPortada.png';
+              }
+              return GestureDetector(
+                onTap: () {
+                  // Mostrar la imagen centrada y aumentada al hacer clic
                   if (userHasCard) {
-                    String baseUrl = 'http://20.162.113.208';
-                    String imagePath = '/FOTOS_CARTAS/${index + 1}.png'; // La imagen sigue el formato de ID de Pokémon
-                    imageUrl = baseUrl + imagePath;
-                  } else {
-                    // Si el usuario no tiene la carta, cargar la imagen estática desde assets
-                    imageUrl = 'assets/ContraPortada.png';
+                    _showCenteredImage(context, imageUrl);
                   }
-                  return GestureDetector(
-                    onTap: () {
-                      // Mostrar la imagen centrada y aumentada al hacer clic
-                      if (userHasCard) {
-                        _showCenteredImage(context, imageUrl);
-                      }
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.all(4.0),
-                      child: userHasCard
-                          ? Image.network(
-                              imageUrl,
-                              fit: BoxFit.fitHeight,
-                            )
-                          : Image.asset(
-                              imageUrl,
-                              fit: BoxFit.fitHeight,
-                            ),
-                    ),
-                  );
                 },
+                child: Padding(
+                  padding: EdgeInsets.all(4.0),
+                  child: userHasCard
+                      ? Image.network(
+                          imageUrl,
+                          fit: BoxFit.fitHeight,
+                        )
+                      : Image.asset(
+                          imageUrl,
+                          fit: BoxFit.fitHeight,
+                        ),
+                ),
               );
-            }
-          },
-        ),
-      ),
-    ],
-  );
-}
-
+            },
+          );
+        }
+      },
+    );
+  }
 
   bool userHasCardAtIndex(int index, List<dynamic> userCards) {
     // Verificar si el JSON contiene una carta con el ID del Pokémon correspondiente al índice
@@ -370,7 +268,7 @@ final usuarioProvider =
         Provider.of<UsuarioProvider>(context, listen: false);
     final usuario = usuarioProvider.usuario;
     int idUsuario = usuario?.idUsuario ?? 0;
-    int pokemon=59;
+    int pokemon = 59;
 
     return FutureBuilder<List<dynamic>>(
       future: fetchDuplicateCards(idUsuario),
@@ -393,8 +291,9 @@ final usuarioProvider =
             itemBuilder: (context, index) {
               String imageUrl = duplicateCards[index]['foto_carta'];
               int duplicatesCount =
-                  (duplicateCards[index]['cantidad_repetidas'] ?? 0)-1 ;
- int cardNumber = int.parse(imageUrl.split('/').last.split('.').first);
+                  (duplicateCards[index]['cantidad_repetidas'] ?? 0) - 1;
+              int cardNumber =
+                  int.parse(imageUrl.split('/').last.split('.').first);
               // Verificar si ya es una URL completa
               if (!imageUrl.startsWith('http')) {
                 // Si no es una URL completa, construir la URL completa
@@ -404,13 +303,13 @@ final usuarioProvider =
               return Stack(
                 alignment: Alignment.center, // Alineación a la derecha
                 children: [
-                  GestureDetector(                    
+                  GestureDetector(
                     onTap: () {
-                       mostrarPokedex(idUsuario,cardNumber );
-                      _showPopUp(context, imageUrl, duplicatesCount, cardNumber);
+                      mostrarPokedex(idUsuario, cardNumber);
+                      _showPopUp(
+                          context, imageUrl, duplicatesCount, cardNumber);
 
-                       print('Número de la carta: $cardNumber');
-                      
+                      print('Número de la carta: $cardNumber');
                     },
                     child: Image.network(
                       imageUrl,
@@ -452,33 +351,30 @@ final usuarioProvider =
   }
 
   Future<List<dynamic>> fetchDuplicateCards(int userId) async {
-  final response = await http.get(Uri.parse(
-      'http://20.162.113.208:5000/api/cartas/usuario/dupes/$userId'));
+    final response = await http.get(Uri.parse(
+        'http://20.162.113.208:5000/api/cartas/usuario/dupes/$userId'));
 
-  if (response.statusCode == 200) {
-    // Decodificar la respuesta JSON
-    List<dynamic> jsonData = json.decode(response.body);
+    if (response.statusCode == 200) {
+      // Decodificar la respuesta JSON
+      List<dynamic> jsonData = json.decode(response.body);
 
-    // Obtener la lista de cartas duplicadas
-    List<dynamic> duplicateCards = [];
-    for (var item in jsonData) {
-      for (var carta in item['cartas_repetidas']) {
-        duplicateCards.add({
-          'id_pokemon': carta['id_pokemon'],
-          'foto_carta': carta['foto_carta'],
-          'cantidad_repetidas': item['cantidad_repetidas'],
-        });
+      // Obtener la lista de cartas duplicadas
+      List<dynamic> duplicateCards = [];
+      for (var item in jsonData) {
+        for (var carta in item['cartas_repetidas']) {
+          duplicateCards.add({
+            'id_pokemon': carta['id_pokemon'],
+            'foto_carta': carta['foto_carta'],
+            'cantidad_repetidas': item['cantidad_repetidas'],
+          });
+        }
       }
+
+      return duplicateCards;
+    } else {
+      throw Exception('Failed to load duplicate cards');
     }
-
-    
-
-    return duplicateCards;
-  } else {
-    throw Exception('Failed to load duplicate cards');
   }
-}
-    
 
   Future<List<dynamic>> fetchUserCards(int userId) async {
     print("PRUEBA PARA SABER SI HACE LA LLAMADA");
@@ -512,7 +408,11 @@ final usuarioProvider =
   }
 
   Future<void> _showPopUp(
-      BuildContext context, String imageUrl, int duplicatesCount ,int cardNumber,) async {
+    BuildContext context,
+    String imageUrl,
+    int duplicatesCount,
+    int cardNumber,
+  ) async {
     int currentCount = 1; // Inicialmente, siempre mostrará 1
     int precio = 15;
 
@@ -644,38 +544,36 @@ final usuarioProvider =
                           Container(
                             width: 150,
                             child: TextButton(
-                              onPressed: () async {                                
-  final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
-  final usuario = usuarioProvider.usuario;
-  int idUsuario = usuario?.idUsuario ?? 0;
-  final precioTotal = precio * currentCount;
+                              onPressed: () async {
+                                final usuarioProvider =
+                                    Provider.of<UsuarioProvider>(context,
+                                        listen: false);
+                                final usuario = usuarioProvider.usuario;
+                                int idUsuario = usuario?.idUsuario ?? 0;
+                                final precioTotal = precio * currentCount;
 
-  try {
- // Obtener las entradas relevantes de la Pokédex para currentCount
-List<int> pokedexEntries = await mostrarPokedex(idUsuario, cardNumber);
+                                try {
+                                  List<int> pokedexEntries =
+                                      await mostrarPokedex(
+                                          idUsuario, cardNumber);
+                                  int pokedexEntryCount = pokedexEntries.length;
 
-// Obtener la cantidad de entradas de la Pokédex
-int pokedexEntryCount = pokedexEntries.length;
-
-// Eliminar las entradas de la Pokédex
-for (int i = pokedexEntryCount - 1; i >= 0 && i >= pokedexEntryCount - currentCount; i--) {
-  int idPokedexEntry = pokedexEntries[i];
-  await deletePokedexEntry(idPokedexEntry);
-}
-
-
-
-
-
-    // Actualizar las monedas
-    await updateMonedas(idUsuario, precioTotal);
-    print('Monedas actualizadas correctamente');                                  
-  } catch (error) {
-    print('Error al actualizar las monedas: $error');
-  }
-  Navigator.of(context).pop();
-},
-
+                                  for (int i = pokedexEntryCount - 1;
+                                      i >= 0 &&
+                                          i >= pokedexEntryCount - currentCount;
+                                      i--) {
+                                    int idPokedexEntry = pokedexEntries[i];
+                                    await deletePokedexEntry(idPokedexEntry);
+                                  }
+                                  await updateMonedas(idUsuario, precioTotal);
+                                  updateCoins();
+                                  _duplicatesContent(); // Llama a la función para actualizar las monedas y _customNavBar
+                                  Navigator.of(context).pop();
+                                } catch (error) {
+                                  print(
+                                      'Error al actualizar las monedas: $error');
+                                }
+                              },
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
@@ -744,39 +642,62 @@ for (int i = pokedexEntryCount - 1; i >= 0 && i >= pokedexEntryCount - currentCo
     );
   }
 
-  Future<void> updateMonedas(int idUsuario, int cantidadMonedas) async {
-    final url = Uri.parse('http://20.162.113.208:5000/api/tienda');
-    final response = await http.post(
-      url,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, dynamic>{
-        'id_usuario': idUsuario,
-        'monedas': cantidadMonedas,
-        'cantidad_pokecoins': 0, // No modificamos las pokecoins en este caso
-      }),
-    );
-    if (response.statusCode == 200) {
-      print('Monedas actualizadas correctamente');
-    } else {
-      throw Exception('Failed to update monedas');
-    }
-  } 
+  void updateCoins() async {
+    final usuarioProvider =
+        Provider.of<UsuarioProvider>(context, listen: false);
+    final usuario = usuarioProvider.usuario;
+    int idUsuario = usuario?.idUsuario ?? 0;
+    final updatedCoins = await fetchUserCoins(idUsuario);
+    setState(() {
+      _customNavBar = CustomNavBar(
+        currentIndex: _currentIndex,
+        coins: updatedCoins[
+            'monedas'], // Actualiza el número de monedas en _customNavBar
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+      );
+    });
+  }
 
-  Future<String> countUserCards(int userId) async {
-  try {
-    final List<dynamic> userCards = await fetchUserCards(userId);
-    return userCards.length.toString();
-  } catch (e) {
-    print('Error counting user cards: $e');
-    return '0'; // Si ocurre un error, se devuelve 0
+  Future<Map<String, dynamic>> fetchUserCoins(int userId) async {
+    final response = await http
+        .get(Uri.parse('http://20.162.113.208:5000/api/tienda/$userId'));
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load user coins');
+    }
   }
 }
 
-  Future<List<int>> mostrarPokedex(int userId, int idPokemon) async {
-  final url = Uri.parse('http://20.162.113.208:5000/api/pokedex/user/$userId/pokemon/$idPokemon');
-  
+Future<void> updateMonedas(int idUsuario, int cantidadMonedas) async {
+  final url = Uri.parse('http://20.162.113.208:5000/api/tienda');
+  final response = await http.post(
+    url,
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, dynamic>{
+      'id_usuario': idUsuario,
+      'monedas': cantidadMonedas,
+      'cantidad_pokecoins': 0, // No modificamos las pokecoins en este caso
+    }),
+  );
+  if (response.statusCode == 200) {
+    print('Monedas actualizadas correctamente');
+  } else {
+    throw Exception('Failed to update monedas');
+  }
+}
+
+Future<List<int>> mostrarPokedex(int userId, int idPokemon) async {
+  final url = Uri.parse(
+      'http://20.162.113.208:5000/api/pokedex/user/$userId/pokemon/$idPokemon');
+
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
@@ -792,13 +713,15 @@ for (int i = pokedexEntryCount - 1; i >= 0 && i >= pokedexEntryCount - currentCo
     return pokedexEntries;
   } else {
     // Si la solicitud no fue exitosa, puedes manejarlo de acuerdo a tus necesidades
-    print('Hubo un error al obtener los datos de la Pokédex. Código de estado: ${response.statusCode}');
+    print(
+        'Hubo un error al obtener los datos de la Pokédex. Código de estado: ${response.statusCode}');
     throw Exception('Failed to fetch Pokédex entries');
   }
 }
 
 Future<void> deletePokedexEntry(int idPokedexEntry) async {
-  final url = Uri.parse('http://20.162.113.208:5000/api/pokedex/delete/$idPokedexEntry');
+  final url = Uri.parse(
+      'http://20.162.113.208:5000/api/pokedex/delete/$idPokedexEntry');
 
   final response = await http.delete(url);
 
@@ -807,9 +730,7 @@ Future<void> deletePokedexEntry(int idPokedexEntry) async {
     print('La entrada de la Pokedex ha sido eliminada correctamente');
   } else {
     // Si el borrado no fue exitoso, puedes manejarlo aquí
-    print('Hubo un error al eliminar la entrada de la Pokedex. Código de estado: ${response.statusCode}');
+    print(
+        'Hubo un error al eliminar la entrada de la Pokedex. Código de estado: ${response.statusCode}');
   }
-}
-
-
 }
