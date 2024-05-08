@@ -181,7 +181,14 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
     int hola;
     hola=countdownTimer._cycleCount;
     hola.toInt;
-    return Scaffold(
+    
+    return WillPopScope(
+      onWillPop: () async {
+        
+        return false;
+      },
+      child: Scaffold(
+        // Tu scaffold actual aquí
         drawer: NavBar(
           // Pasa una función que actualice _selectedProfileImage a NavBar
           onProfileImageSelected: (String imagePath) {
@@ -543,7 +550,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
               ),
             ],
           );
-        }));
+        })));
   }
 
   // Esta función genérica acepta cualquier tipo de pantalla como parámetro y navega a ella.

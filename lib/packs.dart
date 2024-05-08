@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pokemonapp/bar.dart';
 import 'package:pokemonapp/menu.dart';
+import 'package:pokemonapp/open_packNormal.dart';
+import 'package:pokemonapp/open_packPremium.dart';
 import 'package:pokemonapp/usuario.dart';
 import 'package:provider/provider.dart';
 import 'open_pack.dart';
@@ -291,6 +293,8 @@ class _PacksState extends State<Packs> {
 
   Future<void> _showPopUp(
       BuildContext context, String numero, String moneda, String pack) async {
+        int monedasNormales = await obtenerNumeroMonedas(context);
+        int monedasPremium = await obtenerNumeroMonedasPremium(context);
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -397,22 +401,54 @@ class _PacksState extends State<Packs> {
                 Container(
                   width: 150,
                   child: TextButton(
-                    onPressed: () async {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => open_pack()));
+                    onPressed: () async {                     
 
                       final usuarioProvider =
                           Provider.of<UsuarioProvider>(context, listen: false);
                       final usuario = usuarioProvider.usuario;
                       int idUsuario = usuario?.idUsuario ?? 0;
                       int numeros = int.parse(numero);
-                      final precioTotal = numeros * -1;
-
-                      try {
-                        if (pack == "PREMIUM PACK") {
+                      final precioTotal = numeros * -1;                               
+                      monedasNormales;
+                      monedasPremium;
+                      try {                                        
+                        if (pack == "PREMIUM PACK") {                          
+                          if(numero == "550"){
+                            if(monedasPremium<550){
+                            _showSnackBar('No tienes Pokecoins suficientes',Color.fromARGB(255, 255, 56, 42), Colors.black);
+                            Navigator.of(context).pop();
+                            }else{
+                            Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => open_packNormal()));
                           await updateMonedasPremium(idUsuario, 0, precioTotal);
-                        } else {
+                            }
+                          }else{
+                            if(monedasPremium<1000){
+                            _showSnackBar('No tienes Pokecoins suficientes',Color.fromARGB(255, 255, 56, 42), Colors.black);
+                            Navigator.of(context).pop();
+                            }else{
+                            Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => open_packPremium()));
+                          await updateMonedasPremium(idUsuario, 0, precioTotal);
+                          }}
+                        } else {                          
+                          if(numero == "1000"){
+                             if(monedasNormales<1000){
+                            _showSnackBar('No tienes monedas suficientes',Color.fromARGB(255, 255, 56, 42), Colors.black);
+                            Navigator.of(context).pop();
+                            }else{
+                            Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => open_packNormal()));}
                           await updateMonedasPremium(idUsuario, precioTotal, 0);
+                          }else{
+                            if(monedasNormales<1600){
+                            _showSnackBar('No tienes monedas suficientes',Color.fromARGB(255, 255, 56, 42), Colors.black);
+                            Navigator.of(context).pop();
+                            }else{
+                            Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => open_packPremium()));
+                          await updateMonedasPremium(idUsuario, precioTotal, 0);
+                          }}
                         }
                         print('Monedas actualizadas correctamente');
                       } catch (error) {
@@ -508,7 +544,49 @@ class _PacksState extends State<Packs> {
       },
     );
   }
+Future<int> obtenerNumeroMonedas(BuildContext context) async {
+    final usuarioProvider =
+        Provider.of<UsuarioProvider>(context, listen: false);
+    final usuario = usuarioProvider.usuario;
+    int idUsuario = usuario?.idUsuario ?? 0;
 
+    try {
+      Map<String, dynamic> data = await fetchUserCoins(idUsuario);
+      int monedasNormales = data['monedas'] ?? 0;
+      return monedasNormales;
+    } catch (error) {
+      print(error);
+      return 0; // o lanzar una excepción, dependiendo del caso
+    }
+  }
+void _showSnackBar(String message, Color backgroundColor, Color textColor) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(
+        message,
+        style: TextStyle(color: textColor),
+      ),
+      backgroundColor: backgroundColor,
+    ),
+  );
+}
+
+
+  Future<int> obtenerNumeroMonedasPremium(BuildContext context) async {
+    final usuarioProvider =
+        Provider.of<UsuarioProvider>(context, listen: false);
+    final usuario = usuarioProvider.usuario;
+    int idUsuario = usuario?.idUsuario ?? 0;
+
+    try {
+      Map<String, dynamic> data = await fetchUserCoins(idUsuario);
+      int monedasEspeciales = data['cantidad_pokecoins'] ?? 0;
+      return monedasEspeciales;
+    } catch (error) {
+      print(error);
+      return 0; // o lanzar una excepción, dependiendo del caso
+    }
+  }
   Future<int> obtenerSobresUsuario(int idUsuario) async {
     final url = 'http://20.162.113.208:5000/api/usuario/$idUsuario';
 
@@ -529,6 +607,17 @@ class _PacksState extends State<Packs> {
     } catch (e) {
       print('Error en la solicitud: $e');
       return -1;
+    }
+  }
+
+    Future<Map<String, dynamic>> fetchUserCoins(int userId) async {
+    final response = await http
+        .get(Uri.parse('http://20.162.113.208:5000/api/tienda/$userId'));
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to load user coins');
     }
   }
 
