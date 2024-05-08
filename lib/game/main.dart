@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:html';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -62,8 +61,8 @@ class _HomePageState extends State<HomePage> {
 
   //battle 1
   String BrockDirection = 'Down';
-  static double BrockX = 0.1;
-  static double BrockY = 0.9;
+  static double BrockX = 0;
+  static double BrockY = 0;
   bool chatStarted = false;
   int countPressingA = -1;
 
@@ -325,6 +324,7 @@ class _HomePageState extends State<HomePage> {
     [-2.25, -2.2],
     [-2.5, -2.2],
     [-2.75, -2.2],
+    [-1.75, -1.7000000000000002],
   ];
 
   List<List<double>> noMansLandPinkHouse = [
@@ -1005,8 +1005,8 @@ class _HomePageState extends State<HomePage> {
   void pressedB() {}
 
   void animateWalk() {
-    print('x: ' + upPinkMapx.toString());
-    print('y: ' + upPinkMapy.toString());
+    print('x: ' + lapMapx.toString());
+    print('y: ' + lapMapy.toString());
 
     Timer.periodic(Duration(milliseconds: 50), (timer) {
       setState(() {
@@ -1114,13 +1114,14 @@ class _HomePageState extends State<HomePage> {
                 //Brock
                 Container(
                   alignment: Alignment(0, 0),
-                  child: Brock(
+                  child: BattleBrock(
                     x: lapMapx,
-                    y: lapMapx - 0.05,
+                    y: lapMapy,
                     location: currentLocation,
                     BrockDirection: BrockDirection,
                   ),
                 ),
+
               ],
             ),
           ),

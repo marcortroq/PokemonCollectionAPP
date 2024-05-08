@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class Brock extends StatelessWidget{
-  double x;
-  double y;
-  String location;
-  String BrockDirection;
+class BattleBrock extends StatelessWidget{
+  double x = 0.0;
+  double y = 0.0;
+  String location = '';
+  String BrockDirection = '';
 
-  Brock(this.x, this.y, this.location, this.BrockDirection);
+  BattleBrock({required this.x, required this.y, required this.location, required this.BrockDirection});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +14,7 @@ class Brock extends StatelessWidget{
       return Container(
         alignment: Alignment(x,y),
         child: Image.asset(
-          'assets/Game/brock' + BrockDirection + '.png',
+          'assets/Game/personajes/brock' + BrockDirection + '.png',
           width: MediaQuery.of(context).size.width *
               0.75,
           fit: BoxFit.cover,
