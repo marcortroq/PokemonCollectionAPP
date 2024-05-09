@@ -176,11 +176,9 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
     double buttonWidth = screenSize.width * 0.35;
     double buttonHeight = screenSize.height * 0.1;
     double iconSize = screenSize.width * 0.1;
-    final _CountdownTo1415State countdownTimer = _CountdownTo1415State();
-    int currentCount = countdownTimer.getCount();
-    int hola;
-    hola=countdownTimer._cycleCount;
-    hola.toInt;
+    final countdownTimer = CountdownTimer();
+
+
     
     return WillPopScope(
       onWillPop: () async {
@@ -283,22 +281,28 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                                 child: _buildButton("PACKS", "assets/pack.png",
                                     Packs(), activate = true, context,
                                     topLeftRadius: 0, bottomRightRadius: 0)),
-                            Padding(
-                              padding: EdgeInsets.only(bottom: screenSize.height * 0.07),
-                              child: GestureDetector(
-                                onTap: () {
-                                   // Decrement _cycleCount                                  
-                                },
-                                child: Stack(
-                                  children: [ 
-                                                                                                         
-                                    buildButtonContent(currentCount),
-                                    _CountdownTo1415(),
-                                    // Show the remaining time until 14:15
-                                  ],
-                                ),
-                              ),
-                            ),
+                           Padding(
+                          padding:
+                              EdgeInsets.only(bottom: screenSize.height * 0.07),
+                          child: Stack(
+                            children: [
+                              _buildButton(
+                                countdownTimer.getSecondsRemaining() != 0
+                                    ? "READY IN"
+                                    : "COLLECT",
+                                countdownTimer.getSecondsRemaining() != 0
+                                    ? "assets/incubadoraOFF.png"
+                                    : "assets/incubadora.png",
+                                Incubadora(),
+                                countdownTimer.getSecondsRemaining() != 0
+                                    ? activate = false
+                                    : activate = true,
+                                context,
+                              ), // INCUBADORA
+                              countdownTimer, // Contador de cuenta atrás de 12 horas
+                            ],
+                          ),
+                        ),
                             Padding(
                               padding: EdgeInsets.only(
                                   top: screenSize.height * 0.05),
@@ -660,26 +664,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
       ],
     );
   }
-  Widget buildButtonContent(int cycleCount) {
-  String buttonText;
-  String imagePath;
-  Widget widget;
-  bool isActivated;
-
-  if (cycleCount == 0) {
-    buttonText = "READY IN";
-    imagePath = "assets/incubadoraOFF.png";
-    widget = Incubadora();
-    isActivated = false;
-  } else {
-    buttonText = "COLLECT";
-    imagePath = "assets/incubadora.png";
-    widget = Incubadora();
-    isActivated = true;
-  }
-
-  return _buildButton(buttonText, imagePath, widget, isActivated, context);
-}
+  
 
 
   Widget _buildRectangularButton(BuildContext context, Widget screen) {
@@ -798,115 +783,4 @@ void main() {
   ));
 }
 
-class _CountdownTo1415 extends StatefulWidget {
-  @override
-  _CountdownTo1415State createState() => _CountdownTo1415State();
-}
 
-class _CountdownTo1415State extends State<_CountdownTo1415> {
-  late Timer _timer;
-  late Duration _timeUntil1415;
-  late int _secondsRemaining = 0;
-  bool _isButtonActive = true;
-  late int _cycleCount=0; // Variable para almacenar el número de ciclos completados
-
-  @override
-  void initState() {
-    super.initState();
-    _startTimer();
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
-  }
-  
-
-  void _startTimer() {
-    DateTime now = DateTime.now();
-    DateTime fourteenFifteenToday = DateTime(now.year, now.month, now.day, 20,12);
-    DateTime fourteenFifteenTomorrow = fourteenFifteenToday.add(Duration(days: 1));
-
-    if (now.isBefore(fourteenFifteenToday)) {
-      _timeUntil1415 = fourteenFifteenToday.difference(now);
-    } else {
-      _timeUntil1415 = fourteenFifteenTomorrow.difference(now);
-    }
-
-    _secondsRemaining = _timeUntil1415.inSeconds;
-
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      if (mounted) {
-        setState(() {
-          if (_timeUntil1415.inSeconds > 0) {
-            _timeUntil1415 -= Duration(seconds: 1);
-            _secondsRemaining = _timeUntil1415.inSeconds;
-          } else {
-            // Restaurar el temporizador a 23:59:59
-            DateTime tomorrow = DateTime.now().add(Duration(days: 1));
-            DateTime fourteenFifteenTomorrow = DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 20,12);
-            _timeUntil1415 = fourteenFifteenTomorrow.difference(DateTime.now());
-            _secondsRemaining = _timeUntil1415.inSeconds;
-            _isButtonActive = true; // Activar el botón nuevamente
-            _cycleCount = _cycleCount + 1; // Incrementar el contador de ciclos
-          }
-        });
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-     int currentCycleCount = _cycleCount;
-    return Positioned(
-      top: 5,
-      right: -9,
-      child: Column(
-        children: [
-          Text(
-            "Cycles: $currentCycleCount", // Mostrar el número de ciclos completados
-            style: TextStyle(fontSize: 16, color: Colors.white, fontFamily: 'Sarpanch'),
-          ),
-          SizedBox(height: 5), // Espaciado entre el contador y el temporizador
-          Container(
-            width: 100,
-            child: Text(
-              _formatDuration(_timeUntil1415),
-              style: TextStyle(fontSize: 20, color: Colors.white, fontFamily: 'Sarpanch'),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _formatDuration(Duration duration) {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
-  }
-
-  int getSecondsRemaining() {
-    return _secondsRemaining;
-  }
-
- int getCount() {
-  int currentCycleCount = _cycleCount;
-  return currentCycleCount;
-}
-void setCount(int count) {
-  setState(() {
-    _cycleCount = count;
-  });
-}
-
-
-  // Método para cambiar el estado del botón
-  void toggleButtonState() {
-    setState(() {
-      _isButtonActive = !_isButtonActive;
-    });
-  }
-}

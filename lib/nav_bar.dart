@@ -558,7 +558,7 @@ class _NavBarState extends State<NavBar> {
               ],
             ),
             onTap: () {
-              Navigator.push(
+              Navigator.pushReplacement(
                   context, MaterialPageRoute(builder: (context) => MyApp()));
             },
           ),
