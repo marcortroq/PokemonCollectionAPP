@@ -388,6 +388,7 @@ class _MyHomePageState extends State<MyHomePage> {
         admin: userData['admin'],
         sobres: userData['sobres'],
         xp: userData['xp'],
+        fecha_apertura: userData['fecha_apertura'],
       );
 
       // Obtener el UsuarioProvider del contexto

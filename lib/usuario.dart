@@ -5,6 +5,7 @@ class Usuario {
   final int admin;
   final int sobres;
   final int xp;
+  final DateTime fecha_apertura;
 
   Usuario({
     required this.idUsuario,
@@ -13,6 +14,7 @@ class Usuario {
     required this.admin,
     required this.sobres,
     required this.xp,
+    required this.fecha_apertura,
   });
 
   Future<bool> verificarPokemonRegistrado(int pokemonId) async {

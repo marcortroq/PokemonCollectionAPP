@@ -72,6 +72,8 @@ flutter:
 
   assets:
     - assets/
+    - assets/Game/
+    - assets/Game/personajes/
 
   fonts:
       - family: Sarpanch
