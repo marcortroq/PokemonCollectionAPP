@@ -11,7 +11,7 @@ class MyBoy extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (location == 'littleroot') {
-      height = 15;      
+      height = 13;      
     }else if (location == 'pokelab' || location == 'pinkhouse' || location == 'bluehouse' || location == 'upbluehouse' || location == 'uppinkhouse'){
       height = 25;
     }

@@ -6,7 +6,14 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:pokemonapp/game/button.dart';
 import 'package:pokemonapp/game/characters/Brock.dart';
+import 'package:pokemonapp/game/characters/giovanni.dart';
+import 'package:pokemonapp/game/characters/Erika.dart';
+import 'package:pokemonapp/game/characters/LtSurge.dart';
+import 'package:pokemonapp/game/characters/blaine.dart';
 import 'package:pokemonapp/game/characters/boy.dart';
+import 'package:pokemonapp/game/characters/koga.dart';
+import 'package:pokemonapp/game/characters/misty.dart';
+import 'package:pokemonapp/game/characters/sabrina.dart';
 import 'package:pokemonapp/game/maps/bluehouse.dart';
 import 'package:pokemonapp/game/maps/littleroot.dart';
 import 'package:pokemonapp/game/maps/pinkhouse.dart';
@@ -65,21 +72,34 @@ class _HomePageState extends State<HomePage> {
   static double BrockY = 0;
   bool chatStarted = false;
   int countPressingA = -1;
-
   //battle 2
-
+  String BlaineDirection = 'Down';
+  static double BlaineX = 0;
+  static double BlaineY = 0;
   //battle 3
-
+  String LtSurgeDirection = 'Down';
+  static double LtSurgeX = 0;
+  static double LtSurgeY = 0;
   //battle 4
-
+  String GiovanniDirection = 'Down';
+  static double GiovanniX = 0;
+  static double GiovanniY = 0;
   //battle 5
-
+  String ErikaDirection = 'Down';
+  static double ErikaX = 0;
+  static double ErikaY = 0;
   //battle 6
-
+  String KogaDirection = 'Down';
+  static double KogaX = 0;
+  static double KogaY = 0;
   //battle 7
-
+  String MistyDirection = 'Down';
+  static double MistyX = 0;
+  static double MistyY = 0;
   //battle 8
-
+  String SabrinaDirection = 'Down';
+  static double SabrinaX = 0;
+  static double SabrinaY = 0;
 
   //boy charcter
   int boySpriteCount = 0;
@@ -178,6 +198,9 @@ class _HomePageState extends State<HomePage> {
     [0.5, 1.5499999999999998],
     [0.25, 1.5499999999999998],
     [0.25, 1.5499999999999998],
+    [0.0, 1.5499999999999998],
+    [0.0, 1.7999999999999998],
+    [-0.5, 1.7999999999999998],
   ];
 
   List<List<double>> noMansLandPokelab = [
@@ -325,6 +348,8 @@ class _HomePageState extends State<HomePage> {
     [-2.5, -2.2],
     [-2.75, -2.2],
     [-1.75, -1.7000000000000002],
+    [1.75, -1.7000000000000002],
+    [1.0, 1.5499999999999998],
   ];
 
   List<List<double>> noMansLandPinkHouse = [
@@ -412,6 +437,8 @@ class _HomePageState extends State<HomePage> {
     [-1.25, 0.04999999999999982],
     [-1.5, 0.04999999999999982],
     [-1.75, 0.04999999999999982],
+    [-1.5, -0.7000000000000002],
+    [-1.5, -0.4500000000000002],
   ];
 
   List<List<double>> noMansLandBlueHouse = [
@@ -500,6 +527,8 @@ class _HomePageState extends State<HomePage> {
     [1.25, 0.04999999999999982],
     [1.0, 0.04999999999999982],
     [0.5, 0.04999999999999982],
+    [0.0, -0.7000000000000002],
+    [0.0, -0.4500000000000002],
   ];
 
   List<List<double>> noMansLandupBlueHouse = [
@@ -587,6 +616,8 @@ class _HomePageState extends State<HomePage> {
     [2.0, -0.4500000000000002],
     [1.75, -0.4500000000000002],
     [1.5, -0.4500000000000002],
+    [2.5, 0.7999999999999998],
+    [2.5, 0.5499999999999998],
   ];
 
   List<List<double>> noMansLandupPinkHouse = [
@@ -630,7 +661,7 @@ class _HomePageState extends State<HomePage> {
     [-2.75, -1.4500000000000002],
     [-2.75, -1.7000000000000002],
     [-2.5, -1.7000000000000002],
-    [-2.25, -1.7000000000000002 ],
+    [-2.25, -1.7000000000000002],
     [-2.0, -1.7000000000000002],
     [-1.75, -1.7000000000000002],
     [-1.5, -1.7000000000000002],
@@ -673,6 +704,13 @@ class _HomePageState extends State<HomePage> {
     [-2.0, 0.04999999999999982],
     [-1.75, 0.04999999999999982],
     [-1.5, 0.04999999999999982],
+    [-2.25, 1.0499999999999998],
+    [-1.5, 1.0499999999999998],
+    [-1.75, 1.0499999999999998],
+    [-2.0, 1.0499999999999998],
+    [-2.25, 0.7999999999999998],
+    [-2.25, 0.5499999999999998],
+    [-2.5, 0.5499999999999998],
   ];
 
   void moveUp() {
@@ -1001,12 +1039,74 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void pressedA() {}
-  void pressedB() {}
+  void pressedA() {
+    // Verificar la ubicación del jugador y ejecutar la acción correspondiente
+    if (currentLocation == 'littleroot') {
+      // Coordenadas de los personajes interactuables en Littleroot
+      final Map<String, List<double>> interactableCharacters = {
+        'giovanni': [0.0, 1.2999999999999998],
+        // Agrega más personajes y sus coordenadas aquí si es necesario
+      };
+
+      // Verificar si el jugador está cerca de algún personaje interactuable
+      interactableCharacters.forEach((character, coordinates) {
+        double characterX = coordinates[0];
+        double characterY = coordinates[1];
+
+        // Calcular la distancia entre el jugador y el personaje
+        double distance =
+            ((mapx - characterX).abs() + (mapy - characterY).abs()) / 2;
+
+        if (distance <= 0.1) {
+          // El jugador está cerca del personaje, almacenar el mensaje
+          setState(() {
+            interactionMessage = '¡Empieza la batalla contra $character!';
+          });
+        }
+      });
+    } 
+  }
+
+  // Definir una variable en el estado para almacenar el mensaje
+  String interactionMessage = '';
+
+  void pressedB() {
+    // Verificar la ubicación del jugador y ejecutar la acción correspondiente
+    if (currentLocation == 'littleroot') {
+      // Coordenadas de los personajes interactuables en Littleroot
+      final Map<String, List<double>> interactableCharacters = {
+        'giovanni': [0.0, 1.2999999999999998],
+        // Agrega más personajes y sus coordenadas aquí si es necesario
+      };
+
+      // Verificar si el jugador está cerca de algún personaje interactuable
+      interactableCharacters.forEach((character, coordinates) {
+        double characterX = coordinates[0];
+        double characterY = coordinates[1];
+
+        // Calcular la distancia entre el jugador y el personaje
+        double distance =
+            ((mapx - characterX).abs() + (mapy - characterY).abs()) / 2;
+
+        if (distance <= 0.1) {
+          // El jugador está cerca del personaje, almacenar el mensaje
+          setState(() {
+            interactionMessage = '¡Has interactuado con $character!';
+          });
+        }
+      });
+    } else {
+      // Mensaje de despedida
+      setState(() {
+        interactionMessage =
+            'Adiós, gracias por jugar a PokemonApp creado por PAU';
+      });
+    }
+  }
 
   void animateWalk() {
-    print('x: ' + lapMapx.toString());
-    print('y: ' + lapMapy.toString());
+    print('x: ' + mapx.toString());
+    print('y: ' + mapy.toString());
 
     Timer.periodic(Duration(milliseconds: 50), (timer) {
       setState(() {
@@ -1122,6 +1222,82 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
 
+                //Blaine
+                Container(
+                  alignment: Alignment(0, 0),
+                  child: Battleblaine(
+                    x: lapMapx,
+                    y: lapMapy,
+                    location: currentLocation,
+                    BlaineDirection: BlaineDirection,
+                  ),
+                ),
+
+                //LtSurge
+                Container(
+                  alignment: Alignment(0, 0),
+                  child: BattleLtSurge(
+                    x: lapMapx,
+                    y: lapMapy,
+                    location: currentLocation,
+                    LtSurgeDirection: LtSurgeDirection,
+                  ),
+                ),
+
+                //giovanni
+                Container(
+                  alignment: Alignment(0, 0),
+                  child: Battlegiovanni(
+                    x: mapx,
+                    y: mapy,
+                    location: currentLocation,
+                    GiovanniDirection: GiovanniDirection,
+                  ),
+                ),
+
+                //Erika
+                Container(
+                  alignment: Alignment(0, 0),
+                  child: BattleErika(
+                    x: PinkMapx,
+                    y: PinkMapy,
+                    location: currentLocation,
+                    ErikaDirection: ErikaDirection,
+                  ),
+                ),
+
+                //Koga
+                Container(
+                  alignment: Alignment(0, 0),
+                  child: BattleKoga(
+                    x: upPinkMapx,
+                    y: upPinkMapy,
+                    location: currentLocation,
+                    KogaDirection: KogaDirection,
+                  ),
+                ),
+
+                //Misty
+                Container(
+                  alignment: Alignment(0, 0),
+                  child: Battlemisty(
+                    x: upBluMapx,
+                    y: upBluMapy,
+                    location: currentLocation,
+                    MistyDirection: MistyDirection,
+                  ),
+                ),
+
+                //Sabrina
+                Container(
+                  alignment: Alignment(0, 0),
+                  child: BattleSabrina(
+                    x: BluMapx,
+                    y: BluMapy,
+                    location: currentLocation,
+                    SabrinaDirection: SabrinaDirection,
+                  ),
+                ),
               ],
             ),
           ),
@@ -1222,6 +1398,11 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
                     ],
+                  ),
+                  Text(
+                    interactionMessage,
+                    style:
+                        TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                   Text(
                     'C R E A T E D   B Y  P A U',
