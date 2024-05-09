@@ -716,7 +716,15 @@ class _PokedexState extends State<Pokedex> {
       );
     });
   }
-
+Future<String> countUserCards(int userId) async {
+  try {
+    final List<dynamic> userCards = await fetchUserCards(userId);
+    return userCards.length.toString();
+  } catch (e) {
+    print('Error counting user cards: $e');
+    return '0'; // Si ocurre un error, se devuelve 0
+  }
+}
   Future<Map<String, dynamic>> fetchUserCoins(int userId) async {
     final response = await http
         .get(Uri.parse('http://20.162.113.208:5000/api/tienda/$userId'));
