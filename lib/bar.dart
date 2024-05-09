@@ -96,12 +96,12 @@ class CustomNavBar extends StatelessWidget {
                               height: MediaQuery.of(context).size.height * 0.13,
                             ),
                             Positioned(
-                              top: screenSize.height*0.053,
-                              left: screenSize.height*0.008,
+                              top: screenSize.height * 0.053,
+                              left: screenSize.height * ((level.toString().length == 1) ? 0.0128 : 0.007),
                               child: Text(
                                 level.toString(),
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black,
                                 ),
