@@ -44,6 +44,8 @@ dependencies:
   crypto: ^3.0.3
   percent_indicator: ^3.4.0
   shared_preferences: ^2.0.0
+  logger: ^2.2.0
+  intl: ^0.17.0
   
   
 

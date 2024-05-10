@@ -1,17 +1,17 @@
 import 'dart:async';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class CountdownTimer extends StatefulWidget {
+class _CountdownTo1415 extends StatefulWidget {
   @override
-  _CountdownTimerState createState() => _CountdownTimerState();
-
+  _CountdownTo1415State createState() => _CountdownTo1415State();
   int getSecondsRemaining() {
-    return _CountdownTimerState()._secondsRemaining;
+    return _CountdownTo1415State()._secondsRemaining;
   }
 }
 
-class _CountdownTimerState extends State<CountdownTimer> {
+class _CountdownTo1415State extends State<_CountdownTo1415> {
   late Timer _timer;
   late Duration _timeUntil1415;
   late int _secondsRemaining =
@@ -32,7 +32,7 @@ class _CountdownTimerState extends State<CountdownTimer> {
   void _startTimer() {
     DateTime now = DateTime.now();
     DateTime fourteenFifteenToday =
-        DateTime(now.year, now.month, now.day, 14, 15);
+        DateTime(now.year, now.month, now.day, 19, 15);
     DateTime fourteenFifteenTomorrow =
         fourteenFifteenToday.add(Duration(days: 1));
 

@@ -9,17 +9,17 @@ class CustomNavBar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
 
-  CustomNavBar({required this.currentIndex, required this.onTap});
+  CustomNavBar({required this.currentIndex, required this.onTap, required int coins});
 
   @override
   Widget build(BuildContext context) {
-    final usuarioProvider =
-        Provider.of<UsuarioProvider>(context, listen: false);
+    final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
     final usuario = usuarioProvider.usuario;
     int Usuarioxp = usuario?.xp ?? 0;
     double XpLevel = 100.0; // Inicialmente, el valor de XpLevel es 100.0
     double XpPer;
     int level = 1;
+      final int coins; // Agrega esta línea
     int _currentIndex = 0;
 
     while (Usuarioxp >= XpLevel) {
@@ -92,12 +92,12 @@ class CustomNavBar extends StatelessWidget {
                             Image.asset(
                               alignment: Alignment.centerLeft,
                               'assets/xpStar.png',
-                              width: MediaQuery.of(context).size.width * 0.31,
+                              width: MediaQuery.of(context).size.width * 0.28,
                               height: MediaQuery.of(context).size.height * 0.13,
                             ),
                             Positioned(
-                              top: 44,
-                              left: 11,
+                              top: screenSize.height * 0.053,
+                              left: screenSize.height * ((level.toString().length == 1) ? 0.0128 : 0.007),
                               child: Text(
                                 level.toString(),
                                 style: TextStyle(

@@ -9,6 +9,7 @@ import 'package:pokemonapp/register.dart';
 import 'package:pokemonapp/usuario.dart';
 import 'package:pokemonapp/usuario_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -379,7 +380,8 @@ class _MyHomePageState extends State<MyHomePage> {
     if (response.statusCode == 200) {
       // Si la solicitud fue exitosa, extraer los datos del usuario del JSON
       Map<String, dynamic> userData = jsonDecode(response.body)['usuario'];
-
+DateFormat format = DateFormat('EEE, dd MMM yyyy HH:mm:ss \'GMT\'');
+DateTime fechaApertura = format.parse(userData['fecha_apertura']);
       // Crear una instancia de Usuario con los datos recibidos del JSON
       Usuario usuario = Usuario(
         idUsuario: userData['id_usuario'],
@@ -388,7 +390,7 @@ class _MyHomePageState extends State<MyHomePage> {
         admin: userData['admin'],
         sobres: userData['sobres'],
         xp: userData['xp'],
-        fecha_apertura: userData['fecha_apertura'],
+        fecha_apertura: fechaApertura,
       );
 
       // Obtener el UsuarioProvider del contexto
