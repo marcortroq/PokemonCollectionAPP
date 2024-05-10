@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:pokemonapp/bar.dart';
 import 'package:pokemonapp/countdown_timer.dart';
 import 'package:pokemonapp/incubadora.dart';
@@ -11,6 +12,7 @@ import 'package:pokemonapp/nav_bar.dart';
 import 'package:pokemonapp/pokedex.dart';
 import 'dart:math' as math;
 import 'package:http/http.dart' as http;
+import 'package:pokemonapp/usuario.dart';
 import 'main.dart';
 import 'packs.dart';
 import 'usuario_provider.dart';
@@ -128,6 +130,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
         _extraHeight = (_screen.height - _screen.width) * _animator.value;
       });
     });
+    
   }
 
   @override
@@ -176,11 +179,9 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
     double buttonWidth = screenSize.width * 0.35;
     double buttonHeight = screenSize.height * 0.1;
     double iconSize = screenSize.width * 0.1;
-    final _CountdownTo1415State countdownTimer = _CountdownTo1415State();
-    int currentCount = countdownTimer.getCount();
-    int hola;
-    hola=countdownTimer._cycleCount;
-    hola.toInt;
+    final countdownTimer = CountdownTimer();
+
+
     
     return WillPopScope(
       onWillPop: () async {
@@ -283,20 +284,26 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                                 child: _buildButton("PACKS", "assets/pack.png",
                                     Packs(), activate = true, context,
                                     topLeftRadius: 0, bottomRightRadius: 0)),
-                            Padding(
+                           Padding(
                               padding: EdgeInsets.only(bottom: screenSize.height * 0.07),
-                              child: GestureDetector(
-                                onTap: () {
-                                   // Decrement _cycleCount                                  
-                                },
-                                child: Stack(
-                                  children: [ 
-                                                                                                         
-                                    buildButtonContent(currentCount),
-                                    _CountdownTo1415(),
-                                    // Show the remaining time until 14:15
-                                  ],
-                                ),
+                              child: Stack(
+                                children: [
+                                  _buildButton1(
+                                    countdownTimer.getSecondsRemaining() != 0
+                                        ? "READY IN"
+                                        : "COLLECT",
+                                    countdownTimer.getSecondsRemaining() != 0
+                                        ? "assets/incubadoraOFF.png"
+                                        : "assets/incubadora.png",
+                                    Incubadora(),
+                                    countdownTimer.getSecondsRemaining() != 0
+                                        ? activate = false
+                                        : activate = true,
+                                        usuario!,
+                                    context,
+                                  ), // INCUBADORA
+                                  _CountdownTo1415(), // Contador de cuenta atrás de 12 horas
+                                ],
                               ),
                             ),
                             Padding(
@@ -552,6 +559,50 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
           );
         })));
   }
+void actualizarFecha(BuildContext context) async {
+  try {
+    final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
+    final usuario = usuarioProvider.usuario;
+    int idUsuario = usuario?.idUsuario ?? 0;
+    // Realizar la solicitud HTTP al servidor
+    Uri url = Uri.parse('http://20.162.113.208:5000/api/usuario/actualizar_fecha_apertura/$idUsuario');
+    final response = await http.put(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+    if (response.statusCode == 200) {
+      print('Fecha de apertura actualizada correctamente');
+    } else {
+      print('Error al actualizar la fecha de apertura: ${response.statusCode}');
+    }
+  } catch (error) {
+    print('Error en la solicitud HTTP: $error');
+  }
+}
+void verFecha(BuildContext context) async {
+  try {
+    final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
+    final usuario = usuarioProvider.usuario;
+    int idUsuario = usuario?.idUsuario ?? 0;
+    // Realizar la solicitud HTTP al servidor
+    Uri url = Uri.parse('http://20.162.113.208:5000/api/usuario/fecha_apertura/$idUsuario');
+    final response = await http.get(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+    if (response.statusCode == 200) {
+      print('Fecha vista correctamente');
+    } else {
+      print('Error al actualizar la fecha de apertura: ${response.statusCode}');
+    }
+  } catch (error) {
+    print('Error en la solicitud HTTP: $error');
+  }
+}
 
   // Esta función genérica acepta cualquier tipo de pantalla como parámetro y navega a ella.
   void navigateToScreen<T>(BuildContext context, Widget screen) {
@@ -660,26 +711,153 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
       ],
     );
   }
-  Widget buildButtonContent(int cycleCount) {
-  String buttonText;
-  String imagePath;
-  Widget widget;
-  bool isActivated;
-
-  if (cycleCount == 0) {
-    buttonText = "READY IN";
-    imagePath = "assets/incubadoraOFF.png";
-    widget = Incubadora();
-    isActivated = false;
-  } else {
-    buttonText = "COLLECT";
-    imagePath = "assets/incubadora.png";
-    widget = Incubadora();
-    isActivated = true;
+Future<bool> haPasado24Horas(BuildContext context) async {
+  try {
+    final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
+    final usuario = usuarioProvider.usuario;
+    int idUsuario = usuario?.idUsuario ?? 0;
+    // Realizar la solicitud HTTP al servidor
+    Uri url = Uri.parse('http://20.162.113.208:5000/api/usuario/fecha_apertura/$idUsuario');
+    final response = await http.get(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+    if (response.statusCode == 200) {
+      // Obtener la fecha de apertura del usuario desde la respuesta HTTP
+      Map<String, dynamic> responseData = json.decode(response.body);
+      String fechaString = responseData['fecha_apertura'];
+      DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
+      DateTime fechaApertura = dateFormat.parse(fechaString);
+      
+      DateTime ahora = DateTime.now();
+      Duration diferencia = ahora.difference(fechaApertura);
+      return diferencia.inHours >= 24;
+    } else {
+      print('Error al obtener la fecha de apertura: ${response.statusCode}');
+      return false;
+    }
+  } catch (error) {
+    print('Error en la solicitud HTTP: $error');
+    return false;
   }
-
-  return _buildButton(buttonText, imagePath, widget, isActivated, context);
 }
+
+
+  Widget _buildButton1(
+  String text,
+  String imagePath,
+  Widget screen,
+  bool activate,
+  Usuario usuario,
+  BuildContext context, {
+  double? topLeftRadius,
+  double? topRightRadius,
+  double? bottomLeftRadius,
+  double? bottomRightRadius,
+}) {
+  return Stack(
+    children: [
+      Container(
+        width: 110,
+        height: 148,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(topLeftRadius ?? 25),
+            topRight: Radius.circular(topRightRadius ?? 25),
+            bottomLeft: Radius.circular(bottomLeftRadius ?? 25),
+            bottomRight: Radius.circular(bottomRightRadius ?? 25),
+          ),
+          border: Border.all(
+            color: Colors.black,
+            width: 1.5,
+          ),
+          gradient: LinearGradient(
+            colors: [
+              Color.fromRGBO(207, 72, 72, 1),
+              Color.fromRGBO(224, 17, 17, 1),
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Positioned(
+              top: 113,
+              left: 10,
+              right: 10,
+              height: 1,
+              child: Container(
+                width: double.infinity,
+                color: Colors.white,
+              ),
+            ),
+            Positioned(
+              bottom: 4,
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 35,
+              child: Image.asset(
+                imagePath,
+                width: 67,
+                height: 90,
+              ),
+            ),
+          ],
+        ),
+      ),
+      Positioned.fill(
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(topLeftRadius ?? 25),
+              topRight: Radius.circular(topRightRadius ?? 25),
+              bottomLeft: Radius.circular(bottomLeftRadius ?? 25),
+              bottomRight: Radius.circular(bottomRightRadius ?? 25),
+            ),
+            onTap: () async {
+              // Primero validamos si han pasado más de 24 horas
+              if (await haPasado24Horas(context)) {
+                // Actualizamos la fecha de apertura aquí si es necesario
+                actualizarFecha(context);
+                
+                if (!activate) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Vuelve más tarde para abrir la incubadora.'),
+                    ),
+                  );
+                } else {
+                  navigateToScreen(context, screen);
+                }
+              } else {
+                // Si no han pasado 24 horas, mostramos un mensaje indicando que debe esperar
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('No han pasado 24 horas.'),
+                  ),
+                );
+              }
+            },
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+  
 
 
   Widget _buildRectangularButton(BuildContext context, Widget screen) {
@@ -791,13 +969,6 @@ Future<List<Map<String, dynamic>>> fetchMedallasByUserId(int userId) async {
     return [];
   }
 }
-
-void main() {
-  runApp(MaterialApp(
-    home: Menu(),
-  ));
-}
-
 class _CountdownTo1415 extends StatefulWidget {
   @override
   _CountdownTo1415State createState() => _CountdownTo1415State();
@@ -805,108 +976,131 @@ class _CountdownTo1415 extends StatefulWidget {
 
 class _CountdownTo1415State extends State<_CountdownTo1415> {
   late Timer _timer;
-  late Duration _timeUntil1415;
+  late DateTime _targetDate;
+  late Duration _timeUntilTarget;
   late int _secondsRemaining = 0;
-  bool _isButtonActive = true;
-  late int _cycleCount=0; // Variable para almacenar el número de ciclos completados
 
   @override
   void initState() {
     super.initState();
-    _startTimer();
+    _initializeTimer();
   }
 
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
+  Future<void> _initializeTimer() async {
+    final targetDate = await _getTargetDateFromDatabase();
+    _startTimer(targetDate);
   }
-  
 
-  void _startTimer() {
-    DateTime now = DateTime.now();
-    DateTime fourteenFifteenToday = DateTime(now.year, now.month, now.day, 20,12);
-    DateTime fourteenFifteenTomorrow = fourteenFifteenToday.add(Duration(days: 1));
-
-    if (now.isBefore(fourteenFifteenToday)) {
-      _timeUntil1415 = fourteenFifteenToday.difference(now);
-    } else {
-      _timeUntil1415 = fourteenFifteenTomorrow.difference(now);
-    }
-
-    _secondsRemaining = _timeUntil1415.inSeconds;
-
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      if (mounted) {
-        setState(() {
-          if (_timeUntil1415.inSeconds > 0) {
-            _timeUntil1415 -= Duration(seconds: 1);
-            _secondsRemaining = _timeUntil1415.inSeconds;
-          } else {
-            // Restaurar el temporizador a 23:59:59
-            DateTime tomorrow = DateTime.now().add(Duration(days: 1));
-            DateTime fourteenFifteenTomorrow = DateTime(tomorrow.year, tomorrow.month, tomorrow.day, 20,12);
-            _timeUntil1415 = fourteenFifteenTomorrow.difference(DateTime.now());
-            _secondsRemaining = _timeUntil1415.inSeconds;
-            _isButtonActive = true; // Activar el botón nuevamente
-            _cycleCount = _cycleCount + 1; // Incrementar el contador de ciclos
-          }
-        });
+  Future<DateTime> _getTargetDateFromDatabase() async {
+    try {
+      final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
+      final usuario = usuarioProvider.usuario;
+      int idUsuario = usuario?.idUsuario ?? 0;
+      
+      // Realizar la solicitud HTTP al servidor para obtener la fecha
+      Uri url = Uri.parse('http://20.162.113.208:5000/api/usuario/fecha_apertura/$idUsuario');
+      final response = await http.get(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+      if (response.statusCode == 200) {
+    final jsonResponse = json.decode(response.body);
+    final fecha = DateTime.parse(jsonResponse['fecha_apertura']);
+    
+    // Sumar dos horas
+    final nuevaFecha = fecha.add(Duration(hours: 2));
+        return nuevaFecha;
+      } else {
+        print('Error al actualizar la fecha de apertura: ${response.statusCode}');
+        // En caso de error, puedes devolver una fecha por defecto o lanzar una excepción
+        return DateTime.now();
       }
-    });
+    } catch (error) {
+      print('Error en la solicitud HTTP: $error');
+      // En caso de error, puedes devolver una fecha por defecto o lanzar una excepción
+      return DateTime.now();
+    }
+  }
+
+  void _startTimer(DateTime targetDate) {
+    _targetDate = targetDate.add(Duration(days: 1)); // Suma 24 horas a la fecha objetivo
+
+    final difference = _targetDate.difference(DateTime.now());
+    if (difference.inHours <= 24) {
+      _timeUntilTarget = difference;
+      _secondsRemaining = _timeUntilTarget.inSeconds;
+
+      _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+        if (mounted) {
+          setState(() {
+            if (_timeUntilTarget.inSeconds > 0) {
+              _timeUntilTarget -= Duration(seconds: 1);
+              _secondsRemaining = _timeUntilTarget.inSeconds;
+              if (_secondsRemaining <= 0) {
+                _timer.cancel();
+              }
+            } else {
+              _timer.cancel();
+            }
+          });
+        }
+      });
+    } else {
+      // Si han pasado más de 24 horas desde la fecha de la base de datos, establecer el tiempo restante en cero
+      setState(() {
+        _timeUntilTarget = Duration.zero;
+        _secondsRemaining = 0;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-     int currentCycleCount = _cycleCount;
+    if (_timeUntilTarget == null) {
+      return Container(); // O cualquier otro widget de carga
+    }
+
     return Positioned(
       top: 5,
-      right: -9,
-      child: Column(
-        children: [
-          Text(
-            "Cycles: $currentCycleCount", // Mostrar el número de ciclos completados
-            style: TextStyle(fontSize: 16, color: Colors.white, fontFamily: 'Sarpanch'),
+      right: 0,
+      child: Container(
+        width: 100,
+        child: Text(
+          _formatDuration(_timeUntilTarget),
+          style: TextStyle(
+            fontSize: 20,
+            color: Colors.white,
+            fontFamily: 'Sarpanch',
           ),
-          SizedBox(height: 5), // Espaciado entre el contador y el temporizador
-          Container(
-            width: 100,
-            child: Text(
-              _formatDuration(_timeUntil1415),
-              style: TextStyle(fontSize: 20, color: Colors.white, fontFamily: 'Sarpanch'),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 
   String _formatDuration(Duration duration) {
+  if (duration.inSeconds <= 0) {
+    return '00:00:00';
+  } else {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
     String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
     return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
   }
-
-  int getSecondsRemaining() {
-    return _secondsRemaining;
-  }
-
- int getCount() {
-  int currentCycleCount = _cycleCount;
-  return currentCycleCount;
 }
-void setCount(int count) {
-  setState(() {
-    _cycleCount = count;
-  });
+
 }
 
 
-  // Método para cambiar el estado del botón
-  void toggleButtonState() {
-    setState(() {
-      _isButtonActive = !_isButtonActive;
-    });
-  }
+
+
+
+void main() {
+  runApp(MaterialApp(
+    home: Menu(),
+  ));
 }
+
+
+

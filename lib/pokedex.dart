@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:pokemonapp/bar.dart';
 import 'package:pokemonapp/menu.dart';
 import 'dart:typed_data';
@@ -14,12 +15,10 @@ void main() {
     home: Pokedex(),
   ));
 }
-
 class Pokedex extends StatefulWidget {
   @override
   _PokedexState createState() => _PokedexState();
 }
-
 class _PokedexState extends State<Pokedex> {
   PageController _pageController = PageController(initialPage: 0);
   int _currentPageIndex = 0;
@@ -44,7 +43,7 @@ class _PokedexState extends State<Pokedex> {
   Widget build(BuildContext context) {
     late final Size screenSize = MediaQuery.of(context).size;
 
-// Calcula el tamaño de la imagen del fondo
+    // Calcula el tamaño de la imagen del fondo
     double backgroundWidth = screenSize.width * 1.2;
     double backgroundHeight = screenSize.height * 1.2;
     return WillPopScope(
@@ -69,9 +68,9 @@ class _PokedexState extends State<Pokedex> {
                   ),
                   fit: BoxFit.fill,
                 ),
-              ),
+                  ),
             ),
-            _labels(context),
+             _labels(context),
             Positioned(
               top: 150,
               left: 0,
@@ -97,14 +96,13 @@ class _PokedexState extends State<Pokedex> {
               child: _customNavBar, // Utilizamos la variable almacenada
             ),
           ],
-        ),
+        ),        
       ),
     );
   }
 
   Widget _labels(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-
     return Positioned(
       top: MediaQuery.of(context).size.height * 0.12,
       left: 0,
@@ -170,77 +168,147 @@ class _PokedexState extends State<Pokedex> {
       ),
     );
   }
-
   Widget _pokedexContent() {
-    final usuarioProvider =
-        Provider.of<UsuarioProvider>(context, listen: false);
-    final usuario = usuarioProvider.usuario;
-    int idUsuario = usuario?.idUsuario ?? 0;
+  final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
+  final usuario = usuarioProvider.usuario;
+  int idUsuario = usuario?.idUsuario ?? 0;
 
-    return FutureBuilder<List<dynamic>>(
-      future: fetchUserCards(idUsuario), // Cambia 1 por el ID del usuario
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (snapshot.data == null) {
-          // Agregar verificación de nulidad aquí
-          return Center(child: Text('No se encontraron cartas de usuario.'));
-        } else {
-          List<dynamic> userCards = snapshot.data!;
-          return GridView.builder(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              mainAxisSpacing: 4.0,
-              crossAxisSpacing: 4.0,
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        children: [
+          SizedBox(width: 15,
+          height: 5),
+          Positioned(
+            left: MediaQuery.of(context).size.height * 1.1, // Ajusta la posición horizontal según sea necesario
+            top: MediaQuery.of(context).size.height * 0.01, // Ajusta la posición vertical según sea necesario
+            child: FutureBuilder<String>(
+              future: countUserCards(idUsuario), // Pasa el ID del usuario
+              builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else {
+                  if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    return Text(
+                      '${snapshot.data} / 151',
+                      style: TextStyle(fontSize: 24, fontFamily: 'Sarpanch'),
+                    );
+                  }
+                }
+              },
             ),
-            itemCount: 151, // Mostrar 151 cartas
-            itemBuilder: (context, index) {
-              bool userHasCard = userHasCardAtIndex(index, userCards);
-              String imageUrl;
-              if (userHasCard) {
-                String baseUrl = 'http://20.162.113.208';
-                String imagePath =
-                    '/FOTOS_CARTAS/${index + 1}.png'; // La imagen sigue el formato de ID de Pokémon
-                imageUrl = baseUrl + imagePath;
-              } else {
-                // Si el usuario no tiene la carta, cargar la imagen estática desde assets
-                imageUrl = 'assets/ContraPortada.png';
-              }
-              return GestureDetector(
-                onTap: () {
-                  // Mostrar la imagen centrada y aumentada al hacer clic
-                  if (userHasCard) {
-                    _showCenteredImage(context, imageUrl);
+          ),
+          SizedBox(width: 20), // Espacio entre los dos Positioned
+          Positioned(
+            left: MediaQuery.of(context).size.height * 0.15, // Ajusta la posición horizontal según sea necesario
+            top: MediaQuery.of(context).size.height * 0.018, // Ajusta la posición vertical según sea necesario
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.black,
+                  width: 1.5,
+                ), // Define el borde negro
+                borderRadius: BorderRadius.circular(25.0), // Define el radio del borde
+              ),
+              child: FutureBuilder<String>(
+                future: countUserCards(idUsuario), // Pasa el ID del usuario
+                builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else {
+                    if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      int collectedCards = int.parse(snapshot.data ?? '0');
+                      double progress = collectedCards / 151; // Calcula el progreso como el número de cartas recolectadas dividido por 151
+                      return LinearPercentIndicator(
+                        width: MediaQuery.of(context).size.width / 1.6,
+                        animation: true,
+                        lineHeight: 20.0,
+                        animationDuration: 2500,
+                        percent: progress,
+                        linearStrokeCap: LinearStrokeCap.roundAll,
+                        progressColor: const Color.fromRGBO(229, 166, 94, 1),
+                        backgroundColor: const Color.fromRGBO(217, 217, 217, 1),
+                      );
+                    }
                   }
                 },
-                child: Padding(
-                  padding: EdgeInsets.all(4.0),
-                  child: userHasCard
-                      ? Image.network(
-                          imageUrl,
-                          fit: BoxFit.fitHeight,
-                        )
-                      : Image.asset(
-                          imageUrl,
-                          fit: BoxFit.fitHeight,
-                        ),
-                ),
-              );
-            },
-          );
-        }
-      },
-    );
-  }
+              ),
+            ),
+          ),
+        ],
+      ),
+      SizedBox(height: 10),
+      Expanded(
+        child: FutureBuilder<List<dynamic>>(
+          future: fetchUserCards(idUsuario), // Cambia 1 por el ID del usuario
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else if (snapshot.data == null) {
+              // Agregar verificación de nulidad aquí
+              return Center(child: Text('No se encontraron cartas de usuario.'));
+            } else {
+              List<dynamic> userCards = snapshot.data!;
 
+              return GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  mainAxisSpacing: 4.0,
+                  crossAxisSpacing: 4.0,
+                ),
+                itemCount: 151, // Mostrar 151 cartas
+                itemBuilder: (context, index) {
+                  bool userHasCard = userHasCardAtIndex(index, userCards);
+                  String imageUrl;
+                  if (userHasCard) {
+                    String baseUrl = 'http://20.162.113.208';
+                    String imagePath = '/FOTOS_CARTAS/${index + 1}.png'; // La imagen sigue el formato de ID de Pokémon
+                    imageUrl = baseUrl + imagePath;
+                  } else {
+                    // Si el usuario no tiene la carta, cargar la imagen estática desde assets
+                    imageUrl = 'assets/ContraPortada.png';
+                  }
+                  return GestureDetector(
+                    onTap: () {
+                      // Mostrar la imagen centrada y aumentada al hacer clic
+                      if (userHasCard) {
+                        _showCenteredImage(context, imageUrl);
+                      }
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.all(4.0),
+                      child: userHasCard
+                          ? Image.network(
+                              imageUrl,
+                              fit: BoxFit.fitHeight,
+                            )
+                          : Image.asset(
+                              imageUrl,
+                              fit: BoxFit.fitHeight,
+                            ),
+                    ),
+                  );
+                },
+              );
+            }
+          },
+        ),
+      ),
+    ],
+  );
+}
   bool userHasCardAtIndex(int index, List<dynamic> userCards) {
     // Verificar si el JSON contiene una carta con el ID del Pokémon correspondiente al índice
     bool hasCard = userCards.any((card) => card['id_pokemon'] == index + 1);
     return hasCard;
   }
-
   void _showCenteredImage(BuildContext context, String imageUrl) {
     showDialog(
       context: context,
@@ -262,14 +330,12 @@ class _PokedexState extends State<Pokedex> {
       },
     );
   }
-
   Widget _duplicatesContent() {
     final usuarioProvider =
         Provider.of<UsuarioProvider>(context, listen: false);
     final usuario = usuarioProvider.usuario;
     int idUsuario = usuario?.idUsuario ?? 0;
     int pokemon = 59;
-
     return FutureBuilder<List<dynamic>>(
       future: fetchDuplicateCards(idUsuario),
       builder: (context, snapshot) {
@@ -290,8 +356,7 @@ class _PokedexState extends State<Pokedex> {
             itemCount: duplicateCards.length,
             itemBuilder: (context, index) {
               String imageUrl = duplicateCards[index]['foto_carta'];
-              int duplicatesCount =
-                  (duplicateCards[index]['cantidad_repetidas'] ?? 0) - 1;
+              int duplicatesCount =(duplicateCards[index]['cantidad_repetidas'] ?? 0) - 1;
               int cardNumber =
                   int.parse(imageUrl.split('/').last.split('.').first);
               // Verificar si ya es una URL completa
@@ -299,7 +364,6 @@ class _PokedexState extends State<Pokedex> {
                 // Si no es una URL completa, construir la URL completa
                 imageUrl = 'http://20.162.113.208$imageUrl';
               }
-
               return Stack(
                 alignment: Alignment.center, // Alineación a la derecha
                 children: [
@@ -308,8 +372,7 @@ class _PokedexState extends State<Pokedex> {
                       mostrarPokedex(idUsuario, cardNumber);
                       _showPopUp(
                           context, imageUrl, duplicatesCount, cardNumber);
-
-                      print('Número de la carta: $cardNumber');
+                          print('Número de la carta: $cardNumber');
                     },
                     child: Image.network(
                       imageUrl,
@@ -353,8 +416,7 @@ class _PokedexState extends State<Pokedex> {
   Future<List<dynamic>> fetchDuplicateCards(int userId) async {
     final response = await http.get(Uri.parse(
         'http://20.162.113.208:5000/api/cartas/usuario/dupes/$userId'));
-
-    if (response.statusCode == 200) {
+        if (response.statusCode == 200) {
       // Decodificar la respuesta JSON
       List<dynamic> jsonData = json.decode(response.body);
 
@@ -369,7 +431,6 @@ class _PokedexState extends State<Pokedex> {
           });
         }
       }
-
       return duplicateCards;
     } else {
       throw Exception('Failed to load duplicate cards');
@@ -381,18 +442,15 @@ class _PokedexState extends State<Pokedex> {
     final response = await http.get(
         Uri.parse('http://20.162.113.208:5000/api/cartas/usuario/$userId'));
     print("TIENE RESPUESTA");
-
     if (response.statusCode == 200) {
       print(json.decode(response.body));
       List<dynamic> userCards = json.decode(response.body);
-
       while (!json.encode(userCards).contains(']')) {
         await Future.delayed(Duration(
             seconds: 1)); // Esperar un segundo antes de verificar nuevamente
         final updatedResponse = await http.get(
             Uri.parse('http://20.162.113.208:5000/api/cartas/usuario/$userId'));
         print("TIENE RESPUESTA");
-
         if (updatedResponse.statusCode == 200) {
           print(json.decode(updatedResponse.body));
           userCards = json.decode(updatedResponse.body);
@@ -400,7 +458,6 @@ class _PokedexState extends State<Pokedex> {
           throw Exception('Failed to load user cards');
         }
       }
-
       return userCards;
     } else {
       throw Exception('Failed to load user cards');
@@ -557,7 +614,6 @@ class _PokedexState extends State<Pokedex> {
                                       await mostrarPokedex(
                                           idUsuario, cardNumber);
                                   int pokedexEntryCount = pokedexEntries.length;
-
                                   for (int i = pokedexEntryCount - 1;
                                       i >= 0 &&
                                           i >= pokedexEntryCount - currentCount;
@@ -641,7 +697,6 @@ class _PokedexState extends State<Pokedex> {
       },
     );
   }
-
   void updateCoins() async {
     final usuarioProvider =
         Provider.of<UsuarioProvider>(context, listen: false);
@@ -661,11 +716,18 @@ class _PokedexState extends State<Pokedex> {
       );
     });
   }
-
+Future<String> countUserCards(int userId) async {
+  try {
+    final List<dynamic> userCards = await fetchUserCards(userId);
+    return userCards.length.toString();
+  } catch (e) {
+    print('Error counting user cards: $e');
+    return '0'; // Si ocurre un error, se devuelve 0
+  }
+}
   Future<Map<String, dynamic>> fetchUserCoins(int userId) async {
     final response = await http
         .get(Uri.parse('http://20.162.113.208:5000/api/tienda/$userId'));
-
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
@@ -697,8 +759,7 @@ Future<void> updateMonedas(int idUsuario, int cantidadMonedas) async {
 Future<List<int>> mostrarPokedex(int userId, int idPokemon) async {
   final url = Uri.parse(
       'http://20.162.113.208:5000/api/pokedex/user/$userId/pokemon/$idPokemon');
-
-  final response = await http.get(url);
+      final response = await http.get(url);
 
   if (response.statusCode == 200) {
     // Aquí puedes imprimir los resultados o realizar cualquier otra acción
