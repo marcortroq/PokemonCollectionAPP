@@ -1006,9 +1006,12 @@ class _CountdownTo1415State extends State<_CountdownTo1415> {
         },
       );
       if (response.statusCode == 200) {
-        final jsonResponse = json.decode(response.body);
-        final fecha = DateTime.parse(jsonResponse['fecha_apertura']);
-        return fecha;
+    final jsonResponse = json.decode(response.body);
+    final fecha = DateTime.parse(jsonResponse['fecha_apertura']);
+    
+    // Sumar dos horas
+    final nuevaFecha = fecha.add(Duration(hours: 2));
+        return nuevaFecha;
       } else {
         print('Error al actualizar la fecha de apertura: ${response.statusCode}');
         // En caso de error, puedes devolver una fecha por defecto o lanzar una excepción
@@ -1061,7 +1064,7 @@ class _CountdownTo1415State extends State<_CountdownTo1415> {
 
     return Positioned(
       top: 5,
-      right: -9,
+      right: 0,
       child: Container(
         width: 100,
         child: Text(
@@ -1077,15 +1080,16 @@ class _CountdownTo1415State extends State<_CountdownTo1415> {
   }
 
   String _formatDuration(Duration duration) {
+  if (duration.inSeconds <= 0) {
+    return '00:00:00';
+  } else {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
     String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
     return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
   }
+}
 
-  int calculateRemainingSeconds() {
-    return _timeUntilTarget.inSeconds;
-  }
 }
 
 
