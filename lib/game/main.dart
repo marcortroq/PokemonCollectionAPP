@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:pokemonapp/game/Pokemon_List.dart';
 import 'package:pokemonapp/game/button.dart';
 import 'package:pokemonapp/game/characters/Brock.dart';
 import 'package:pokemonapp/game/characters/giovanni.dart';
@@ -1062,6 +1063,11 @@ class _HomePageState extends State<HomePage> {
           setState(() {
             interactionMessage = '¡Empieza la batalla contra $character!';
           });
+          // Navegar a PokemonList
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => PokemonList()),
+        );
         }
       });
     } 
