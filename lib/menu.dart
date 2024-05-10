@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -112,7 +111,13 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
   double _maxSlide = 200.0;
   double _startingPos = 0.0;
   final Logger logger = Logger();
-  
+   late Timer _timer;
+  late DateTime _targetDate;
+  late Duration _timeUntilTarget;
+  late int _secondsRemaining = 0;
+  int getSecondsRemaining() {
+    return _secondsRemaining;
+  }
 
   @override
   void initState() {
@@ -129,22 +134,21 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
       setState(() {
         _extraHeight = (_screen.height - _screen.width) * _animator.value;
       });
-    });
+    });  
     
   }
-
   @override
   void dispose() {
     _animationController.dispose();
     super.dispose();
   }
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _screen = MediaQuery.of(context).size; // Inicialización de _screen
+    _screen = MediaQuery.of(context).size; 
+    _initializeTimer();// Inicialización de _screen
   }
-
+  
   @override
   Widget build(BuildContext context) {
     bool activate = true;
@@ -159,33 +163,25 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
     int level = 1;
     int userId = 0;
     int _currentIndex = 0;
-
     while (Usuarioxp >= XpLevel) {
       // Mientras el usuario alcance el nivel actual, actualizamos XpLevel multiplicándolo por 2.25
       XpLevel *= 2.25;
       level += 1;
     }
-
 // Calculamos el progreso del usuario como un porcentaje
     XpPer = Usuarioxp / XpLevel;
-
     // Calcula el tamaño de la imagen del fondo
     double backgroundWidth = screenSize.width * 1.2;
     double backgroundHeight = screenSize.height * 1.2;
-
     // Calcula el tamaño y la posición de otros elementos
     double imageWidth = screenSize.width * 0.25;
     double imageHeight = screenSize.width * 0.25;
     double buttonWidth = screenSize.width * 0.35;
     double buttonHeight = screenSize.height * 0.1;
     double iconSize = screenSize.width * 0.1;
-    final countdownTimer = CountdownTimer();
-
-
-    
+    final countDownTimer = _CountdownTo1415State();
     return WillPopScope(
       onWillPop: () async {
-        
         return false;
       },
       child: Scaffold(
@@ -289,15 +285,15 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                               child: Stack(
                                 children: [
                                   _buildButton1(
-                                    countdownTimer.getSecondsRemaining() != 0
-                                        ? "READY IN"
-                                        : "COLLECT",
-                                    countdownTimer.getSecondsRemaining() != 0
-                                        ? "assets/incubadoraOFF.png"
-                                        : "assets/incubadora.png",
+                                    getSecondsRemaining() <=0
+                                        ? "COLLECT"
+                                        : "READY IN",
+                                    getSecondsRemaining()  <= 0
+                                        ? "assets/incubadora.png"
+                                        : "assets/incubadoraOFF.png",
                                     Incubadora(),
-                                    countdownTimer.getSecondsRemaining() != 0
-                                        ? activate = false
+                                    getSecondsRemaining()  <= 0
+                                        ? activate = true
                                         : activate = true,
                                         usuario!,
                                     context,
@@ -336,7 +332,6 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                                       height: 40,
                                     ),
                                   ),
-
                                   Positioned(
                                     // Posiciona el texto encima de la imagen
                                     top:
@@ -401,7 +396,6 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                   ),
                 ),
               ),
-
               // En tu widget donde quieres mostrar la medalla
               Positioned(
                 left: (MediaQuery.of(context).size.width * 0.4) / 2,
@@ -436,9 +430,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                           (medalla) => medalla['medalla'] == 'Medalla Tierra');
                       bool tieneMedallaVolcan = medallas.any(
                           (medalla) => medalla['medalla'] == 'Medalla Volcan');
-
                       // Repite este proceso para las demás medalla
-
                       return Stack(
                         children: [
                           Image.asset(
@@ -549,7 +541,6 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                   },
                 ),
               ),
-
               Positioned(
                 left: screenSize.width * 0.23,
                 top: screenSize.height * 0.58,
@@ -603,7 +594,6 @@ void verFecha(BuildContext context) async {
     print('Error en la solicitud HTTP: $error');
   }
 }
-
   // Esta función genérica acepta cualquier tipo de pantalla como parámetro y navega a ella.
   void navigateToScreen<T>(BuildContext context, Widget screen) {
     Navigator.push(
@@ -611,7 +601,6 @@ void verFecha(BuildContext context) async {
       MaterialPageRoute(builder: (context) => screen),
     );
   }
-
   Widget _buildButton(
     String text,
     String imagePath,
@@ -743,8 +732,6 @@ Future<bool> haPasado24Horas(BuildContext context) async {
     return false;
   }
 }
-
-
   Widget _buildButton1(
   String text,
   String imagePath,
@@ -831,7 +818,6 @@ Future<bool> haPasado24Horas(BuildContext context) async {
               if (await haPasado24Horas(context)) {
                 // Actualizamos la fecha de apertura aquí si es necesario
                 actualizarFecha(context);
-                
                 if (!activate) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -856,10 +842,6 @@ Future<bool> haPasado24Horas(BuildContext context) async {
     ],
   );
 }
-
-  
-
-
   Widget _buildRectangularButton(BuildContext context, Widget screen) {
     return SizedBox(
       width: 215,
@@ -914,18 +896,91 @@ Future<bool> haPasado24Horas(BuildContext context) async {
       ),
     );
   }
+  Future<void> _initializeTimer() async {
+    final targetDate = await _getTargetDateFromDatabase();
+    _startTimer(targetDate);
+  }
+  Future<DateTime> _getTargetDateFromDatabase() async {
+    try {
+      final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
+      final usuario = usuarioProvider.usuario;
+      int idUsuario = usuario?.idUsuario ?? 0;
+      // Realizar la solicitud HTTP al servidor para obtener la fecha
+      Uri url = Uri.parse('http://20.162.113.208:5000/api/usuario/fecha_apertura/$idUsuario');
+      final response = await http.get(
+        url,
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+      );
+      if (response.statusCode == 200) {
+    final jsonResponse = json.decode(response.body);
+    final fecha = DateTime.parse(jsonResponse['fecha_apertura']);
+    // Sumar dos horas
+    final nuevaFecha = fecha.add(Duration(hours: 2));
+        return nuevaFecha;
+      } else {
+        print('Error al actualizar la fecha de apertura: ${response.statusCode}');
+        // En caso de error, puedes devolver una fecha por defecto o lanzar una excepción
+        return DateTime.now();
+      }
+    } catch (error) {
+      print('Error en la solicitud HTTP: $error');
+      // En caso de error, puedes devolver una fecha por defecto o lanzar una excepción
+      return DateTime.now();
+    }
+  }
+  void _startTimer(DateTime targetDate) {
+    _targetDate = targetDate.add(Duration(days: 1)); // Suma 24 horas a la fecha objetivo
+    final difference = _targetDate.difference(DateTime.now());
+    if (difference.inHours <= 24) {
+      _timeUntilTarget = difference;
+      _secondsRemaining = _timeUntilTarget.inSeconds;
+      _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+        if (mounted) {
+          setState(() {
+            if (_timeUntilTarget.inSeconds > 0) {
+              _timeUntilTarget -= Duration(seconds: 1);
+              _secondsRemaining = _timeUntilTarget.inSeconds;
+              if (_secondsRemaining <= 0) {
+                _timer.cancel();
+              }
+            } else {
+              _timer.cancel();
+            }
+          });
+        }
+      });
+    } else {
+      // Si han pasado más de 24 horas desde la fecha de la base de datos, establecer el tiempo restante en cero
+      setState(() {
+        _timeUntilTarget = Duration.zero;
+        _secondsRemaining = 0;
+      });
+    }
+    String _formatDuration(Duration duration) {
+  if (duration.inSeconds <= 0) {
+    return '00:00:00';
+  } else {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
+  }
 }
-
+int getSecondsRemaining() {
+    return _secondsRemaining;
+  }
+  }
+}
 Future<List<dynamic>> fetchUserCards(int userId) async {
   print("PRUEBA PARA SABER SI HACE LA LLAMADA");
   final response = await http
       .get(Uri.parse('http://20.162.113.208:5000/api/cartas/usuario/$userId'));
   print("TIENE RESPUESTA");
-
   if (response.statusCode == 200) {
     print(json.decode(response.body));
     List<dynamic> userCards = json.decode(response.body);
-
     while (!json.encode(userCards).contains(']')) {
       await Future.delayed(Duration(
           seconds: 1)); // Esperar un segundo antes de verificar nuevamente
@@ -940,13 +995,11 @@ Future<List<dynamic>> fetchUserCards(int userId) async {
         throw Exception('Failed to load user cards');
       }
     }
-
     return userCards;
   } else {
     throw Exception('Failed to load user cards');
   }
 }
-
 Future<String> countUserCards(int userId) async {
   try {
     final List<dynamic> userCards = await fetchUserCards(userId);
@@ -956,7 +1009,6 @@ Future<String> countUserCards(int userId) async {
     return '0'; // Si ocurre un error, se devuelve 0
   }
 }
-
 Future<List<Map<String, dynamic>>> fetchMedallasByUserId(int userId) async {
   final response = await http.get(
       Uri.parse('http://20.162.113.208:5000/api/medallas/usuario/$userId'));
@@ -972,31 +1024,29 @@ Future<List<Map<String, dynamic>>> fetchMedallasByUserId(int userId) async {
 class _CountdownTo1415 extends StatefulWidget {
   @override
   _CountdownTo1415State createState() => _CountdownTo1415State();
+  int getSecondsRemaining() {
+    return _CountdownTo1415State()._secondsRemaining;
+  }
 }
-
 class _CountdownTo1415State extends State<_CountdownTo1415> {
   late Timer _timer;
   late DateTime _targetDate;
   late Duration _timeUntilTarget;
   late int _secondsRemaining = 0;
-
   @override
   void initState() {
     super.initState();
     _initializeTimer();
   }
-
   Future<void> _initializeTimer() async {
     final targetDate = await _getTargetDateFromDatabase();
     _startTimer(targetDate);
   }
-
   Future<DateTime> _getTargetDateFromDatabase() async {
     try {
       final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
       final usuario = usuarioProvider.usuario;
       int idUsuario = usuario?.idUsuario ?? 0;
-      
       // Realizar la solicitud HTTP al servidor para obtener la fecha
       Uri url = Uri.parse('http://20.162.113.208:5000/api/usuario/fecha_apertura/$idUsuario');
       final response = await http.get(
@@ -1008,7 +1058,6 @@ class _CountdownTo1415State extends State<_CountdownTo1415> {
       if (response.statusCode == 200) {
     final jsonResponse = json.decode(response.body);
     final fecha = DateTime.parse(jsonResponse['fecha_apertura']);
-    
     // Sumar dos horas
     final nuevaFecha = fecha.add(Duration(hours: 2));
         return nuevaFecha;
@@ -1023,15 +1072,12 @@ class _CountdownTo1415State extends State<_CountdownTo1415> {
       return DateTime.now();
     }
   }
-
   void _startTimer(DateTime targetDate) {
     _targetDate = targetDate.add(Duration(days: 1)); // Suma 24 horas a la fecha objetivo
-
     final difference = _targetDate.difference(DateTime.now());
     if (difference.inHours <= 24) {
       _timeUntilTarget = difference;
       _secondsRemaining = _timeUntilTarget.inSeconds;
-
       _timer = Timer.periodic(Duration(seconds: 1), (timer) {
         if (mounted) {
           setState(() {
@@ -1055,13 +1101,11 @@ class _CountdownTo1415State extends State<_CountdownTo1415> {
       });
     }
   }
-
   @override
   Widget build(BuildContext context) {
     if (_timeUntilTarget == null) {
       return Container(); // O cualquier otro widget de carga
     }
-
     return Positioned(
       top: 5,
       right: 0,
@@ -1078,7 +1122,6 @@ class _CountdownTo1415State extends State<_CountdownTo1415> {
       ),
     );
   }
-
   String _formatDuration(Duration duration) {
   if (duration.inSeconds <= 0) {
     return '00:00:00';
@@ -1089,18 +1132,14 @@ class _CountdownTo1415State extends State<_CountdownTo1415> {
     return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
   }
 }
+int getSecondsRemaining() {
+    return _secondsRemaining;
+  }
 
 }
-
-
-
-
-
 void main() {
   runApp(MaterialApp(
     home: Menu(),
+     
   ));
 }
-
-
-
