@@ -12,7 +12,7 @@ class PokemonList extends StatefulWidget {
 }
 
 class _PokemonListState extends State<PokemonList> {
-  List<dynamic> _selectedPokemon = [];
+  List<int> _selectedPokemonIds = [];
   TextEditingController _searchController = TextEditingController();
 
   @override
@@ -149,18 +149,17 @@ class _PokemonListState extends State<PokemonList> {
               final pokemon = filteredPokemonList[index];
               String imageUrl =
                   'http://20.162.113.208/' + pokemon['foto_pokemon'];
-              bool isSelected = _selectedPokemon.contains(pokemon);
+              bool isSelected = _selectedPokemonIds.contains(pokemon['id_pokemon']);
 
               return GestureDetector(
                 onTap: () {
-                  print(pokemon[
-                      'nombre_pokemon']); // Imprime el nombre del Pokémon
                   setState(() {
-                    // Cambia el estado de isSelected y actualiza la lista de Pokémon seleccionados
-                    isSelected = !isSelected;
-                    if (isSelected) {
-                      if (_selectedPokemon.length < 6) {
-                        _selectedPokemon.add(pokemon);
+                    print('Pokemon seleccionado: ${pokemon['nombre_pokemon']}');
+                    if (_selectedPokemonIds.contains(pokemon['id_pokemon'])) {
+                      _selectedPokemonIds.remove(pokemon['id_pokemon']);
+                    } else {
+                      if (_selectedPokemonIds.length < 6) {
+                        _selectedPokemonIds.add(pokemon['id_pokemon']);
                       } else {
                         // Si se intenta seleccionar más de 6, muestra un mensaje
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -169,37 +168,33 @@ class _PokemonListState extends State<PokemonList> {
                           ),
                         );
                       }
-                    } else {
-                      _selectedPokemon.remove(pokemon);
                     }
                   });
                 },
                 child: Column(
                   children: [
-                    Stack(
-                      children: [
-                        Container(
-                          width: 72, // Tamaño del contenedor
-                          height: 72, // Tamaño del contenedor
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: isSelected
-                                ? Colors.yellow.withOpacity(0.5)
-                                : Colors.transparent,
+                    Container(
+                      width: 72, // Tamaño del contenedor
+                      height: 72, // Tamaño del contenedor
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isSelected
+                            ? Colors.yellow
+                            : Colors.white, // Cambia el color del círculo
+                      ),
+                      child: Center(
+                        child: ClipOval(
+                          child: Image.network(
+                            imageUrl,
+                            width: 60, // Tamaño de la imagen
+                            height: 60, // Tamaño de la imagen
+                            fit: BoxFit.cover,
                           ),
                         ),
-                        Image.network(
-                          imageUrl,
-                          width: 72, // Tamaño de la imagen
-                          height: 72, // Tamaño de la imagen
-                        ),
-                      ],
+                      ),
                     ),
                     Text(
-                      pokemon['nombre_pokemon'] +
-                          (isSelected
-                              ? ' ✔️'
-                              : ''), // Agregar el tick si está seleccionado
+                      pokemon['nombre_pokemon'],
                       style: TextStyle(
                         fontSize: 14, // Ajusta el tamaño del nombre aquí
                         fontWeight: FontWeight.bold,
