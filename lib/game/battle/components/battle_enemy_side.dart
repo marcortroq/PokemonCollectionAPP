@@ -51,23 +51,6 @@ class BattleEnemySide extends StatelessWidget {
                       ),
                     ),
                     Spacer(),
-                    Container(
-                      margin: EdgeInsets.only(top: 10, right: 20),
-                      child: Text(
-                        "Lv5",
-                        style: TextStyle(
-                          fontFamily: 'PokemonFireRed',
-                          fontSize: 27,
-                          shadows: <Shadow>[
-                            Shadow(
-                              offset: Offset(2, 2),
-                              blurRadius: 1.0,
-                              color: Color(0xffd8d0b0),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),

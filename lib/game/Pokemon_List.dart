@@ -2,9 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:pokemonapp/game/battle/main.dart';
 import 'package:provider/provider.dart';
 import '../usuario.dart';
 import '../usuario_provider.dart';
+import 'package:pokemonapp/game/battle/screens/battle_screen.dart';
 
 class PokemonList extends StatefulWidget {
   @override
@@ -114,6 +116,18 @@ class _PokemonListState extends State<PokemonList> {
               child: _buildPokemonList(usuario),
             ),
           ),
+          if (_selectedPokemonIds.length == 6)
+            Container(
+              alignment: Alignment.bottomLeft,
+              padding: EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  // Llama a la función que abre la pantalla de batalla
+                  _navigateToBattleScreen(context);
+                },
+                child: Text('→'),
+              ),
+            ),
         ],
       ),
     );
@@ -149,22 +163,28 @@ class _PokemonListState extends State<PokemonList> {
               final pokemon = filteredPokemonList[index];
               String imageUrl =
                   'http://20.162.113.208/' + pokemon['foto_pokemon'];
-              bool isSelected = _selectedPokemonIds.contains(pokemon['id_pokemon']);
+              bool isSelected = _selectedPokemonIds
+                  .contains(pokemon['id_pokemon']);
 
               return GestureDetector(
                 onTap: () {
                   setState(() {
-                    print('Pokemon seleccionado: ${pokemon['nombre_pokemon']}');
-                    if (_selectedPokemonIds.contains(pokemon['id_pokemon'])) {
-                      _selectedPokemonIds.remove(pokemon['id_pokemon']);
+                    print(
+                        'Pokemon seleccionado: ${pokemon['nombre_pokemon']}');
+                    if (_selectedPokemonIds
+                        .contains(pokemon['id_pokemon'])) {
+                      _selectedPokemonIds
+                          .remove(pokemon['id_pokemon']);
                     } else {
                       if (_selectedPokemonIds.length < 6) {
-                        _selectedPokemonIds.add(pokemon['id_pokemon']);
+                        _selectedPokemonIds
+                            .add(pokemon['id_pokemon']);
                       } else {
                         // Si se intenta seleccionar más de 6, muestra un mensaje
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('¡Ya has seleccionado 6 Pokémon!'),
+                            content: Text(
+                                '¡Ya has seleccionado 6 Pokémon!'),
                           ),
                         );
                       }
@@ -180,7 +200,8 @@ class _PokemonListState extends State<PokemonList> {
                         shape: BoxShape.circle,
                         color: isSelected
                             ? Colors.yellow
-                            : Colors.white, // Cambia el color del círculo
+                            : Colors
+                                .white, // Cambia el color del círculo
                       ),
                       child: Center(
                         child: ClipOval(
@@ -216,13 +237,22 @@ class _PokemonListState extends State<PokemonList> {
 
   Future<List<dynamic>> _fetchPokemonList(int userId) async {
     final response = await http.get(
-        Uri.parse('http://20.162.113.208:5000/api/pokemon/usuario/$userId'));
+        Uri.parse(
+            'http://20.162.113.208:5000/api/pokemon/usuario/$userId'));
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);
       return jsonData;
     } else {
       throw Exception('Failed to load Pokemon');
     }
+  }
+
+  // Función para navegar a la pantalla de batalla
+  void _navigateToBattleScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => MyBattle()),
+    );
   }
 }
 
