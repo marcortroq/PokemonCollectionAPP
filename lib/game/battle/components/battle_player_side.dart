@@ -4,6 +4,15 @@ import 'dart:convert';
 
 import 'package:pokemonapp/game/Pokemon_List.dart';
 
+// Define una clase para representar la información del Pokémon con solo el id_pokemon
+class PokemonInfo {
+  final int pokemonId;
+
+  PokemonInfo({required this.pokemonId});
+
+  int get id => pokemonId;
+}
+
 class BattlePlayerSide extends StatefulWidget {
   @override
   _BattlePlayerSideState createState() => _BattlePlayerSideState();
@@ -12,12 +21,18 @@ class BattlePlayerSide extends StatefulWidget {
 class _BattlePlayerSideState extends State<BattlePlayerSide> {
   String pokemonName = "";
   String pokemonImage = "";
-  bool _pokemonDataLoaded = false; // Variable para verificar si los datos del Pokémon ya se han cargado
+  bool _pokemonDataLoaded =
+      false; // Variable para verificar si los datos del Pokémon ya se han cargado
+  List<PokemonInfo> pokemonInfos =
+      []; // Lista para almacenar la información del Pokémon
+  static int currentPokemonId = 0;
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _pokemonDataLoaded ? null : _fetchPokemonData(), // Solo ejecutar la solicitud si los datos del Pokémon no se han cargado todavía
+      future: _pokemonDataLoaded
+          ? null
+          : _fetchPokemonData(), // Solo ejecutar la solicitud si los datos del Pokémon no se han cargado todavía
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
@@ -115,27 +130,25 @@ class _BattlePlayerSideState extends State<BattlePlayerSide> {
 
   Future<void> _fetchPokemonData() async {
     try {
-      // Obtener los IDs de los Pokémon seleccionados
       List<int> selectedPokemonIds = PokemonList.getSelectedPokemonIds();
-
-      // Escoger el primer Pokémon seleccionado
       int pokemonId =
           selectedPokemonIds.isNotEmpty ? selectedPokemonIds.first : 1;
-
-      // Hacer la solicitud HTTP para obtener los datos del Pokémon
       String apiUrl =
           'http://20.162.113.208:5000/api/pokemon/ataques/$pokemonId';
       final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
-        // Decodificar la respuesta JSON
         final Map<String, dynamic> data = json.decode(response.body);
         setState(() {
-          // Asignar el nombre del Pokémon
           pokemonName = data['nombre_pokemon'];
-          // Formar la URL completa de la imagen del Pokémon
           String relativeImagePath = data['foto_pokemon_back'];
           pokemonImage = 'http://20.162.113.208/$relativeImagePath';
-          _pokemonDataLoaded = true; // Marcar que los datos del Pokémon se han cargado
+          _pokemonDataLoaded = true;
+
+          // Actualiza el id_pokemon actual obtenido de la respuesta de la API
+          currentPokemonId = pokemonId;
+
+          // Almacena la información del Pokémon
+          pokemonInfos.add(PokemonInfo(pokemonId: pokemonId));
         });
       } else {
         throw Exception('Failed to load pokemon data');

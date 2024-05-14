@@ -24,7 +24,7 @@ class BattleScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
                     BattlePlayerSide(),
-                    BattleActions(),
+                    BattleActions(), // Pasa una lista vacía como placeholder
                     SizedBox(height: 20), // Añadir un espacio entre BattleActions y el borde inferior
                   ],
                 ),
