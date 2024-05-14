@@ -14,7 +14,7 @@ class PokemonList extends StatefulWidget {
 }
 
 class _PokemonListState extends State<PokemonList> {
-  List<int> _selectedPokemonIds = [];
+  static List<int> _selectedPokemonIds = []; // Variable estática para almacenar los IDs de los Pokémon seleccionados
   TextEditingController _searchController = TextEditingController();
 
   @override
@@ -249,10 +249,21 @@ class _PokemonListState extends State<PokemonList> {
 
   // Función para navegar a la pantalla de batalla
   void _navigateToBattleScreen(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => MyBattle()),
-    );
+    if (_selectedPokemonIds.length == 6) {
+      // Almacena los IDs de los 6 Pokémon seleccionados en la variable estática
+      _PokemonListState._selectedPokemonIds = List.from(_selectedPokemonIds);
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => MyBattle()),
+      );
+    } else {
+      // Si no se han seleccionado 6 Pokémon, muestra un mensaje
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Selecciona 6 Pokémon para continuar.'),
+        ),
+      );
+    }
   }
 }
 

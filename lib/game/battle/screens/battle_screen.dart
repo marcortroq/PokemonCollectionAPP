@@ -7,27 +7,30 @@ class BattleScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage("assets/Game/background-grass.png"),
-              fit: BoxFit.fitHeight, // Ajusta la imagen para adaptarse a la altura de la pantalla
-            ),
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("assets/Game/background-grass.png"),
+            fit: BoxFit.fitHeight, // Ajusta la imagen para adaptarse a la altura de la pantalla
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              BattleEnemySide(),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  BattlePlayerSide(),
-                  BattleActions(),
-                ],
+        ),
+        child: Column(
+          children: <Widget>[
+            BattleEnemySide(),
+            Expanded(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    BattlePlayerSide(),
+                    BattleActions(),
+                    SizedBox(height: 20), // Añadir un espacio entre BattleActions y el borde inferior
+                  ],
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -1,10 +1,12 @@
 import 'dart:async';
-
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:pokemonapp/game/Pokemon_List.dart';
+import 'package:pokemonapp/game/battle/components/battle_enemy_side.dart';
 import 'package:pokemonapp/game/button.dart';
 import 'package:pokemonapp/game/characters/Brock.dart';
 import 'package:pokemonapp/game/characters/giovanni.dart';
@@ -1040,38 +1042,63 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void pressedA() {
-    // Verificar la ubicación del jugador y ejecutar la acción correspondiente
-    if (currentLocation == 'littleroot') {
-      // Coordenadas de los personajes interactuables en Littleroot
-      final Map<String, List<double>> interactableCharacters = {
-        'giovanni': [0.0, 1.2999999999999998],
-        // Agrega más personajes y sus coordenadas aquí si es necesario
-      };
+  void pressedA() async {
+  // Verificar la ubicación del jugador y ejecutar la acción correspondiente
+  if (currentLocation == 'littleroot') {
+    // Coordenadas de los personajes interactuables en Littleroot
+    final Map<String, List<double>> interactableCharacters = {
+      'giovanni': [0.0, 1.2999999999999998],
+      // Agrega más personajes y sus coordenadas aquí si es necesario
+    };
 
-      // Verificar si el jugador está cerca de algún personaje interactuable
-      interactableCharacters.forEach((character, coordinates) {
-        double characterX = coordinates[0];
-        double characterY = coordinates[1];
+    // Verificar si el jugador está cerca de algún personaje interactuable
+    interactableCharacters.forEach((character, coordinates) async {
+      double characterX = coordinates[0];
+      double characterY = coordinates[1];
 
-        // Calcular la distancia entre el jugador y el personaje
-        double distance =
-            ((mapx - characterX).abs() + (mapy - characterY).abs()) / 2;
+      // Calcular la distancia entre el jugador y el personaje
+      double distance =
+          ((mapx - characterX).abs() + (mapy - characterY).abs()) / 2;
 
-        if (distance <= 0.1) {
-          // El jugador está cerca del personaje, almacenar el mensaje
-          setState(() {
-            interactionMessage = '¡Empieza la batalla contra $character!';
-          });
-          // Navegar a PokemonList
+      if (distance <= 0.1) {
+        // El jugador está cerca del personaje, almacenar el mensaje
+        setState(() {
+          interactionMessage = '¡Empieza la batalla contra $character!';
+        });
+
+        // Realizar la llamada a la API para obtener los líderes de gimnasio
+        try {
+          final response = await http.get(Uri.parse('http://20.162.113.208:5000/api/lideres_gimnasio'));
+          if (response.statusCode == 200) {
+            // Decodificar la respuesta JSON
+            final List<dynamic> data = json.decode(response.body);
+            // Buscar el líder de gimnasio con el mismo nombre que el personaje
+            for (var lider in data) {
+              if (lider['nombre_lider'].toLowerCase() == character.toLowerCase()) {
+                // Almacenar el ID del líder de gimnasio en una variable estática
+                // para acceder más tarde
+                YourClass.idLiderGimnasio = lider['id_lider'];
+                break; // Salir del bucle una vez encontrado el líder
+              }
+            }
+          } else {
+            throw Exception('Failed to load data');
+          }
+        } catch (e) {
+          print('Error: $e');
+        }
+
+        // Navegar a PokemonList
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => PokemonList()),
         );
-        }
-      });
-    } 
-  }
+      }
+    });
+  } 
+}
+
+
 
   // Definir una variable en el estado para almacenar el mensaje
   String interactionMessage = '';
@@ -1424,4 +1451,5 @@ class _HomePageState extends State<HomePage> {
   double cleanNum(double num) {
     return double.parse(num.toStringAsFixed(2));
   }
+  
 }
