@@ -559,6 +559,8 @@ Future<int> obtenerNumeroMonedas(BuildContext context) async {
       return 0; // o lanzar una excepción, dependiendo del caso
     }
   }
+
+  
 void _showSnackBar(String message, Color backgroundColor, Color textColor) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(

@@ -691,6 +691,7 @@ void verFecha(BuildContext context) async {
                     ),
                   );
                 } else {
+                  _updateTimerDisplay();
                   navigateToScreen(context, screen);
                 }
               },
@@ -732,6 +733,8 @@ Future<bool> haPasado24Horas(BuildContext context) async {
     return false;
   }
 }
+
+
   Widget _buildButton1(
   String text,
   String imagePath,
@@ -825,6 +828,7 @@ Future<bool> haPasado24Horas(BuildContext context) async {
                     ),
                   );
                 } else {
+                  
                   navigateToScreen(context, screen);
                 }
               } else {
@@ -897,68 +901,66 @@ Future<bool> haPasado24Horas(BuildContext context) async {
     );
   }
   Future<void> _initializeTimer() async {
-    final targetDate = await _getTargetDateFromDatabase();
-    _startTimer(targetDate);
-  }
-  Future<DateTime> _getTargetDateFromDatabase() async {
-    try {
-      final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
-      final usuario = usuarioProvider.usuario;
-      int idUsuario = usuario?.idUsuario ?? 0;
-      // Realizar la solicitud HTTP al servidor para obtener la fecha
-      Uri url = Uri.parse('http://20.162.113.208:5000/api/usuario/fecha_apertura/$idUsuario');
-      final response = await http.get(
-        url,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      );
-      if (response.statusCode == 200) {
-    final jsonResponse = json.decode(response.body);
-    final fecha = DateTime.parse(jsonResponse['fecha_apertura']);
-    // Sumar dos horas
-    final nuevaFecha = fecha.add(Duration(hours: 2));
-        return nuevaFecha;
-      } else {
-        print('Error al actualizar la fecha de apertura: ${response.statusCode}');
-        // En caso de error, puedes devolver una fecha por defecto o lanzar una excepción
-        return DateTime.now();
-      }
-    } catch (error) {
-      print('Error en la solicitud HTTP: $error');
+  final targetDate = await _getTargetDateFromDatabase();
+  _startCountdown(targetDate);
+}
+
+Future<DateTime> _getTargetDateFromDatabase() async {
+  try {
+    final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
+    final usuario = usuarioProvider.usuario;
+    int idUsuario = usuario?.idUsuario ?? 0;
+    
+    // Realizar la solicitud HTTP al servidor para obtener la fecha
+    Uri url = Uri.parse('http://20.162.113.208:5000/api/usuario/fecha_apertura/$idUsuario');
+    final response = await http.get(
+      url,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      final fecha = DateTime.parse(jsonResponse['fecha_apertura']);
+      // Sumar dos horas
+      final nuevaFecha = fecha.add(Duration(hours: 2));
+      return nuevaFecha;
+    } else {
+      print('Error al actualizar la fecha de apertura: ${response.statusCode}');
       // En caso de error, puedes devolver una fecha por defecto o lanzar una excepción
       return DateTime.now();
     }
+  } catch (error) {
+    print('Error en la solicitud HTTP: $error');
+    // En caso de error, puedes devolver una fecha por defecto o lanzar una excepción
+    return DateTime.now();
   }
-  void _startTimer(DateTime targetDate) {
-    _targetDate = targetDate.add(Duration(days: 1)); // Suma 24 horas a la fecha objetivo
-    final difference = _targetDate.difference(DateTime.now());
-    if (difference.inHours <= 24) {
-      _timeUntilTarget = difference;
-      _secondsRemaining = _timeUntilTarget.inSeconds;
-      _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-        if (mounted) {
-          setState(() {
-            if (_timeUntilTarget.inSeconds > 0) {
-              _timeUntilTarget -= Duration(seconds: 1);
-              _secondsRemaining = _timeUntilTarget.inSeconds;
-              if (_secondsRemaining <= 0) {
-                _timer.cancel();
-              }
-            } else {
-              _timer.cancel();
-            }
-          });
-        }
-      });
-    } else {
-      // Si han pasado más de 24 horas desde la fecha de la base de datos, establecer el tiempo restante en cero
+}
+
+void _startCountdown(DateTime targetDate) {
+  _targetDate = targetDate.add(Duration(days: 1)); // Suma 24 horas a la fecha objetivo
+  _updateTimerDisplay();
+}
+
+void _updateTimerDisplay() {
+  final difference = _targetDate.difference(DateTime.now());
+  if (difference.inSeconds > 0) {
+    _secondsRemaining = difference.inSeconds;
+    Future.delayed(Duration(seconds: 10), () {
       setState(() {
-        _timeUntilTarget = Duration.zero;
-        _secondsRemaining = 0;
+        _updateTimerDisplay();
       });
-    }
-    String _formatDuration(Duration duration) {
+    });
+  } else {
+    setState(() {
+      _secondsRemaining = 0;
+    });
+  }
+}
+
+
+String _formatDuration(Duration duration) {
   if (duration.inSeconds <= 0) {
     return '00:00:00';
   } else {
@@ -968,10 +970,9 @@ Future<bool> haPasado24Horas(BuildContext context) async {
     return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
   }
 }
-int getSecondsRemaining() {
-    return _secondsRemaining;
-  }
-  }
+
+
+
 }
 Future<List<dynamic>> fetchUserCards(int userId) async {
   print("PRUEBA PARA SABER SI HACE LA LLAMADA");
