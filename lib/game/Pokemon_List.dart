@@ -11,11 +11,19 @@ import 'package:pokemonapp/game/battle/screens/battle_screen.dart';
 class PokemonList extends StatefulWidget {
   @override
   _PokemonListState createState() => _PokemonListState();
+
+  static List<int> getSelectedPokemonIds() {
+    return _PokemonListState.getSelectedPokemonIds();
+  }
 }
 
 class _PokemonListState extends State<PokemonList> {
-  static List<int> _selectedPokemonIds = []; // Variable estática para almacenar los IDs de los Pokémon seleccionados
+  static List<int> _selectedPokemonIds = [];
   TextEditingController _searchController = TextEditingController();
+
+  static List<int> getSelectedPokemonIds() {
+    return _selectedPokemonIds;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,8 +58,7 @@ class _PokemonListState extends State<PokemonList> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors
-                            .white, // Cambia el color del texto según tu preferencia
+                        color: Colors.white,
                       ),
                     ),
                     SizedBox(height: 5),
@@ -60,8 +67,7 @@ class _PokemonListState extends State<PokemonList> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors
-                            .white, // Cambia el color del texto según tu preferencia
+                        color: Colors.white,
                       ),
                     ),
                     SizedBox(height: 10),
@@ -71,31 +77,24 @@ class _PokemonListState extends State<PokemonList> {
             ),
           ),
           Container(
-            color: Colors.black, // Color de fondo negro
+            color: Colors.black,
             padding: EdgeInsets.all(8.0),
             child: SizedBox(
-              height: 30, // Altura deseada del contenedor
+              height: 30,
               child: Container(
                 child: TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
-                    //hintText: 'Buscar por nombre',
-                    prefixIcon: Icon(Icons.search,
-                        color: Colors
-                            .white), // Cambia el color del ícono de búsqueda según tu preferencia
+                    prefixIcon: Icon(Icons.search, color: Colors.white),
                     filled: true,
-                    fillColor: Colors.white.withOpacity(
-                        0.3), // Cambia el color del fondo del TextField según tu preferencia
+                    fillColor: Colors.white.withOpacity(0.3),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide:
-                          BorderSide.none, // Elimina el borde del TextField
+                      borderSide: BorderSide.none,
                     ),
                   ),
                   onChanged: (value) {
-                    // Implementa la lógica de búsqueda aquí
-                    setState(
-                        () {}); // Para actualizar la lista al cambiar el texto de búsqueda
+                    setState(() {});
                   },
                 ),
               ),
@@ -108,8 +107,8 @@ class _PokemonListState extends State<PokemonList> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color.fromRGBO(179, 179, 179, 1), // Color gris
-                    Colors.white, // Color blanco
+                    Color.fromRGBO(179, 179, 179, 1),
+                    Colors.white,
                   ],
                 ),
               ),
@@ -122,7 +121,6 @@ class _PokemonListState extends State<PokemonList> {
               padding: EdgeInsets.all(16.0),
               child: ElevatedButton(
                 onPressed: () {
-                  // Llama a la función que abre la pantalla de batalla
                   _navigateToBattleScreen(context);
                 },
                 child: Text('→'),
@@ -144,7 +142,6 @@ class _PokemonListState extends State<PokemonList> {
         } else {
           final List<dynamic> pokemonList = snapshot.data ?? [];
 
-          // Filtrar la lista de Pokémon basado en el texto de búsqueda
           final filteredPokemonList = pokemonList.where((pokemon) {
             final pokemonName =
                 pokemon['nombre_pokemon'].toString().toLowerCase();
@@ -169,8 +166,6 @@ class _PokemonListState extends State<PokemonList> {
               return GestureDetector(
                 onTap: () {
                   setState(() {
-                    print(
-                        'Pokemon seleccionado: ${pokemon['nombre_pokemon']}');
                     if (_selectedPokemonIds
                         .contains(pokemon['id_pokemon'])) {
                       _selectedPokemonIds
@@ -180,7 +175,6 @@ class _PokemonListState extends State<PokemonList> {
                         _selectedPokemonIds
                             .add(pokemon['id_pokemon']);
                       } else {
-                        // Si se intenta seleccionar más de 6, muestra un mensaje
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
@@ -194,21 +188,18 @@ class _PokemonListState extends State<PokemonList> {
                 child: Column(
                   children: [
                     Container(
-                      width: 72, // Tamaño del contenedor
-                      height: 72, // Tamaño del contenedor
+                      width: 72,
+                      height: 72,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: isSelected
-                            ? Colors.yellow
-                            : Colors
-                                .white, // Cambia el color del círculo
+                        color: isSelected ? Colors.yellow : Colors.white,
                       ),
                       child: Center(
                         child: ClipOval(
                           child: Image.network(
                             imageUrl,
-                            width: 60, // Tamaño de la imagen
-                            height: 60, // Tamaño de la imagen
+                            width: 60,
+                            height: 60,
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -217,14 +208,13 @@ class _PokemonListState extends State<PokemonList> {
                     Text(
                       pokemon['nombre_pokemon'],
                       style: TextStyle(
-                        fontSize: 14, // Ajusta el tamaño del nombre aquí
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        fontFamily:
-                            'Pokemon-Solid', // Usa la fuente personalizada
+                        fontFamily: 'Pokemon-Solid',
                         color: isSelected ? Colors.green : Colors.black,
                       ),
                     ),
-                    SizedBox(height: 20), // Espacio entre los Pokémon
+                    SizedBox(height: 20),
                   ],
                 ),
               );
@@ -247,17 +237,14 @@ class _PokemonListState extends State<PokemonList> {
     }
   }
 
-  // Función para navegar a la pantalla de batalla
   void _navigateToBattleScreen(BuildContext context) {
     if (_selectedPokemonIds.length == 6) {
-      // Almacena los IDs de los 6 Pokémon seleccionados en la variable estática
-      _PokemonListState._selectedPokemonIds = List.from(_selectedPokemonIds);
+      _selectedPokemonIds = List.from(_selectedPokemonIds);
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => MyBattle()),
       );
     } else {
-      // Si no se han seleccionado 6 Pokémon, muestra un mensaje
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Selecciona 6 Pokémon para continuar.'),
