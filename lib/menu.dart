@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -9,12 +11,15 @@ import 'package:pokemonapp/nav_bar.dart';
 import 'package:pokemonapp/pokedex.dart';
 import 'dart:math' as math;
 import 'package:http/http.dart' as http;
+import 'package:pokemonapp/usuario.dart';
 import 'main.dart';
 import 'packs.dart';
 import 'usuario_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'dart:convert';
+import 'package:intl/intl.dart';
+
 
 class RPSCustomPainter extends CustomPainter {
   @override
@@ -107,9 +112,12 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
   double _startingPos = 0.0;
   final countdownTimer = CountdownTimer();
 
+
   @override
   void initState() {
     super.initState();
+
+
 
     _animationController = AnimationController(
       vsync: this,
@@ -146,11 +154,18 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
     final usuario = usuarioProvider.usuario;
     int Usuarioxp = usuario?.xp ?? 0;
     int idusuario = usuario?.idUsuario ?? 0;
+    DateTime _fechaApertura = usuario?.fecha_apertura ?? DateTime.now();
+    print("la fecha de apertura del ultimo sobre fue:" + _fechaApertura.toString());
+    
+
     double XpLevel = 100.0; // Inicialmente, el valor de XpLevel es 100.0
     double XpPer;
     int level = 1;
     int userId = 0;
     int _currentIndex = 0;
+    
+   
+
 
     while (Usuarioxp >= XpLevel) {
       // Mientras el usuario alcance el nivel actual, actualizamos XpLevel multiplicándolo por 2.25
@@ -579,6 +594,9 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
       );
   }
 
+
+
+
   // Esta función genérica acepta cualquier tipo de pantalla como parámetro y navega a ella.
   void navigateToScreen<T>(BuildContext context, Widget screen) {
     Navigator.push(
@@ -678,6 +696,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                   );
                 } else {
                   navigateToScreen(context, screen);
+            
                 }
               },
             ),
@@ -788,7 +807,11 @@ Future<List<Map<String, dynamic>>> fetchMedallasByUserId(int userId) async {
     // Si hay un error, lanza una excepción
     throw Exception('Failed to load data');
   }
+  
 }
+
+
+
 
 void main() {
   runApp(MaterialApp(
