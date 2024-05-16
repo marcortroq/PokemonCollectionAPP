@@ -7,6 +7,9 @@ class YourClass {
 }
 
 class BattleEnemySide extends StatelessWidget {
+  int pokemonDefense = 0; // Variable para almacenar la defensa del Pokémon
+  int currentPs = 0; // Variable para almacenar la vida actual del Pokémon
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -20,6 +23,12 @@ class BattleEnemySide extends StatelessWidget {
           final data = snapshot.data;
           if (data != null && data['pokemons'] != null && data['pokemons'].isNotEmpty) {
             final pokemon = data['pokemons'][0];
+            currentPs = pokemon['ps'] as int; // Puntos de vida actuales
+            final maxPs = pokemon['ps'] as int; // Puntos de vida máximos
+            
+            // Almacenar la defensa del Pokémon
+            pokemonDefense = pokemon['defensa'] as int;
+
             return Padding(
               padding: const EdgeInsets.only(top: 30),
               child: Container(
@@ -79,8 +88,28 @@ class BattleEnemySide extends StatelessWidget {
                           height: 10,
                           margin: EdgeInsets.only(top: 46, left: 163),
                           decoration: BoxDecoration(
-                            color: Color(0xff70f8a8),
+                            color: Colors.grey[300], // Color base
                             borderRadius: BorderRadius.all(Radius.circular(8)),
+                          ),
+                          child: Stack(
+                            children: [
+                              Container(
+                                width: 134 * (currentPs / maxPs), // Representa la cantidad actual de puntos de vida
+                                height: 10,
+                                decoration: BoxDecoration(
+                                  color: Colors.green, // Color de puntos de vida restantes
+                                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                                ),
+                              ),
+                              Container(
+                                width: 134 * ((maxPs - currentPs) / maxPs), // Representa la cantidad perdida de puntos de vida
+                                height: 10,
+                                decoration: BoxDecoration(
+                                  color: Colors.red, // Color de puntos de vida perdidos
+                                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
