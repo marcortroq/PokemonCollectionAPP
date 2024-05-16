@@ -1,8 +1,6 @@
-import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:intl/intl.dart';
 import 'package:pokemonapp/bar.dart';
 import 'package:pokemonapp/countdown_timer.dart';
 import 'package:pokemonapp/incubadora.dart';
@@ -11,15 +9,12 @@ import 'package:pokemonapp/nav_bar.dart';
 import 'package:pokemonapp/pokedex.dart';
 import 'dart:math' as math;
 import 'package:http/http.dart' as http;
-import 'package:pokemonapp/usuario.dart';
 import 'main.dart';
 import 'packs.dart';
 import 'usuario_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'dart:convert';
-import 'package:pokemonapp/game/main.dart';
-import 'package:logger/logger.dart';
 
 class RPSCustomPainter extends CustomPainter {
   @override
@@ -110,14 +105,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
   late Size _screen;
   double _maxSlide = 200.0;
   double _startingPos = 0.0;
-  final Logger logger = Logger();
-   late Timer _timer;
-  late DateTime _targetDate;
-  late Duration _timeUntilTarget;
-  late int _secondsRemaining = 0;
-  int getSecondsRemaining() {
-    return _secondsRemaining;
-  }
+  final countdownTimer = CountdownTimer();
 
   @override
   void initState() {
@@ -134,21 +122,21 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
       setState(() {
         _extraHeight = (_screen.height - _screen.width) * _animator.value;
       });
-    });  
-    
+    });
   }
+
   @override
   void dispose() {
     _animationController.dispose();
     super.dispose();
   }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _screen = MediaQuery.of(context).size; 
-    _initializeTimer();// Inicialización de _screen
+    _screen = MediaQuery.of(context).size; // Inicialización de _screen
   }
-  
+
   @override
   Widget build(BuildContext context) {
     bool activate = true;
@@ -163,437 +151,434 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
     int level = 1;
     int userId = 0;
     int _currentIndex = 0;
+
     while (Usuarioxp >= XpLevel) {
       // Mientras el usuario alcance el nivel actual, actualizamos XpLevel multiplicándolo por 2.25
       XpLevel *= 2.25;
       level += 1;
     }
+
 // Calculamos el progreso del usuario como un porcentaje
     XpPer = Usuarioxp / XpLevel;
+
     // Calcula el tamaño de la imagen del fondo
     double backgroundWidth = screenSize.width * 1.2;
     double backgroundHeight = screenSize.height * 1.2;
+
     // Calcula el tamaño y la posición de otros elementos
     double imageWidth = screenSize.width * 0.25;
     double imageHeight = screenSize.width * 0.25;
     double buttonWidth = screenSize.width * 0.35;
     double buttonHeight = screenSize.height * 0.1;
     double iconSize = screenSize.width * 0.1;
-    final countDownTimer = _CountdownTo1415State();
+
     return WillPopScope(
-      onWillPop: () async {
-        return false;
-      },
-      child: Scaffold(
-        // Tu scaffold actual aquí
-        drawer: NavBar(
-          // Pasa una función que actualice _selectedProfileImage a NavBar
-          onProfileImageSelected: (String imagePath) {
-            setState(() {
-              _selectedProfileImage = imagePath;
-            });
-          },
-          xpPer: XpPer,
-          level: level,
-          idusuario: idusuario,
-        ),
-        body: Builder(builder: (BuildContext context) {
-          return Stack(
-            children: [
-              Positioned.fill(
-                child: CustomPaint(
-                  painter: RPSCustomPainter(),
-                ),
-              ),
-              Positioned(
-                left: -backgroundWidth * 0.05,
-                bottom: screenSize.height * 0.06,
-                child: Image.asset(
-                  _selectedProfileImage.isNotEmpty
-                      ? _selectedProfileImage
-                      : 'assets/grow.png',
-                  width: backgroundWidth,
-                  height: backgroundHeight,
-                  fit: BoxFit.contain,
-                ),
-              ),
-              Positioned(
-                right: screenSize.width * 0.0,
-                bottom: screenSize.height * 0.15,
-                child: CustomPaint(
-                  size: Size(screenSize.width, screenSize.width * 1.5),
-                  painter: RPSCustomPainter2(),
-                ),
-              ),
-              Positioned(
-                right: screenSize.width * 0.0,
-                bottom: screenSize.height * 0.44,
-                child: Transform.rotate(
-                  angle: 65 * math.pi / 180,
-                  child: Container(
-                    width: screenSize.width * 0.065,
-                    height: screenSize.height * 0.316,
-                    color: Color.fromRGBO(29, 30, 29, 1),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: screenSize.width * 0.0,
-                bottom: screenSize.height * 0.44,
-                child: Transform.rotate(
-                  angle: -65 * math.pi / 180,
-                  child: Container(
-                    width: screenSize.width * 0.065,
-                    height: screenSize.height * 0.316,
-                    color: Color.fromRGBO(29, 30, 29, 1),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 0,
-                right: 0,
-                top: 20,
-                child: CustomNavBar(
-                  currentIndex: _currentIndex,
-                  onTap: (index) {
-                    setState(() {
-                      _currentIndex = index;
-                    });
-                  },
-                  coins: 0,
-                ),
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+        onWillPop: () async {
+          return false;
+        },
+        child: Scaffold(
+            // Tu scaffold actual aquí
+            drawer: NavBar(
+              // Pasa una función que actualice _selectedProfileImage a NavBar
+              onProfileImageSelected: (String imagePath) {
+                setState(() {
+                  _selectedProfileImage = imagePath;
+                });
+              },
+              xpPer: XpPer,
+              level: level,
+              idusuario: idusuario,
+            ),
+            body: Builder(builder: (BuildContext context) {
+              return Stack(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 510),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Row(
+                  Positioned.fill(
+                    child: CustomPaint(
+                      painter: RPSCustomPainter(),
+                    ),
+                  ),
+                  Positioned(
+                    left: -backgroundWidth * 0.05,
+                    bottom: screenSize.height * 0.06,
+                    child: Image.asset(
+                      _selectedProfileImage.isNotEmpty
+                          ? _selectedProfileImage
+                          : 'assets/grow.png',
+                      width: backgroundWidth,
+                      height: backgroundHeight,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  Positioned(
+                    right: screenSize.width * 0.0,
+                    bottom: screenSize.height * 0.15,
+                    child: CustomPaint(
+                      size: Size(screenSize.width, screenSize.width * 1.5),
+                      painter: RPSCustomPainter2(),
+                    ),
+                  ),
+                  Positioned(
+                    right: screenSize.width * 0.0,
+                    bottom: screenSize.height * 0.44,
+                    child: Transform.rotate(
+                      angle: 65 * math.pi / 180,
+                      child: Container(
+                        width: screenSize.width * 0.065,
+                        height: screenSize.height * 0.316,
+                        color: Color.fromRGBO(29, 30, 29, 1),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: screenSize.width * 0.0,
+                    bottom: screenSize.height * 0.44,
+                    child: Transform.rotate(
+                      angle: -65 * math.pi / 180,
+                      child: Container(
+                        width: screenSize.width * 0.065,
+                        height: screenSize.height * 0.316,
+                        color: Color.fromRGBO(29, 30, 29, 1),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    top: 20,
+                    child: CustomNavBar(
+                      currentIndex: _currentIndex,
+                      onTap: (index) {
+                        setState(() {
+                          _currentIndex = index;
+                        });
+                      },
+                      coins: 0,
+                    ),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 510),
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            Padding(
-                                padding: EdgeInsets.only(
-                                    top: screenSize.height * 0.05),
-                                child: _buildButton("PACKS", "assets/pack.png",
-                                    Packs(), activate = true, context,
-                                    topLeftRadius: 0, bottomRightRadius: 0)),
-                           Padding(
-                              padding: EdgeInsets.only(bottom: screenSize.height * 0.07),
-                              child: Stack(
-                                children: [
-                                  _buildButton1(
-                                    getSecondsRemaining() <=0
-                                        ? "COLLECT"
-                                        : "READY IN",
-                                    getSecondsRemaining()  <= 0
-                                        ? "assets/incubadora.png"
-                                        : "assets/incubadoraOFF.png",
-                                    Incubadora(),
-                                    getSecondsRemaining()  <= 0
-                                        ? activate = true
-                                        : activate = true,
-                                        usuario!,
-                                    context,
-                                  ), // INCUBADORA
-                                  _CountdownTo1415(), // Contador de cuenta atrás de 12 horas
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  top: screenSize.height * 0.05),
-                              child: Stack(
-                                children: [
-                                  // Botón POKEDEX
-                                  Positioned(
-                                    // Ajusta la posición horizontal del botón
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Padding(
+                                    padding: EdgeInsets.only(
+                                        top: screenSize.height * 0.05),
                                     child: _buildButton(
-                                      "POKEDEX",
-                                      "assets/pokeball.png",
-                                      Pokedex(),
-                                      activate = true,
-                                      context,
-                                      topRightRadius: 0,
-                                      bottomLeftRadius: 0,
-                                    ),
+                                        "PACKS",
+                                        "assets/pack.png",
+                                        Packs(),
+                                        activate = true,
+                                        context,
+                                        topLeftRadius: 0,
+                                        bottomRightRadius: 0)),
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                      bottom: screenSize.height * 0.07),
+                                  child: Stack(
+                                    children: [
+                                      _buildButton(
+                                        countdownTimer.getSecondsRemaining() !=
+                                                0
+                                            ? "READY IN"
+                                            : "COLLECT",
+                                        countdownTimer.getSecondsRemaining() !=
+                                                0
+                                            ? "assets/incubadoraOFF.png"
+                                            : "assets/incubadora.png",
+                                        Incubadora(),
+                                        countdownTimer.getSecondsRemaining() !=
+                                                0
+                                            ? activate = false
+                                            : activate = true,
+                                        context,
+                                      ), // INCUBADORA
+                                      countdownTimer, // Contador de cuenta atrás de 12 horas
+                                    ],
                                   ),
-                                  Positioned(
-                                    // Posiciona la imagen dentro del Stack
-                                    top:
-                                        19, // Ajusta la posición vertical de la imagen según sea necesario
-                                    left:
-                                        55, // Ajusta la posición horizontal de la imagen según sea necesario
-                                    child: Image.asset(
-                                      "assets/CollectionCircle.png",
-                                      width: 40,
-                                      height: 40,
-                                    ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                      top: screenSize.height * 0.05),
+                                  child: Stack(
+                                    children: [
+                                      // Botón POKEDEX
+                                      Positioned(
+                                        // Ajusta la posición horizontal del botón
+                                        child: _buildButton(
+                                          "POKEDEX",
+                                          "assets/pokeball.png",
+                                          Pokedex(),
+                                          activate = true,
+                                          context,
+                                          topRightRadius: 0,
+                                          bottomLeftRadius: 0,
+                                        ),
+                                      ),
+                                      Positioned(
+                                        // Posiciona la imagen dentro del Stack
+                                        top:
+                                            19, // Ajusta la posición vertical de la imagen según sea necesario
+                                        left:
+                                            55, // Ajusta la posición horizontal de la imagen según sea necesario
+                                        child: Image.asset(
+                                          "assets/CollectionCircle.png",
+                                          width: 40,
+                                          height: 40,
+                                        ),
+                                      ),
+
+                                      Positioned(
+                                        // Posiciona el texto encima de la imagen
+                                        top:
+                                            26, // Ajusta la posición vertical del texto según sea necesario
+                                        left:
+                                            66, // Ajusta la posición horizontal del texto según sea necesario
+                                        child: FutureBuilder<String>(
+                                          future: countUserCards(idusuario),
+                                          builder: (BuildContext context,
+                                              AsyncSnapshot<String> snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                              // While waiting for the future to complete, you can return a placeholder or a loading indicator
+                                              return CircularProgressIndicator(); // Placeholder widget
+                                            } else {
+                                              // When the future completes, you can use its result
+                                              if (snapshot.hasError) {
+                                                return Text(
+                                                    'Error: ${snapshot.error}');
+                                              } else {
+                                                return Text(
+                                                  snapshot
+                                                      .data!, // Use the data from the future
+                                                  style: TextStyle(
+                                                    fontSize:
+                                                        14, // Ajusta el tamaño de la fuente según tus necesidades
+                                                    fontWeight: FontWeight
+                                                        .bold, // Ajusta el peso de la fuente según tus necesidades
+                                                    color: Colors.black,
+                                                    fontFamily:
+                                                        'Pokemon-Solid', // Ajusta el color del texto según tus necesidades
+                                                  ),
+                                                );
+                                              }
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  Positioned(
-                                    // Posiciona el texto encima de la imagen
-                                    top:
-                                        26, // Ajusta la posición vertical del texto según sea necesario
-                                    left:
-                                        66, // Ajusta la posición horizontal del texto según sea necesario
-                                    child: FutureBuilder<String>(
-                                      future: countUserCards(idusuario),
-                                      builder: (BuildContext context,
-                                          AsyncSnapshot<String> snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          // While waiting for the future to complete, you can return a placeholder or a loading indicator
-                                          return CircularProgressIndicator(); // Placeholder widget
-                                        } else {
-                                          // When the future completes, you can use its result
-                                          if (snapshot.hasError) {
-                                            return Text(
-                                                'Error: ${snapshot.error}');
-                                          } else {
-                                            return Text(
-                                              snapshot
-                                                  .data!, // Use the data from the future
-                                              style: TextStyle(
-                                                fontSize:
-                                                    14, // Ajusta el tamaño de la fuente según tus necesidades
-                                                fontWeight: FontWeight
-                                                    .bold, // Ajusta el peso de la fuente según tus necesidades
-                                                color: Colors.black,
-                                                fontFamily:
-                                                    'Pokemon-Solid', // Ajusta el color del texto según tus necesidades
-                                              ),
-                                            );
-                                          }
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ],
+                      ),
+                    ],
+                  ),
+                  Positioned(
+                    left: MediaQuery.of(context).size.width * 0.42,
+                    top: MediaQuery.of(context).size.height * 0.9,
+                    child: GestureDetector(
+                      onTap: () {
+                        // Navegar a la otra pestaña al hacer clic en la imagen
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => MainScreen()),
+                        );
+                      },
+                      child: Image.asset(
+                        'assets/OCR.png', // Reemplaza 'ruta/de/la/imagen.png' con la ruta de tu imagen
+                      ),
                     ),
                   ),
-                ],
-              ),
-              Positioned(
-                left: MediaQuery.of(context).size.width * 0.42,
-                top: MediaQuery.of(context).size.height * 0.9,
-                child: GestureDetector(
-                  onTap: () {
-                    // Navegar a la otra pestaña al hacer clic en la imagen
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => MainScreen()),
-                    );
-                  },
-                  child: Image.asset(
-                    'assets/OCR.png', // Reemplaza 'ruta/de/la/imagen.png' con la ruta de tu imagen
+
+                  // En tu widget donde quieres mostrar la medalla
+                  Positioned(
+                    left: (MediaQuery.of(context).size.width * 0.4) / 2,
+                    top: (MediaQuery.of(context).size.height * 0.28) / 2,
+                    child: FutureBuilder<List<Map<String, dynamic>>>(
+                      future: fetchMedallasByUserId(1),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          // Si está esperando la respuesta de la API, muestra un indicador de carga
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          // Si hay un error al obtener la medalla, muestra un mensaje de error
+                          return Text('Error: ${snapshot.error}');
+                        } else {
+                          // Si la respuesta de la API es exitosa, verifica si el usuario tiene la medalla de roca
+                          // Itera sobre la lista de mapas para encontrar las medallas
+                          final List<Map<String, dynamic>> medallas =
+                              snapshot.data!;
+                          bool tieneMedallaRoca = medallas.any((medalla) =>
+                              medalla['medalla'] == 'Medalla Roca');
+                          bool tieneMedallaCascada = medallas.any((medalla) =>
+                              medalla['medalla'] == 'Medalla Cascada');
+                          bool tieneMedallaTrueno = medallas.any((medalla) =>
+                              medalla['medalla'] == 'Medalla Trueno');
+                          bool tieneMedallaArcoiris = medallas.any((medalla) =>
+                              medalla['medalla'] == 'Medalla Arcoiris');
+                          bool tieneMedallaAlma = medallas.any((medalla) =>
+                              medalla['medalla'] == 'Medalla Alma');
+                          bool tieneMedallaPantano = medallas.any((medalla) =>
+                              medalla['medalla'] == 'Medalla Pantano');
+                          bool tieneMedallaTierra = medallas.any((medalla) =>
+                              medalla['medalla'] == 'Medalla Tierra');
+                          bool tieneMedallaVolcan = medallas.any((medalla) =>
+                              medalla['medalla'] == 'Medalla Volcan');
+
+                          // Repite este proceso para las demás medalla
+
+                          return Stack(
+                            children: [
+                              Image.asset(
+                                'assets/hexMedallas.png',
+                                width: MediaQuery.of(context).size.width * 0.6,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.6,
+                                fit: BoxFit.contain,
+                              ),
+                              Positioned(
+                                left: MediaQuery.of(context).size.width * 0.17,
+                                top: MediaQuery.of(context).size.height * 0.21,
+                                child: Image.asset(
+                                  tieneMedallaRoca
+                                      ? 'assets/MedallaRoca.png'
+                                      : 'assets/medallaRocaOut.png',
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.09,
+                                  height:
+                                      MediaQuery.of(context).size.width * 0.09,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                              Positioned(
+                                left: MediaQuery.of(context).size.width * 0.17,
+                                top: MediaQuery.of(context).size.height * 0.35,
+                                child: Image.asset(
+                                  tieneMedallaAlma
+                                      ? 'assets/MedallaVolcan.png'
+                                      : 'assets/medallaVolcanOut.png',
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.09,
+                                  height:
+                                      MediaQuery.of(context).size.width * 0.09,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                              Positioned(
+                                left: MediaQuery.of(context).size.width * 0.245,
+                                top: MediaQuery.of(context).size.height * 0.25,
+                                child: Image.asset(
+                                  tieneMedallaVolcan
+                                      ? 'assets/MedallaAlma.png'
+                                      : 'assets/medallaAlmaout.png',
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.09,
+                                  height:
+                                      MediaQuery.of(context).size.width * 0.09,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                              Positioned(
+                                left: MediaQuery.of(context).size.width * 0.4,
+                                top: MediaQuery.of(context).size.height * 0.285,
+                                child: Image.asset(
+                                  tieneMedallaPantano
+                                      ? 'assets/MedallaPantano.png'
+                                      : 'assets/medallaPantanoOut.png',
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.09,
+                                  height:
+                                      MediaQuery.of(context).size.width * 0.09,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                              Positioned(
+                                left: MediaQuery.of(context).size.width * 0.32,
+                                top: MediaQuery.of(context).size.height * 0.21,
+                                child: Image.asset(
+                                  tieneMedallaCascada
+                                      ? 'assets/MedallaCascada.png'
+                                      : 'assets/medallaCascadaOut.png',
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.09,
+                                  height:
+                                      MediaQuery.of(context).size.width * 0.09,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                              Positioned(
+                                left: MediaQuery.of(context).size.width * 0.25,
+                                top: MediaQuery.of(context).size.height * 0.315,
+                                child: Image.asset(
+                                  tieneMedallaArcoiris
+                                      ? 'assets/MedallaArcoiris.png'
+                                      : 'assets/medallaArcoirisout.png',
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.09,
+                                  height:
+                                      MediaQuery.of(context).size.width * 0.09,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                              Positioned(
+                                left: MediaQuery.of(context).size.width * 0.1,
+                                top: MediaQuery.of(context).size.height * 0.285,
+                                child: Image.asset(
+                                  tieneMedallaTrueno
+                                      ? 'assets/MedallaTrueno.png'
+                                      : 'assets/medallaTruenoOut.png',
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.09,
+                                  height:
+                                      MediaQuery.of(context).size.width * 0.09,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                              Positioned(
+                                left: MediaQuery.of(context).size.width * 0.32,
+                                top: MediaQuery.of(context).size.height * 0.35,
+                                child: Image.asset(
+                                  tieneMedallaTierra
+                                      ? 'assets/MedallaTierra.png'
+                                      : 'assets/medallaTierraOut.png',
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.09,
+                                  height:
+                                      MediaQuery.of(context).size.width * 0.09,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                            ],
+                          );
+                        }
+                      },
+                    ),
                   ),
-                ),
-              ),
-              // En tu widget donde quieres mostrar la medalla
-              Positioned(
-                left: (MediaQuery.of(context).size.width * 0.4) / 2,
-                top: (MediaQuery.of(context).size.height * 0.28) / 2,
-                child: FutureBuilder<List<Map<String, dynamic>>>(
-                  future: fetchMedallasByUserId(idusuario),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      // Si está esperando la respuesta de la API, muestra un indicador de carga
-                      return CircularProgressIndicator();
-                    } else if (snapshot.hasError) {
-                      // Si hay un error al obtener la medalla, muestra un mensaje de error
-                      return Text('Error: ${snapshot.error}');
-                    } else {
-                      // Si la respuesta de la API es exitosa, verifica si el usuario tiene la medalla de roca
-                      // Itera sobre la lista de mapas para encontrar las medallas
-                      final List<Map<String, dynamic>> medallas =
-                          snapshot.data!;
-                      bool tieneMedallaRoca = medallas.any(
-                          (medalla) => medalla['medalla'] == 'Medalla Roca');
-                      bool tieneMedallaCascada = medallas.any(
-                          (medalla) => medalla['medalla'] == 'Medalla Cascada');
-                      bool tieneMedallaTrueno = medallas.any(
-                          (medalla) => medalla['medalla'] == 'Medalla Trueno');
-                      bool tieneMedallaArcoiris = medallas.any((medalla) =>
-                          medalla['medalla'] == 'Medalla Arcoiris');
-                      bool tieneMedallaAlma = medallas.any(
-                          (medalla) => medalla['medalla'] == 'Medalla Alma');
-                      bool tieneMedallaPantano = medallas.any(
-                          (medalla) => medalla['medalla'] == 'Medalla Pantano');
-                      bool tieneMedallaTierra = medallas.any(
-                          (medalla) => medalla['medalla'] == 'Medalla Tierra');
-                      bool tieneMedallaVolcan = medallas.any(
-                          (medalla) => medalla['medalla'] == 'Medalla Volcan');
-                      // Repite este proceso para las demás medalla
-                      return Stack(
-                        children: [
-                          Image.asset(
-                            'assets/hexMedallas.png',
-                            width: MediaQuery.of(context).size.width * 0.6,
-                            height: MediaQuery.of(context).size.height * 0.6,
-                            fit: BoxFit.contain,
-                          ),
-                          Positioned(
-                            left: MediaQuery.of(context).size.width * 0.17,
-                            top: MediaQuery.of(context).size.height * 0.21,
-                            child: Image.asset(
-                              tieneMedallaRoca
-                                  ? 'assets/MedallaRoca.png'
-                                  : 'assets/medallaRocaOut.png',
-                              width: MediaQuery.of(context).size.width * 0.09,
-                              height: MediaQuery.of(context).size.width * 0.09,
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                          Positioned(
-                            left: MediaQuery.of(context).size.width * 0.17,
-                            top: MediaQuery.of(context).size.height * 0.35,
-                            child: Image.asset(
-                              tieneMedallaAlma
-                                  ? 'assets/MedallaVolcan.png'
-                                  : 'assets/medallaVolcanOut.png',
-                              width: MediaQuery.of(context).size.width * 0.09,
-                              height: MediaQuery.of(context).size.width * 0.09,
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                          Positioned(
-                            left: MediaQuery.of(context).size.width * 0.245,
-                            top: MediaQuery.of(context).size.height * 0.25,
-                            child: Image.asset(
-                              tieneMedallaVolcan
-                                  ? 'assets/MedallaAlma.png'
-                                  : 'assets/medallaAlmaout.png',
-                              width: MediaQuery.of(context).size.width * 0.09,
-                              height: MediaQuery.of(context).size.width * 0.09,
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                          Positioned(
-                            left: MediaQuery.of(context).size.width * 0.4,
-                            top: MediaQuery.of(context).size.height * 0.285,
-                            child: Image.asset(
-                              tieneMedallaPantano
-                                  ? 'assets/MedallaPantano.png'
-                                  : 'assets/medallaPantanoOut.png',
-                              width: MediaQuery.of(context).size.width * 0.09,
-                              height: MediaQuery.of(context).size.width * 0.09,
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                          Positioned(
-                            left: MediaQuery.of(context).size.width * 0.32,
-                            top: MediaQuery.of(context).size.height * 0.21,
-                            child: Image.asset(
-                              tieneMedallaCascada
-                                  ? 'assets/MedallaCascada.png'
-                                  : 'assets/medallaCascadaOut.png',
-                              width: MediaQuery.of(context).size.width * 0.09,
-                              height: MediaQuery.of(context).size.width * 0.09,
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                          Positioned(
-                            left: MediaQuery.of(context).size.width * 0.25,
-                            top: MediaQuery.of(context).size.height * 0.315,
-                            child: Image.asset(
-                              tieneMedallaArcoiris
-                                  ? 'assets/MedallaArcoiris.png'
-                                  : 'assets/medallaArcoirisout.png',
-                              width: MediaQuery.of(context).size.width * 0.09,
-                              height: MediaQuery.of(context).size.width * 0.09,
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                          Positioned(
-                            left: MediaQuery.of(context).size.width * 0.1,
-                            top: MediaQuery.of(context).size.height * 0.285,
-                            child: Image.asset(
-                              tieneMedallaTrueno
-                                  ? 'assets/MedallaTrueno.png'
-                                  : 'assets/medallaTruenoOut.png',
-                              width: MediaQuery.of(context).size.width * 0.09,
-                              height: MediaQuery.of(context).size.width * 0.09,
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                          Positioned(
-                            left: MediaQuery.of(context).size.width * 0.32,
-                            top: MediaQuery.of(context).size.height * 0.35,
-                            child: Image.asset(
-                              tieneMedallaTierra
-                                  ? 'assets/MedallaTierra.png'
-                                  : 'assets/medallaTierraOut.png',
-                              width: MediaQuery.of(context).size.width * 0.09,
-                              height: MediaQuery.of(context).size.width * 0.09,
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                        ],
-                      );
-                    }
-                  },
-                ),
-              ),
-              Positioned(
-                left: screenSize.width * 0.23,
-                top: screenSize.height * 0.58,
-                child: _buildRectangularButton(context, MyAppGame()),
-              ),
-            ],
-          );
-        })));
+
+                  Positioned(
+                    left: screenSize.width * 0.23,
+                    top: screenSize.height * 0.58,
+                    child: _buildRectangularButton("NUEVO BOTÓN", () {
+                      print("Botón rectangular presionado");
+                    }),
+                  ),
+                ],
+              );
+            }
+          )
+        )
+      );
   }
-void actualizarFecha(BuildContext context) async {
-  try {
-    final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
-    final usuario = usuarioProvider.usuario;
-    int idUsuario = usuario?.idUsuario ?? 0;
-    // Realizar la solicitud HTTP al servidor
-    Uri url = Uri.parse('http://20.162.113.208:5000/api/usuario/actualizar_fecha_apertura/$idUsuario');
-    final response = await http.put(
-      url,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-    );
-    if (response.statusCode == 200) {
-      print('Fecha de apertura actualizada correctamente');
-    } else {
-      print('Error al actualizar la fecha de apertura: ${response.statusCode}');
-    }
-  } catch (error) {
-    print('Error en la solicitud HTTP: $error');
-  }
-}
-void verFecha(BuildContext context) async {
-  try {
-    final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
-    final usuario = usuarioProvider.usuario;
-    int idUsuario = usuario?.idUsuario ?? 0;
-    // Realizar la solicitud HTTP al servidor
-    Uri url = Uri.parse('http://20.162.113.208:5000/api/usuario/fecha_apertura/$idUsuario');
-    final response = await http.get(
-      url,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-    );
-    if (response.statusCode == 200) {
-      print('Fecha vista correctamente');
-    } else {
-      print('Error al actualizar la fecha de apertura: ${response.statusCode}');
-    }
-  } catch (error) {
-    print('Error en la solicitud HTTP: $error');
-  }
-}
+
   // Esta función genérica acepta cualquier tipo de pantalla como parámetro y navega a ella.
   void navigateToScreen<T>(BuildContext context, Widget screen) {
     Navigator.push(
@@ -601,6 +586,7 @@ void verFecha(BuildContext context) async {
       MaterialPageRoute(builder: (context) => screen),
     );
   }
+
   Widget _buildButton(
     String text,
     String imagePath,
@@ -691,7 +677,6 @@ void verFecha(BuildContext context) async {
                     ),
                   );
                 } else {
-                  _updateTimerDisplay();
                   navigateToScreen(context, screen);
                 }
               },
@@ -701,164 +686,13 @@ void verFecha(BuildContext context) async {
       ],
     );
   }
-Future<bool> haPasado24Horas(BuildContext context) async {
-  try {
-    final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
-    final usuario = usuarioProvider.usuario;
-    int idUsuario = usuario?.idUsuario ?? 0;
-    // Realizar la solicitud HTTP al servidor
-    Uri url = Uri.parse('http://20.162.113.208:5000/api/usuario/fecha_apertura/$idUsuario');
-    final response = await http.get(
-      url,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-    );
-    if (response.statusCode == 200) {
-      // Obtener la fecha de apertura del usuario desde la respuesta HTTP
-      Map<String, dynamic> responseData = json.decode(response.body);
-      String fechaString = responseData['fecha_apertura'];
-      DateFormat dateFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
-      DateTime fechaApertura = dateFormat.parse(fechaString);
-      
-      DateTime ahora = DateTime.now();
-      Duration diferencia = ahora.difference(fechaApertura);
-      return diferencia.inHours >= 24;
-    } else {
-      print('Error al obtener la fecha de apertura: ${response.statusCode}');
-      return false;
-    }
-  } catch (error) {
-    print('Error en la solicitud HTTP: $error');
-    return false;
-  }
-}
 
-
-  Widget _buildButton1(
-  String text,
-  String imagePath,
-  Widget screen,
-  bool activate,
-  Usuario usuario,
-  BuildContext context, {
-  double? topLeftRadius,
-  double? topRightRadius,
-  double? bottomLeftRadius,
-  double? bottomRightRadius,
-}) {
-  return Stack(
-    children: [
-      Container(
-        width: 110,
-        height: 148,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(topLeftRadius ?? 25),
-            topRight: Radius.circular(topRightRadius ?? 25),
-            bottomLeft: Radius.circular(bottomLeftRadius ?? 25),
-            bottomRight: Radius.circular(bottomRightRadius ?? 25),
-          ),
-          border: Border.all(
-            color: Colors.black,
-            width: 1.5,
-          ),
-          gradient: LinearGradient(
-            colors: [
-              Color.fromRGBO(207, 72, 72, 1),
-              Color.fromRGBO(224, 17, 17, 1),
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Positioned(
-              top: 113,
-              left: 10,
-              right: 10,
-              height: 1,
-              child: Container(
-                width: double.infinity,
-                color: Colors.white,
-              ),
-            ),
-            Positioned(
-              bottom: 4,
-              child: Text(
-                text,
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 35,
-              child: Image.asset(
-                imagePath,
-                width: 67,
-                height: 90,
-              ),
-            ),
-          ],
-        ),
-      ),
-      Positioned.fill(
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(topLeftRadius ?? 25),
-              topRight: Radius.circular(topRightRadius ?? 25),
-              bottomLeft: Radius.circular(bottomLeftRadius ?? 25),
-              bottomRight: Radius.circular(bottomRightRadius ?? 25),
-            ),
-            onTap: () async {
-              // Primero validamos si han pasado más de 24 horas
-              if (await haPasado24Horas(context)) {
-                // Actualizamos la fecha de apertura aquí si es necesario
-                actualizarFecha(context);
-                if (!activate) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Vuelve más tarde para abrir la incubadora.'),
-                    ),
-                  );
-                } else {
-                  
-                  navigateToScreen(context, screen);
-                }
-              } else {
-                // Si no han pasado 24 horas, mostramos un mensaje indicando que debe esperar
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('No han pasado 24 horas.'),
-                  ),
-                );
-              }
-            },
-          ),
-        ),
-      ),
-    ],
-  );
-}
-  Widget _buildRectangularButton(BuildContext context, Widget screen) {
+  Widget _buildRectangularButton(String text, VoidCallback onPressed) {
     return SizedBox(
       width: 215,
       height: 60,
       child: ElevatedButton(
-        onPressed: () {
-          // Navegar a la pantalla deseada
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => screen), // Llama a la pantalla aquí
-          );
-        },
+        onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(13.0),
@@ -900,88 +734,18 @@ Future<bool> haPasado24Horas(BuildContext context) async {
       ),
     );
   }
-  Future<void> _initializeTimer() async {
-  final targetDate = await _getTargetDateFromDatabase();
-  _startCountdown(targetDate);
 }
 
-Future<DateTime> _getTargetDateFromDatabase() async {
-  try {
-    final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
-    final usuario = usuarioProvider.usuario;
-    int idUsuario = usuario?.idUsuario ?? 0;
-    
-    // Realizar la solicitud HTTP al servidor para obtener la fecha
-    Uri url = Uri.parse('http://20.162.113.208:5000/api/usuario/fecha_apertura/$idUsuario');
-    final response = await http.get(
-      url,
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body);
-      final fecha = DateTime.parse(jsonResponse['fecha_apertura']);
-      // Sumar dos horas
-      final nuevaFecha = fecha.add(Duration(hours: 2));
-      return nuevaFecha;
-    } else {
-      print('Error al actualizar la fecha de apertura: ${response.statusCode}');
-      // En caso de error, puedes devolver una fecha por defecto o lanzar una excepción
-      return DateTime.now();
-    }
-  } catch (error) {
-    print('Error en la solicitud HTTP: $error');
-    // En caso de error, puedes devolver una fecha por defecto o lanzar una excepción
-    return DateTime.now();
-  }
-}
-
-void _startCountdown(DateTime targetDate) {
-  _targetDate = targetDate.add(Duration(days: 1)); // Suma 24 horas a la fecha objetivo
-  _updateTimerDisplay();
-}
-
-void _updateTimerDisplay() {
-  final difference = _targetDate.difference(DateTime.now());
-  if (difference.inSeconds > 0) {
-    _secondsRemaining = difference.inSeconds;
-    Future.delayed(Duration(seconds: 10), () {
-      setState(() {
-        _updateTimerDisplay();
-      });
-    });
-  } else {
-    setState(() {
-      _secondsRemaining = 0;
-    });
-  }
-}
-
-
-String _formatDuration(Duration duration) {
-  if (duration.inSeconds <= 0) {
-    return '00:00:00';
-  } else {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
-  }
-}
-
-
-
-}
 Future<List<dynamic>> fetchUserCards(int userId) async {
   print("PRUEBA PARA SABER SI HACE LA LLAMADA");
   final response = await http
       .get(Uri.parse('http://20.162.113.208:5000/api/cartas/usuario/$userId'));
   print("TIENE RESPUESTA");
+
   if (response.statusCode == 200) {
     print(json.decode(response.body));
     List<dynamic> userCards = json.decode(response.body);
+
     while (!json.encode(userCards).contains(']')) {
       await Future.delayed(Duration(
           seconds: 1)); // Esperar un segundo antes de verificar nuevamente
@@ -996,11 +760,13 @@ Future<List<dynamic>> fetchUserCards(int userId) async {
         throw Exception('Failed to load user cards');
       }
     }
+
     return userCards;
   } else {
     throw Exception('Failed to load user cards');
   }
 }
+
 Future<String> countUserCards(int userId) async {
   try {
     final List<dynamic> userCards = await fetchUserCards(userId);
@@ -1010,6 +776,7 @@ Future<String> countUserCards(int userId) async {
     return '0'; // Si ocurre un error, se devuelve 0
   }
 }
+
 Future<List<Map<String, dynamic>>> fetchMedallasByUserId(int userId) async {
   final response = await http.get(
       Uri.parse('http://20.162.113.208:5000/api/medallas/usuario/$userId'));
@@ -1019,128 +786,12 @@ Future<List<Map<String, dynamic>>> fetchMedallasByUserId(int userId) async {
     return List<Map<String, dynamic>>.from(json.decode(response.body));
   } else {
     // Si hay un error, lanza una excepción
-    return [];
+    throw Exception('Failed to load data');
   }
 }
-class _CountdownTo1415 extends StatefulWidget {
-  @override
-  _CountdownTo1415State createState() => _CountdownTo1415State();
-  int getSecondsRemaining() {
-    return _CountdownTo1415State()._secondsRemaining;
-  }
-}
-class _CountdownTo1415State extends State<_CountdownTo1415> {
-  late Timer _timer;
-  late DateTime _targetDate;
-  late Duration _timeUntilTarget;
-  late int _secondsRemaining = 0;
-  @override
-  void initState() {
-    super.initState();
-    _initializeTimer();
-  }
-  Future<void> _initializeTimer() async {
-    final targetDate = await _getTargetDateFromDatabase();
-    _startTimer(targetDate);
-  }
-  Future<DateTime> _getTargetDateFromDatabase() async {
-    try {
-      final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
-      final usuario = usuarioProvider.usuario;
-      int idUsuario = usuario?.idUsuario ?? 0;
-      // Realizar la solicitud HTTP al servidor para obtener la fecha
-      Uri url = Uri.parse('http://20.162.113.208:5000/api/usuario/fecha_apertura/$idUsuario');
-      final response = await http.get(
-        url,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-      );
-      if (response.statusCode == 200) {
-    final jsonResponse = json.decode(response.body);
-    final fecha = DateTime.parse(jsonResponse['fecha_apertura']);
-    // Sumar dos horas
-    final nuevaFecha = fecha.add(Duration(hours: 2));
-        return nuevaFecha;
-      } else {
-        print('Error al actualizar la fecha de apertura: ${response.statusCode}');
-        // En caso de error, puedes devolver una fecha por defecto o lanzar una excepción
-        return DateTime.now();
-      }
-    } catch (error) {
-      print('Error en la solicitud HTTP: $error');
-      // En caso de error, puedes devolver una fecha por defecto o lanzar una excepción
-      return DateTime.now();
-    }
-  }
-  void _startTimer(DateTime targetDate) {
-    _targetDate = targetDate.add(Duration(days: 1)); // Suma 24 horas a la fecha objetivo
-    final difference = _targetDate.difference(DateTime.now());
-    if (difference.inHours <= 24) {
-      _timeUntilTarget = difference;
-      _secondsRemaining = _timeUntilTarget.inSeconds;
-      _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-        if (mounted) {
-          setState(() {
-            if (_timeUntilTarget.inSeconds > 0) {
-              _timeUntilTarget -= Duration(seconds: 1);
-              _secondsRemaining = _timeUntilTarget.inSeconds;
-              if (_secondsRemaining <= 0) {
-                _timer.cancel();
-              }
-            } else {
-              _timer.cancel();
-            }
-          });
-        }
-      });
-    } else {
-      // Si han pasado más de 24 horas desde la fecha de la base de datos, establecer el tiempo restante en cero
-      setState(() {
-        _timeUntilTarget = Duration.zero;
-        _secondsRemaining = 0;
-      });
-    }
-  }
-  @override
-  Widget build(BuildContext context) {
-    if (_timeUntilTarget == null) {
-      return Container(); // O cualquier otro widget de carga
-    }
-    return Positioned(
-      top: 5,
-      right: 0,
-      child: Container(
-        width: 100,
-        child: Text(
-          _formatDuration(_timeUntilTarget),
-          style: TextStyle(
-            fontSize: 20,
-            color: Colors.white,
-            fontFamily: 'Sarpanch',
-          ),
-        ),
-      ),
-    );
-  }
-  String _formatDuration(Duration duration) {
-  if (duration.inSeconds <= 0) {
-    return '00:00:00';
-  } else {
-    String twoDigits(int n) => n.toString().padLeft(2, '0');
-    String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
-    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
-    return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
-  }
-}
-int getSecondsRemaining() {
-    return _secondsRemaining;
-  }
 
-}
 void main() {
   runApp(MaterialApp(
     home: Menu(),
-     
   ));
 }
