@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:pokemonapp/game/Pokemon_List.dart';
+import 'package:pokemonapp/game/battle/components/battle_enemy_side.dart';
 import 'package:pokemonapp/game/main.dart'; 
 
 class PokemonInfo {
@@ -25,6 +26,7 @@ class _BattlePlayerSideState extends State<BattlePlayerSide> {
   List<PokemonInfo> pokemonInfos = [];
   static int currentPokemonId = 0;
   List<String> _attacks = [];
+  List<int> _attackDamages = []; // Lista para almacenar el daño de cada ataque
   int currentPs = 100; // Valor predeterminado de puntos de vida actual
   int maxPs = 100; // Valor predeterminado de puntos de vida máximo
   int pokemonDefense = 0; // Variable para almacenar la defensa del Pokémon
@@ -45,6 +47,12 @@ class _BattlePlayerSideState extends State<BattlePlayerSide> {
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else {
+          // Obteniendo datos del enemigo
+          int enemyDefense = BattleEnemySide.pokemonEnemyDefense;
+          int enemyCurrentPs = BattleEnemySide.currentEnemyPs;
+
+          // Utiliza los datos del enemigo como desees
+          
           return Center(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -158,7 +166,11 @@ class _BattlePlayerSideState extends State<BattlePlayerSide> {
                     children: <Widget>[
                       for (var i = 0; i < _attacks.length; i++)
                         GestureDetector(
-                          onTap: () {},
+                          onTap: () {
+                            // Aquí puedes usar el daño del ataque seleccionado
+                            int damage = _attackDamages[i];
+                            // Realiza acciones con el daño, como restar PS al oponente, etc.
+                          },
                           child: Text(
                             _attacks[i],
                             style: TextStyle(
@@ -241,6 +253,7 @@ class _BattlePlayerSideState extends State<BattlePlayerSide> {
           List<String> attacks = [];
           for (var attackData in attacksData) {
             attacks.add(attackData['nombre_ataque'] as String);
+            _attackDamages.add(attackData['daño'] as int); // Guarda el daño del ataque
           }
           _attacks = attacks;
 

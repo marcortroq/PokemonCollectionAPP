@@ -7,8 +7,9 @@ class YourClass {
 }
 
 class BattleEnemySide extends StatelessWidget {
-  int pokemonDefense = 0; // Variable para almacenar la defensa del Pokémon
-  int currentPs = 0; // Variable para almacenar la vida actual del Pokémon
+  static int pokemonEnemyDefense = 0; // Variable para almacenar la defensa del Pokémon enemigo
+  static int currentEnemyPs = 0; // Variable para almacenar la vida actual del Pokémon enemigo
+  int maxEnemyPs = 0; // Variable para almacenar la vida máxima del Pokémon enemigo
 
   @override
   Widget build(BuildContext context) {
@@ -23,11 +24,11 @@ class BattleEnemySide extends StatelessWidget {
           final data = snapshot.data;
           if (data != null && data['pokemons'] != null && data['pokemons'].isNotEmpty) {
             final pokemon = data['pokemons'][0];
-            currentPs = pokemon['ps'] as int; // Puntos de vida actuales
-            final maxPs = pokemon['ps'] as int; // Puntos de vida máximos
+            currentEnemyPs = pokemon['ps'] as int; // Puntos de vida actuales del Pokémon enemigo
+            maxEnemyPs = pokemon['ps'] as int; // Puntos de vida máximos del Pokémon enemigo
             
-            // Almacenar la defensa del Pokémon
-            pokemonDefense = pokemon['defensa'] as int;
+            // Almacenar la defensa del Pokémon enemigo
+            pokemonEnemyDefense = pokemon['defensa'] as int;
 
             return Padding(
               padding: const EdgeInsets.only(top: 30),
@@ -94,7 +95,7 @@ class BattleEnemySide extends StatelessWidget {
                           child: Stack(
                             children: [
                               Container(
-                                width: 134 * (currentPs / maxPs), // Representa la cantidad actual de puntos de vida
+                                width: 134 * (currentEnemyPs / maxEnemyPs), // Representa la cantidad actual de puntos de vida del Pokémon enemigo
                                 height: 10,
                                 decoration: BoxDecoration(
                                   color: Colors.green, // Color de puntos de vida restantes
@@ -102,7 +103,7 @@ class BattleEnemySide extends StatelessWidget {
                                 ),
                               ),
                               Container(
-                                width: 134 * ((maxPs - currentPs) / maxPs), // Representa la cantidad perdida de puntos de vida
+                                width: 134 * ((maxEnemyPs - currentEnemyPs) / maxEnemyPs), // Representa la cantidad perdida de puntos de vida del Pokémon enemigo
                                 height: 10,
                                 decoration: BoxDecoration(
                                   color: Colors.red, // Color de puntos de vida perdidos
