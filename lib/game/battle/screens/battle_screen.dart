@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pokemonapp/game/battle/components/battle_actions.dart';
-import 'package:pokemonapp/game/battle/components/battle_enemy_side.dart';
+import 'package:pokemonapp/game/battle/components/battle_enemy_side.dart' as EnemySide; // Renombramos BattleEnemySide para evitar conflictos
 import 'package:pokemonapp/game/battle/components/battle_player_side.dart';
 
 class BattleScreen extends StatelessWidget {
@@ -16,7 +16,7 @@ class BattleScreen extends StatelessWidget {
         ),
         child: Column(
           children: <Widget>[
-            BattleEnemySide(),
+            EnemySide.BattleEnemySide(), // Usamos el BattleEnemySide importado como EnemySide
             Expanded(
               child: Align(
                 alignment: Alignment.bottomCenter,
