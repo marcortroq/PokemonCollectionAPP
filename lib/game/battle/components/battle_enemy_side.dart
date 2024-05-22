@@ -7,10 +7,30 @@ class YourClass {
 }
 
 class BattleEnemySide extends StatelessWidget {
-  static int pokemonEnemyDefense = 0; // Variable para almacenar la defensa del Pokémon enemigo
-  static int currentEnemyPs = 0; // Variable para almacenar la vida actual del Pokémon enemigo
-  static int maxEnemyPs = 0; // Variable para almacenar la vida máxima del Pokémon enemigo
-  static bool pokemonEnemyDeath = false; // Variable para almacenar si el Pokémon enemigo está muerto
+  // Variables de instancia
+  int _pokemonEnemyDefense = 0;
+  int _currentEnemyPs = 0;
+  int _maxEnemyPs = 0;
+  bool _pokemonEnemyDeath = false;
+
+  // Getters y setters
+  int get pokemonEnemyDefense => _pokemonEnemyDefense;
+  set pokemonEnemyDefense(int value) {
+    _pokemonEnemyDefense = value;
+  }
+
+  int get currentEnemyPs => _currentEnemyPs;
+  set currentEnemyPs(int value) {
+    _currentEnemyPs = value;
+    _pokemonEnemyDeath = _currentEnemyPs == 0;
+  }
+
+  int get maxEnemyPs => _maxEnemyPs;
+  set maxEnemyPs(int value) {
+    _maxEnemyPs = value;
+  }
+
+  bool get pokemonEnemyDeath => _pokemonEnemyDeath;
 
   @override
   Widget build(BuildContext context) {
@@ -27,18 +47,13 @@ class BattleEnemySide extends StatelessWidget {
             final pokemon = data['pokemons'][0];
             currentEnemyPs = pokemon['ps'] as int; // Puntos de vida actuales del Pokémon enemigo
             maxEnemyPs = pokemon['ps'] as int; // Puntos de vida máximos del Pokémon enemigo
-            
-            // Almacenar la defensa del Pokémon enemigo
-            pokemonEnemyDefense = pokemon['defensa'] as int;
-            
-            // Actualizar el estado del Pokémon enemigo (vivo o muerto)
-            pokemonEnemyDeath = currentEnemyPs == 0;
+            pokemonEnemyDefense = pokemon['defensa'] as int; // Almacenar la defensa del Pokémon enemigo
 
             // Impresión de la vida del Pokémon, su defensa y si está vivo
             print('Vida del Pokémon enemigo: $currentEnemyPs');
             print('Defensa del Pokémon enemigo: $pokemonEnemyDefense');
             print('El Pokémon enemigo está vivo: ${!pokemonEnemyDeath}');
-            
+
             return Padding(
               padding: const EdgeInsets.only(top: 30),
               child: Container(
