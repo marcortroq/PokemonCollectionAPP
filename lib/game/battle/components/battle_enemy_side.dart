@@ -8,9 +8,9 @@ class YourClass {
 
 class BattleEnemySide extends StatelessWidget {
   // Variables de instancia
-  int _pokemonEnemyDefense = 0;
-  int _currentEnemyPs = 0;
-  int _maxEnemyPs = 0;
+  static int _pokemonEnemyDefense = 0;
+  static int _currentEnemyPs = 0;
+  static int _maxEnemyPs = 0;
   bool _pokemonEnemyDeath = false;
 
   // Getters y setters
@@ -21,8 +21,11 @@ class BattleEnemySide extends StatelessWidget {
 
   int get currentEnemyPs => _currentEnemyPs;
   set currentEnemyPs(int value) {
+    print('VALUE del Pokémon enemigo: $value');
+    print('Vida1 del Pokémon enemigo: $_currentEnemyPs');
     _currentEnemyPs = value;
     _pokemonEnemyDeath = _currentEnemyPs == 0;
+    print('Vida2 del Pokémon enemigo: $_currentEnemyPs');
   }
 
   int get maxEnemyPs => _maxEnemyPs;
@@ -31,6 +34,25 @@ class BattleEnemySide extends StatelessWidget {
   }
 
   bool get pokemonEnemyDeath => _pokemonEnemyDeath;
+
+  // Función para aplicar el daño del ataque al enemigo
+  void applyAttackDamage(int attackDamage) {
+    print('Vida antes peleaa del Pokémon enemigo: $currentEnemyPs');
+    print('Defensa antes pelea  del Pokémon enemigo: $pokemonEnemyDefense');
+    print('daño antes pelea  del Pokémon enemigo: $attackDamage');
+    // Calcula el daño después de considerar la defensa del enemigo
+    int calculatedDamage = attackDamage - _pokemonEnemyDefense;
+    print('daño real  del Pokémon enemigo: $calculatedDamage');
+    // Asegúrate de que el daño calculado no sea negativo
+    if (calculatedDamage < 0) {
+      calculatedDamage = 0;
+    }
+    // Resta el daño calculado de los puntos de vida del enemigo
+    _currentEnemyPs -= calculatedDamage;
+    // Verifica si el Pokémon enemigo está muerto
+    _pokemonEnemyDeath = _currentEnemyPs <= 0;
+    print('Vida final del Pokémon enemigo: $_currentEnemyPs');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,16 +65,19 @@ class BattleEnemySide extends StatelessWidget {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else {
           final data = snapshot.data;
-          if (data != null && data['pokemons'] != null && data['pokemons'].isNotEmpty) {
-            final pokemon = data['pokemons'][0];
-            currentEnemyPs = pokemon['ps'] as int; // Puntos de vida actuales del Pokémon enemigo
-            maxEnemyPs = pokemon['ps'] as int; // Puntos de vida máximos del Pokémon enemigo
-            pokemonEnemyDefense = pokemon['defensa'] as int; // Almacenar la defensa del Pokémon enemigo
-
+          if (data != null &&
+              data['pokemons'] != null &&
+              data['pokemons'].isNotEmpty) {
+            final primerPokemon = data['pokemons'][0];
+            // Actualizar variables con los datos del JSON
+            pokemonEnemyDefense = primerPokemon['defensa'] as int;
+            currentEnemyPs = primerPokemon['ps'] as int;
+            maxEnemyPs = primerPokemon['ps'] as int;
+            print('Vida del Pokémon enemigo: $primerPokemon');
             // Impresión de la vida del Pokémon, su defensa y si está vivo
-            print('Vida del Pokémon enemigo: $currentEnemyPs');
-            print('Defensa del Pokémon enemigo: $pokemonEnemyDefense');
-            print('El Pokémon enemigo está vivo: ${!pokemonEnemyDeath}');
+            print('Vida del Pokémon enemigo: $_currentEnemyPs');
+            print('Defensa del Pokémon enemigo: $_pokemonEnemyDefense');
+            print('El Pokémon enemigo está vivo: ${!_pokemonEnemyDeath}');
 
             return Padding(
               padding: const EdgeInsets.only(top: 30),
@@ -81,7 +106,7 @@ class BattleEnemySide extends StatelessWidget {
                               Container(
                                 margin: EdgeInsets.only(top: 10, left: 15),
                                 child: Text(
-                                  '${pokemon['nombre_pokemon']}',
+                                  '${primerPokemon['nombre_pokemon']}',
                                   style: TextStyle(
                                     fontFamily: 'PokemonFireRed',
                                     fontSize: 20,
@@ -113,25 +138,37 @@ class BattleEnemySide extends StatelessWidget {
                           height: 10,
                           margin: EdgeInsets.only(top: 46, left: 163),
                           decoration: BoxDecoration(
-                            color: pokemonEnemyDeath ? Colors.red : Colors.grey[300], // Color base
+                            color: _pokemonEnemyDeath
+                                ? Colors.red
+                                : Colors.grey[300], // Color base
                             borderRadius: BorderRadius.all(Radius.circular(8)),
                           ),
                           child: Stack(
                             children: [
                               Container(
-                                width: 134 * (currentEnemyPs / maxEnemyPs), // Representa la cantidad actual de puntos de vida del Pokémon enemigo
+                                width: 134 *
+                                    (_currentEnemyPs /
+                                        _maxEnemyPs), // Representa la cantidad actual de puntos de vida del Pokémon enemigo
                                 height: 10,
                                 decoration: BoxDecoration(
-                                  color: pokemonEnemyDeath ? Colors.red : Colors.green, // Color de puntos de vida restantes
-                                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                                  color: _pokemonEnemyDeath
+                                      ? Colors.red
+                                      : Colors
+                                          .green, // Color de puntos de vida restantes
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(8)),
                                 ),
                               ),
                               Container(
-                                width: 134 * ((maxEnemyPs - currentEnemyPs) / maxEnemyPs), // Representa la cantidad perdida de puntos de vida del Pokémon enemigo
+                                width: 134 *
+                                    ((_maxEnemyPs - _currentEnemyPs) /
+                                        _maxEnemyPs), // Representa la cantidad perdida de puntos de vida del Pokémon enemigo
                                 height: 10,
                                 decoration: BoxDecoration(
-                                  color: Colors.red, // Color de puntos de vida perdidos
-                                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                                  color: Colors
+                                      .red, // Color de puntos de vida perdidos
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(8)),
                                 ),
                               ),
                             ],
@@ -155,7 +192,7 @@ class BattleEnemySide extends StatelessWidget {
                           height: 120,
                           margin: EdgeInsets.only(bottom: 25),
                           child: Image.network(
-                            'http://20.162.113.208/${pokemon['foto_pokemon']}',
+                            'http://20.162.113.208/${primerPokemon['foto_pokemon']}',
                             fit: BoxFit.fitHeight,
                           ),
                         ),
@@ -175,15 +212,16 @@ class BattleEnemySide extends StatelessWidget {
 
   Future<Map<String, dynamic>> obtenerDatosLider(int idLider) async {
     print('ID del líder de gimnasio: $idLider');
-    final response = await http.get(Uri.parse('http://20.162.113.208:5000/api/lider/Battle/$idLider'));
+    final response = await http
+        .get(Uri.parse('http://20.162.113.208:5000/api/lider/Battle/$idLider'));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      // Actualiza las variables con los datos del primer Pokémon en la lista de pokemons
       final primerPokemon = data['pokemons'][0];
+      // Actualizar variables con los datos del JSON
+      pokemonEnemyDefense = primerPokemon['defensa'] as int;
       currentEnemyPs = primerPokemon['ps'] as int;
       maxEnemyPs = primerPokemon['ps'] as int;
-      pokemonEnemyDefense = primerPokemon['defensa'] as int;
       return data;
     } else {
       throw Exception('Error al cargar los datos del líder de gimnasio');

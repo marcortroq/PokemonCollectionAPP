@@ -3,8 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:pokemonapp/game/Pokemon_List.dart';
+import 'package:pokemonapp/game/main.dart';
 import 'package:pokemonapp/game/battle/components/battle_enemy_side.dart';
-import 'package:pokemonapp/game/main.dart'; 
 
 class PokemonInfo {
   final int pokemonId;
@@ -30,15 +30,12 @@ class _BattlePlayerSideState extends State<BattlePlayerSide> {
   int currentPs = 100; // Valor predeterminado de puntos de vida actual
   int maxPs = 100; // Valor predeterminado de puntos de vida máximo
   int pokemonDefense = 0; // Variable para almacenar la defensa del Pokémon
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchPokemonData();
-  }
+  BattleEnemySide? _enemySide; // Referencia al lado del enemigo
 
   @override
   Widget build(BuildContext context) {
+    _enemySide ??= BattleEnemySide(); // Inicializa _enemySide si es nulo
+
     return FutureBuilder(
       future: _pokemonDataLoaded ? null : _fetchPokemonData(),
       builder: (context, snapshot) {
@@ -47,12 +44,12 @@ class _BattlePlayerSideState extends State<BattlePlayerSide> {
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else {
-          // Obteniendo datos del enemigo
-          int enemyDefense = BattleEnemySide.pokemonEnemyDefense;
-          int enemyCurrentPs = BattleEnemySide.currentEnemyPs;
+          // Utiliza los getters de BattleEnemySide para obtener los datos del enemigo
+          int enemyDefense = _enemySide!.pokemonEnemyDefense;
+          int enemyCurrentPs = _enemySide!.currentEnemyPs;
+          bool enemyDeath = _enemySide!.pokemonEnemyDeath;
 
           // Utiliza los datos del enemigo como desees
-          
           return Center(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -131,19 +128,27 @@ class _BattlePlayerSideState extends State<BattlePlayerSide> {
                       child: Stack(
                         children: [
                           Container(
-                            width: 131 * (currentPs / maxPs), // Representa la cantidad actual de puntos de vida
+                            width: 131 *
+                                (currentPs /
+                                    maxPs), // Representa la cantidad actual de puntos de vida
                             height: 10,
                             decoration: BoxDecoration(
-                              color: Colors.green, // Color de puntos de vida restantes
-                              borderRadius: BorderRadius.all(Radius.circular(8)),
+                              color: Colors
+                                  .green, // Color de puntos de vida restantes
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8)),
                             ),
                           ),
                           Container(
-                            width: 131 * ((maxPs - currentPs) / maxPs), // Representa la cantidad perdida de puntos de vida
+                            width: 131 *
+                                ((maxPs - currentPs) /
+                                    maxPs), // Representa la cantidad perdida de puntos de vida
                             height: 10,
                             decoration: BoxDecoration(
-                              color: Colors.red, // Color de puntos de vida perdidos
-                              borderRadius: BorderRadius.all(Radius.circular(8)),
+                              color: Colors
+                                  .red, // Color de puntos de vida perdidos
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8)),
                             ),
                           ),
                         ],
@@ -167,9 +172,10 @@ class _BattlePlayerSideState extends State<BattlePlayerSide> {
                       for (var i = 0; i < _attacks.length; i++)
                         GestureDetector(
                           onTap: () {
-                            // Aquí puedes usar el daño del ataque seleccionado
+                            // Obtener el daño del ataque seleccionado
                             int damage = _attackDamages[i];
-                            // Realiza acciones con el daño, como restar PS al oponente, etc.
+                            // Aplicar el daño al enemigo utilizando la función en BattleEnemySide
+                            _enemySide!.applyAttackDamage(damage);
                           },
                           child: Text(
                             _attacks[i],
@@ -195,7 +201,8 @@ class _BattlePlayerSideState extends State<BattlePlayerSide> {
                               onTap: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => MyAppGame()),
+                                  MaterialPageRoute(
+                                      builder: (context) => MyAppGame()),
                                 );
                               },
                               child: Text(
@@ -231,8 +238,10 @@ class _BattlePlayerSideState extends State<BattlePlayerSide> {
   Future<void> _fetchPokemonData() async {
     try {
       List<int> selectedPokemonIds = PokemonList.getSelectedPokemonIds();
-      int pokemonId = selectedPokemonIds.isNotEmpty ? selectedPokemonIds.first : 1;
-      String apiUrl = 'http://20.162.113.208:5000/api/pokemon/ataques/$pokemonId';
+      int pokemonId =
+          selectedPokemonIds.isNotEmpty ? selectedPokemonIds.first : 1;
+      String apiUrl =
+          'http://20.162.113.208:5000/api/pokemon/ataques/$pokemonId';
       final response = await http.get(Uri.parse(apiUrl));
       print('HTTP Status Code: ${response.statusCode}');
       if (response.statusCode == 200) {
@@ -253,7 +262,8 @@ class _BattlePlayerSideState extends State<BattlePlayerSide> {
           List<String> attacks = [];
           for (var attackData in attacksData) {
             attacks.add(attackData['nombre_ataque'] as String);
-            _attackDamages.add(attackData['daño'] as int); // Guarda el daño del ataque
+            _attackDamages
+                .add(attackData['daño'] as int); // Guarda el daño del ataque
           }
           _attacks = attacks;
 
