@@ -12,6 +12,8 @@ class BattleEnemySide extends StatelessWidget {
   static int _currentEnemyPs = 0;
   static int _maxEnemyPs = 0;
   bool _pokemonEnemyDeath = false;
+  List<dynamic> _pokemonList = [];
+  int _currentPokemonIndex = 0;
 
   // Getters y setters
   int get pokemonEnemyDefense => _pokemonEnemyDefense;
@@ -24,8 +26,20 @@ class BattleEnemySide extends StatelessWidget {
     print('VALUE del Pokémon enemigo: $value');
     print('Vida1 del Pokémon enemigo: $_currentEnemyPs');
     _currentEnemyPs = value;
-    _pokemonEnemyDeath = _currentEnemyPs == 0;
+    _pokemonEnemyDeath = _currentEnemyPs <= 0;
     print('Vida2 del Pokémon enemigo: $_currentEnemyPs');
+    if (_currentEnemyPs <= 0) {
+      _currentPokemonIndex++;
+      if (_currentPokemonIndex < _pokemonList.length) {
+        _currentEnemyPs = _pokemonList[_currentPokemonIndex]['ps'] as int;
+        _maxEnemyPs = _pokemonList[_currentPokemonIndex]['ps'] as int;
+        _pokemonEnemyDefense =
+            _pokemonList[_currentPokemonIndex]['defensa'] as int;
+      } else {
+        // Aquí puedes manejar lo que sucede cuando no quedan más Pokémon en la lista
+        print('No quedan más Pokémon en la lista');
+      }
+    }
   }
 
   int get maxEnemyPs => _maxEnemyPs;
@@ -55,6 +69,7 @@ class BattleEnemySide extends StatelessWidget {
       _pokemonEnemyDeath = true;
     }
     print('Vida final del Pokémon enemigo: $_currentEnemyPs');
+    print('El Pokémon enemigo está vivo: ${!_pokemonEnemyDeath}');
   }
 
   @override
@@ -71,7 +86,8 @@ class BattleEnemySide extends StatelessWidget {
           if (data != null &&
               data['pokemons'] != null &&
               data['pokemons'].isNotEmpty) {
-            final primerPokemon = data['pokemons'][0];
+            _pokemonList = data['pokemons'];
+            final primerPokemon = _pokemonList[_currentPokemonIndex];
             // Actualizar variables con los datos del JSON
             pokemonEnemyDefense = primerPokemon['defensa'] as int;
             currentEnemyPs = primerPokemon['ps'] as int;
@@ -81,6 +97,7 @@ class BattleEnemySide extends StatelessWidget {
             print('Vida del Pokémon enemigo: $_currentEnemyPs');
             print('Defensa del Pokémon enemigo: $_pokemonEnemyDefense');
             print('El Pokémon enemigo está vivo: ${!_pokemonEnemyDeath}');
+            print('Lista pokemons: $_pokemonList');
 
             return Padding(
               padding: const EdgeInsets.only(top: 30),
@@ -220,7 +237,8 @@ class BattleEnemySide extends StatelessWidget {
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      final primerPokemon = data['pokemons'][0];
+      _pokemonList = data['pokemons'];
+      final primerPokemon = _pokemonList[_currentPokemonIndex];
       // Actualizar variables con los datos del JSON
       pokemonEnemyDefense = primerPokemon['defensa'] as int;
       currentEnemyPs = primerPokemon['ps'] as int;
