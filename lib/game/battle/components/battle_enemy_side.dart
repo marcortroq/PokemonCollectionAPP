@@ -51,6 +51,9 @@ class BattleEnemySide extends StatelessWidget {
     _currentEnemyPs -= calculatedDamage;
     // Verifica si el Pokémon enemigo está muerto
     _pokemonEnemyDeath = _currentEnemyPs <= 0;
+    if (_currentEnemyPs <= 0) {
+      _pokemonEnemyDeath = true;
+    }
     print('Vida final del Pokémon enemigo: $_currentEnemyPs');
   }
 
