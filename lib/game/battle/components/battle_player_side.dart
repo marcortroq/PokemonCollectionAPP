@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -44,11 +46,6 @@ class _BattlePlayerSideState extends State<BattlePlayerSide> {
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else {
-          // Utiliza los getters de BattleEnemySide para obtener los datos del enemigo
-          int enemyDefense = _enemySide!.pokemonEnemyDefense;
-          int enemyCurrentPs = _enemySide!.currentEnemyPs;
-          bool enemyDeath = _enemySide!.pokemonEnemyDeath;
-
           // Utiliza los datos del enemigo como desees
           return Center(
             child: Column(
@@ -176,6 +173,8 @@ class _BattlePlayerSideState extends State<BattlePlayerSide> {
                             int damage = _attackDamages[i];
                             // Aplicar el daño al enemigo utilizando la función en BattleEnemySide
                             _enemySide!.applyAttackDamage(damage);
+                            // Restar vida al Pokémon
+                            _subtractPokemonLife();
                           },
                           child: Text(
                             _attacks[i],
@@ -233,6 +232,41 @@ class _BattlePlayerSideState extends State<BattlePlayerSide> {
         }
       },
     );
+  }
+
+  void _subtractPokemonLife() {
+    // Generar un número aleatorio entre 80 y 100
+    var random = Random();
+    int damage = random.nextInt(21) + 100; // Número aleatorio entre 80 y 100
+
+    setState(() {
+      // Restar el daño a los puntos de vida actuales
+      currentPs -= damage - pokemonDefense;
+      if (currentPs < 0) {
+        currentPs = 0;
+        // Si los puntos de vida son cero, mostrar el mensaje de "Perdiste"
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Perdiste"),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    // Código para continuar
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => MyAppGame()),
+                    );
+                  },
+                  child: Text("Continuar"),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    });
   }
 
   Future<void> _fetchPokemonData() async {

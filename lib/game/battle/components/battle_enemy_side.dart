@@ -7,15 +7,13 @@ class YourClass {
 }
 
 class BattleEnemySide extends StatelessWidget {
-  // Variables de instancia
   static int _pokemonEnemyDefense = 0;
   static int _currentEnemyPs = 0;
   static int _maxEnemyPs = 0;
   bool _pokemonEnemyDeath = false;
-  List<dynamic> _pokemonList = [];
+  static List<dynamic> _pokemonList = [];
   int _currentPokemonIndex = 0;
 
-  // Getters y setters
   int get pokemonEnemyDefense => _pokemonEnemyDefense;
   set pokemonEnemyDefense(int value) {
     _pokemonEnemyDefense = value;
@@ -49,27 +47,36 @@ class BattleEnemySide extends StatelessWidget {
 
   bool get pokemonEnemyDeath => _pokemonEnemyDeath;
 
-  // Función para aplicar el daño del ataque al enemigo
   void applyAttackDamage(int attackDamage) {
-    print('Vida antes peleaa del Pokémon enemigo: $currentEnemyPs');
-    print('Defensa antes pelea  del Pokémon enemigo: $pokemonEnemyDefense');
-    print('daño antes pelea  del Pokémon enemigo: $attackDamage');
-    // Calcula el daño después de considerar la defensa del enemigo
+    print('Vida antes pelea del Pokémon enemigo: $currentEnemyPs');
+    print('Defensa antes pelea del Pokémon enemigo: $pokemonEnemyDefense');
+    print('Daño antes pelea del Pokémon enemigo: $attackDamage');
     int calculatedDamage = attackDamage - _pokemonEnemyDefense;
-    print('daño real  del Pokémon enemigo: $calculatedDamage');
-    // Asegúrate de que el daño calculado no sea negativo
+    print('Daño real del Pokémon enemigo: $calculatedDamage');
     if (calculatedDamage < 0) {
       calculatedDamage = 0;
     }
-    // Resta el daño calculado de los puntos de vida del enemigo
     _currentEnemyPs -= calculatedDamage;
-    // Verifica si el Pokémon enemigo está muerto
     _pokemonEnemyDeath = _currentEnemyPs <= 0;
-    if (_currentEnemyPs <= 0) {
-      _pokemonEnemyDeath = true;
-    }
     print('Vida final del Pokémon enemigo: $_currentEnemyPs');
     print('El Pokémon enemigo está vivo: ${!_pokemonEnemyDeath}');
+    print('Lista: $_pokemonList');
+
+    if (_pokemonEnemyDeath) {
+      _currentPokemonIndex++;
+      if (_currentPokemonIndex < _pokemonList.length) {
+        _currentEnemyPs = _pokemonList[_currentPokemonIndex]['ps'] as int;
+        _maxEnemyPs = _pokemonList[_currentPokemonIndex]['ps'] as int;
+        _pokemonEnemyDefense =
+            _pokemonList[_currentPokemonIndex]['defensa'] as int;
+      } else {
+        // Aquí puedes manejar lo que sucede cuando no quedan más Pokémon en la lista
+        print('No quedan más Pokémon en la lista');
+        print('Lista: $_pokemonList');
+      }
+    }else {
+      
+    }
   }
 
   @override
@@ -86,14 +93,13 @@ class BattleEnemySide extends StatelessWidget {
           if (data != null &&
               data['pokemons'] != null &&
               data['pokemons'].isNotEmpty) {
-            _pokemonList = data['pokemons'];
+            final pokemonDataList = data['pokemons'] as List<dynamic>;
+            _pokemonList = pokemonDataList;
             final primerPokemon = _pokemonList[_currentPokemonIndex];
-            // Actualizar variables con los datos del JSON
             pokemonEnemyDefense = primerPokemon['defensa'] as int;
             currentEnemyPs = primerPokemon['ps'] as int;
             maxEnemyPs = primerPokemon['ps'] as int;
             print('Vida del Pokémon enemigo: $primerPokemon');
-            // Impresión de la vida del Pokémon, su defensa y si está vivo
             print('Vida del Pokémon enemigo: $_currentEnemyPs');
             print('Defensa del Pokémon enemigo: $_pokemonEnemyDefense');
             print('El Pokémon enemigo está vivo: ${!_pokemonEnemyDeath}');
@@ -237,9 +243,18 @@ class BattleEnemySide extends StatelessWidget {
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      _pokemonList = data['pokemons'];
+      final List<dynamic> pokemonDataList = data['pokemons'];
+
+      // Borra la lista de Pokémon existente antes de agregar los nuevos
+      _pokemonList.clear();
+
+      // Agregar cada Pokémon individualmente a la lista
+      pokemonDataList.forEach((pokemon) {
+        _pokemonList.add(pokemon);
+      });
+
+      print('Datos de la lista de Pokémon: $_pokemonList');
       final primerPokemon = _pokemonList[_currentPokemonIndex];
-      // Actualizar variables con los datos del JSON
       pokemonEnemyDefense = primerPokemon['defensa'] as int;
       currentEnemyPs = primerPokemon['ps'] as int;
       maxEnemyPs = primerPokemon['ps'] as int;
