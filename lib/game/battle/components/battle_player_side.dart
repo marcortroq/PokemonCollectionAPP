@@ -237,7 +237,7 @@ class _BattlePlayerSideState extends State<BattlePlayerSide> {
   void _subtractPokemonLife() {
     // Generar un número aleatorio entre 80 y 100
     var random = Random();
-    int damage = random.nextInt(21) + 100; // Número aleatorio entre 80 y 100
+    int damage = random.nextInt(21) + 80; // Número aleatorio entre 80 y 100
 
     setState(() {
       // Restar el daño a los puntos de vida actuales

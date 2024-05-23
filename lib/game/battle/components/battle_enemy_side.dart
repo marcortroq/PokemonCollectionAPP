@@ -1,6 +1,12 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:pokemonapp/game/battle/components/battle_player_side.dart';
+import 'package:pokemonapp/game/main.dart';
+import 'package:pokemonapp/usuario_provider.dart';
 
 class YourClass {
   static int idLiderGimnasio = 0;
@@ -13,6 +19,9 @@ class BattleEnemySide extends StatelessWidget {
   bool _pokemonEnemyDeath = false;
   static List<dynamic> _pokemonList = [];
   int _currentPokemonIndex = 0;
+  BattlePlayerSide _battlePlayerSide = BattlePlayerSide();
+  bool _showVictoryDialog = false; // Variable para controlar la visibilidad del mensaje de victoria
+
 
   int get pokemonEnemyDefense => _pokemonEnemyDefense;
   set pokemonEnemyDefense(int value) {
@@ -21,11 +30,8 @@ class BattleEnemySide extends StatelessWidget {
 
   int get currentEnemyPs => _currentEnemyPs;
   set currentEnemyPs(int value) {
-    print('VALUE del Pokémon enemigo: $value');
-    print('Vida1 del Pokémon enemigo: $_currentEnemyPs');
     _currentEnemyPs = value;
     _pokemonEnemyDeath = _currentEnemyPs <= 0;
-    print('Vida2 del Pokémon enemigo: $_currentEnemyPs');
     if (_currentEnemyPs <= 0) {
       _currentPokemonIndex++;
       if (_currentPokemonIndex < _pokemonList.length) {
@@ -47,7 +53,7 @@ class BattleEnemySide extends StatelessWidget {
 
   bool get pokemonEnemyDeath => _pokemonEnemyDeath;
 
-  void applyAttackDamage(int attackDamage) {
+  Future<void> applyAttackDamage(int attackDamage) async {
     print('Vida antes pelea del Pokémon enemigo: $currentEnemyPs');
     print('Defensa antes pelea del Pokémon enemigo: $pokemonEnemyDefense');
     print('Daño antes pelea del Pokémon enemigo: $attackDamage');
@@ -61,7 +67,6 @@ class BattleEnemySide extends StatelessWidget {
     print('Vida final del Pokémon enemigo: $_currentEnemyPs');
     print('El Pokémon enemigo está vivo: ${!_pokemonEnemyDeath}');
     print('Lista: $_pokemonList');
-
     if (_pokemonEnemyDeath) {
       _currentPokemonIndex++;
       if (_currentPokemonIndex < _pokemonList.length) {
@@ -70,18 +75,60 @@ class BattleEnemySide extends StatelessWidget {
         _pokemonEnemyDefense =
             _pokemonList[_currentPokemonIndex]['defensa'] as int;
       } else {
-        // Aquí puedes manejar lo que sucede cuando no quedan más Pokémon en la lista
+        // No quedan más Pokémon en la lista
         print('No quedan más Pokémon en la lista');
         print('Lista: $_pokemonList');
+
+        // Obtener datos del líder para obtener el nombre de la medalla
+        final dataLider = await obtenerDatosLider(YourClass.idLiderGimnasio);
+        final String medalla = dataLider['medalla'];
+        final String nombreLider = dataLider['nombre_lider'];
+
+        // Realizar la llamada a la API para agregar la medalla
+        final int idUsuario = UsuarioProvider()
+            .usuario!
+            .idUsuario; // Obtener el ID del usuario autenticado
+
+        final response = await http.post(
+          Uri.parse('http://20.162.113.208:5000/api/medallas'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(<String, dynamic>{
+            'id_usuario': idUsuario,
+            'medalla': medalla,
+          }),
+        );
+
+        if (response.statusCode == 201) {
+          // Medalla agregada correctamente
+          print('Medalla agregada correctamente');
+          _showVictoryDialog = true; // Mostrar el mensaje de victoria
+
+        } else {
+          // Error al agregar la medalla
+          print('Error al agregar la medalla: ${response.statusCode}');
+          _showVictoryDialog = true; // Mostrar el mensaje de victoria
+        }
       }
-    }else {
-      
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
+    if (_showVictoryDialog) {
+    // Si _showVictoryDialog es true, mostrar el diálogo de victoria
+    final data = _pokemonList.isNotEmpty ? _pokemonList.first : null;
+    if (data != null) {
+      final String medalla = data['medalla'];
+      final String nombreLider = data['nombre_lider'];
+      WidgetsBinding.instance?.addPostFrameCallback((_) {
+        showVictoryDialog(context, nombreLider, medalla);
+        _showVictoryDialog = false; // Restablecer la variable para futuros usos
+      });
+    }
+  }
+    return FutureBuilder<Map<String, dynamic>>(
       future: obtenerDatosLider(YourClass.idLiderGimnasio),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -89,149 +136,178 @@ class BattleEnemySide extends StatelessWidget {
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else {
-          final data = snapshot.data;
-          if (data != null &&
-              data['pokemons'] != null &&
-              data['pokemons'].isNotEmpty) {
-            final pokemonDataList = data['pokemons'] as List<dynamic>;
-            _pokemonList = pokemonDataList;
-            final primerPokemon = _pokemonList[_currentPokemonIndex];
-            pokemonEnemyDefense = primerPokemon['defensa'] as int;
-            currentEnemyPs = primerPokemon['ps'] as int;
-            maxEnemyPs = primerPokemon['ps'] as int;
-            print('Vida del Pokémon enemigo: $primerPokemon');
-            print('Vida del Pokémon enemigo: $_currentEnemyPs');
-            print('Defensa del Pokémon enemigo: $_pokemonEnemyDefense');
-            print('El Pokémon enemigo está vivo: ${!_pokemonEnemyDeath}');
-            print('Lista pokemons: $_pokemonList');
+          final data = snapshot.data!;
+          final List<dynamic> pokemonDataList = data['pokemons'];
+          final String medalla = data['medalla'];
+          final String nombreLider = data['nombre_lider'];
 
-            return Padding(
-              padding: const EdgeInsets.only(top: 30),
-              child: Container(
-                margin: EdgeInsets.only(left: 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Stack(
-                      children: <Widget>[
-                        Container(
-                          height: 80,
-                          width: 279,
-                          margin: EdgeInsets.only(left: kToolbarHeight),
-                          child: Image.asset(
-                            'assets/Game/enemy_ui.png',
-                            fit: BoxFit.fitHeight,
-                            alignment: Alignment.topRight,
-                          ),
+          _pokemonList = pokemonDataList;
+          final primerPokemon = _pokemonList[_currentPokemonIndex];
+          pokemonEnemyDefense = primerPokemon['defensa'] as int;
+          currentEnemyPs = primerPokemon['ps'] as int;
+          maxEnemyPs = primerPokemon['ps'] as int;
+          print('Vida del Pokémon enemigo: $primerPokemon');
+          print('Vida del Pokémon enemigo: $_currentEnemyPs');
+          print('Defensa del Pokémon enemigo: $_pokemonEnemyDefense');
+          print('El Pokémon enemigo está vivo: ${!_pokemonEnemyDeath}');
+          print('Lista pokemons: $_pokemonList');
+
+          return Padding(
+            padding: const EdgeInsets.only(top: 30),
+            child: Container(
+              margin: EdgeInsets.only(left: 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Stack(
+                    children: <Widget>[
+                      Container(
+                        height: 80,
+                        width: 279,
+                        margin: EdgeInsets.only(left: kToolbarHeight),
+                        child: Image.asset(
+                          'assets/Game/enemy_ui.png',
+                          fit: BoxFit.fitHeight,
+                          alignment: Alignment.topRight,
                         ),
-                        Container(
-                          width: 264,
-                          margin: EdgeInsets.only(left: 60),
-                          child: Row(
-                            children: <Widget>[
-                              Container(
-                                margin: EdgeInsets.only(top: 10, left: 15),
-                                child: Text(
-                                  '${primerPokemon['nombre_pokemon']}',
-                                  style: TextStyle(
-                                    fontFamily: 'PokemonFireRed',
-                                    fontSize: 20,
-                                    shadows: <Shadow>[
-                                      Shadow(
-                                        offset: Offset(2, 2),
-                                        blurRadius: 1.0,
-                                        color: Color(0xffd8d0b0),
-                                      ),
-                                    ],
-                                  ),
+                      ),
+                      Container(
+                        width: 264,
+                        margin: EdgeInsets.only(left: 60),
+                        child: Row(
+                          children: <Widget>[
+                            Container(
+                              margin: EdgeInsets.only(top: 10, left: 15),
+                              child: Text(
+                                '${primerPokemon['nombre_pokemon']}',
+                                style: TextStyle(
+                                  fontFamily: 'PokemonFireRed',
+                                  fontSize: 20,
+                                  shadows: <Shadow>[
+                                    Shadow(
+                                      offset: Offset(2, 2),
+                                      blurRadius: 1.0,
+                                      color: Color(0xffd8d0b0),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              Container(
-                                height: 20,
-                                margin: EdgeInsets.only(top: 12),
-                                child: Image.asset(
-                                  'assets/Game/female.png',
-                                  fit: BoxFit.fitHeight,
-                                  alignment: Alignment.topRight,
-                                ),
+                            ),
+                            Container(
+                              height: 20,
+                              margin: EdgeInsets.only(top: 12),
+                              child: Image.asset(
+                                'assets/Game/female.png',
+                                fit: BoxFit.fitHeight,
+                                alignment: Alignment.topRight,
                               ),
-                              Spacer(),
-                            ],
-                          ),
+                            ),
+                            Spacer(),
+                          ],
                         ),
-                        Container(
-                          width: 134,
-                          height: 10,
-                          margin: EdgeInsets.only(top: 46, left: 163),
-                          decoration: BoxDecoration(
-                            color: _pokemonEnemyDeath
-                                ? Colors.red
-                                : Colors.grey[300], // Color base
-                            borderRadius: BorderRadius.all(Radius.circular(8)),
-                          ),
-                          child: Stack(
-                            children: [
-                              Container(
-                                width: 134 *
-                                    (_currentEnemyPs /
-                                        _maxEnemyPs), // Representa la cantidad actual de puntos de vida del Pokémon enemigo
-                                height: 10,
-                                decoration: BoxDecoration(
-                                  color: _pokemonEnemyDeath
-                                      ? Colors.red
-                                      : Colors
-                                          .green, // Color de puntos de vida restantes
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(8)),
-                                ),
+                      ),
+                      Container(
+                        width: 134,
+                        height: 10,
+                        margin: EdgeInsets.only(top: 46, left: 163),
+                        decoration: BoxDecoration(
+                          color: _pokemonEnemyDeath
+                              ? Colors.red
+                              : Colors.grey[300], // Color base
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                        ),
+                        child: Stack(
+                          children: [
+                            Container(
+                              width: 134 *
+                                  (_currentEnemyPs /
+                                      _maxEnemyPs), // Representa la cantidad actual de puntos de vida del Pokémon enemigo
+                              height: 10,
+                              decoration: BoxDecoration(
+                                color: _pokemonEnemyDeath
+                                    ? Colors.red
+                                    : Colors.green,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(8)),
                               ),
-                              Container(
-                                width: 134 *
-                                    ((_maxEnemyPs - _currentEnemyPs) /
-                                        _maxEnemyPs), // Representa la cantidad perdida de puntos de vida del Pokémon enemigo
-                                height: 10,
-                                decoration: BoxDecoration(
-                                  color: Colors
-                                      .red, // Color de puntos de vida perdidos
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(8)),
-                                ),
+                            ),
+                            Container(
+                              width: 134 *
+                                  ((_maxEnemyPs - _currentEnemyPs) /
+                                      _maxEnemyPs), // Representa la cantidad perdida de puntos de vida del Pokémon enemigo
+                              height: 10,
+                              decoration: BoxDecoration(
+                                color: Colors
+                                    .red, // Color de puntos de vida perdidos
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(8)),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    SizedBox(height: 20),
-                    Stack(
-                      alignment: Alignment.bottomCenter,
-                      children: <Widget>[
-                        Container(
-                          height: 80,
-                          width: 284,
-                          child: Image.asset(
-                            'assets/Game/grass-enemy.png',
-                            fit: BoxFit.fitHeight,
-                          ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  Stack(
+                    alignment: Alignment.bottomCenter,
+                    children: <Widget>[
+                      Container(
+                        height: 80,
+                        width: 284,
+                        child: Image.asset(
+                          'assets/Game/grass-enemy.png',
+                          fit: BoxFit.fitHeight,
                         ),
-                        Container(
-                          height: 120,
-                          margin: EdgeInsets.only(bottom: 25),
-                          child: Image.network(
-                            'http://20.162.113.208/${primerPokemon['foto_pokemon']}',
-                            fit: BoxFit.fitHeight,
-                          ),
+                      ),
+                      Container(
+                        height: 120,
+                        margin: EdgeInsets.only(bottom: 25),
+                        child: Image.network(
+                          'http://20.162.113.208/${primerPokemon['foto_pokemon']}',
+                          fit: BoxFit.fitHeight,
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-            );
-          } else {
-            return Center(child: Text('No se encontraron datos'));
-          }
+            ),
+          );
         }
+      },
+    );
+  }
+
+  // Función para mostrar el diálogo de victoria
+  void showVictoryDialog(BuildContext context, String nombreLider, String medalla) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("¡Has ganado!"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("¡Has ganado a $nombreLider!"),
+              SizedBox(height: 10),
+              Text("Has ganado la medalla $medalla"),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // Código para continuar
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyAppGame()),
+                );
+              },
+              child: Text("Continuar"),
+            ),
+          ],
+        );
       },
     );
   }
@@ -244,6 +320,8 @@ class BattleEnemySide extends StatelessWidget {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final List<dynamic> pokemonDataList = data['pokemons'];
+      final String medalla = data['medalla'];
+      final String nombreLider = data['nombre_lider'];
 
       // Borra la lista de Pokémon existente antes de agregar los nuevos
       _pokemonList.clear();
@@ -258,7 +336,11 @@ class BattleEnemySide extends StatelessWidget {
       pokemonEnemyDefense = primerPokemon['defensa'] as int;
       currentEnemyPs = primerPokemon['ps'] as int;
       maxEnemyPs = primerPokemon['ps'] as int;
-      return data;
+      return {
+        'pokemons': pokemonDataList,
+        'medalla': medalla,
+        'nombre_lider': nombreLider
+      };
     } else {
       throw Exception('Error al cargar los datos del líder de gimnasio');
     }
