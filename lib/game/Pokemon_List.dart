@@ -8,6 +8,10 @@ import '../usuario.dart';
 import '../usuario_provider.dart';
 import 'package:pokemonapp/game/battle/screens/battle_screen.dart';
 
+class GlobalState {
+  static int idUsuario = 0;
+}
+
 class PokemonList extends StatefulWidget {
   @override
   _PokemonListState createState() => _PokemonListState();
@@ -30,6 +34,11 @@ class _PokemonListState extends State<PokemonList> {
     final usuarioProvider =
         Provider.of<UsuarioProvider>(context, listen: false);
     final usuario = usuarioProvider.usuario;
+
+    // Guardar idUsuario en GlobalState
+    if (usuario != null) {
+      GlobalState.idUsuario = usuario.idUsuario;
+    }
 
     return Scaffold(
       body: Column(
@@ -112,7 +121,7 @@ class _PokemonListState extends State<PokemonList> {
                   ],
                 ),
               ),
-              child: _buildPokemonList(usuario),
+              child: _buildPokemonList(),
             ),
           ),
           if (_selectedPokemonIds.length == 6)
@@ -131,9 +140,9 @@ class _PokemonListState extends State<PokemonList> {
     );
   }
 
-  Widget _buildPokemonList(Usuario? usuario) {
+  Widget _buildPokemonList() {
     return FutureBuilder(
-      future: _fetchPokemonList(usuario?.idUsuario ?? 0),
+      future: _fetchPokemonList(GlobalState.idUsuario),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());

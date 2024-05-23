@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -8,11 +6,16 @@ import 'package:pokemonapp/game/battle/components/battle_player_side.dart';
 import 'package:pokemonapp/game/main.dart';
 import 'package:pokemonapp/usuario_provider.dart';
 
+
 class YourClass {
   static int idLiderGimnasio = 0;
 }
 
 class BattleEnemySide extends StatelessWidget {
+  final UsuarioProvider usuarioProvider; // Agrega un campo para el UsuarioProvider
+
+  BattleEnemySide({required this.usuarioProvider}); // Constructor que recibe el UsuarioProvider
+
   static int _pokemonEnemyDefense = 0;
   static int _currentEnemyPs = 0;
   static int _maxEnemyPs = 0;
@@ -21,7 +24,6 @@ class BattleEnemySide extends StatelessWidget {
   int _currentPokemonIndex = 0;
   BattlePlayerSide _battlePlayerSide = BattlePlayerSide();
   bool _showVictoryDialog = false; // Variable para controlar la visibilidad del mensaje de victoria
-
 
   int get pokemonEnemyDefense => _pokemonEnemyDefense;
   set pokemonEnemyDefense(int value) {
@@ -68,13 +70,8 @@ class BattleEnemySide extends StatelessWidget {
     print('El Pokémon enemigo está vivo: ${!_pokemonEnemyDeath}');
     print('Lista: $_pokemonList');
     if (_pokemonEnemyDeath) {
-      _currentPokemonIndex++;
-      if (_currentPokemonIndex < _pokemonList.length) {
-        _currentEnemyPs = _pokemonList[_currentPokemonIndex]['ps'] as int;
-        _maxEnemyPs = _pokemonList[_currentPokemonIndex]['ps'] as int;
-        _pokemonEnemyDefense =
-            _pokemonList[_currentPokemonIndex]['defensa'] as int;
-      } else {
+      //_currentPokemonIndex++;
+      if (_pokemonEnemyDeath) {
         // No quedan más Pokémon en la lista
         print('No quedan más Pokémon en la lista');
         print('Lista: $_pokemonList');
@@ -85,30 +82,34 @@ class BattleEnemySide extends StatelessWidget {
         final String nombreLider = dataLider['nombre_lider'];
 
         // Realizar la llamada a la API para agregar la medalla
-        final int idUsuario = UsuarioProvider()
-            .usuario!
-            .idUsuario; // Obtener el ID del usuario autenticado
+        final idUsuario = usuarioProvider.usuario?.idUsuario; // Obtén el idUsuario del UsuarioProvider
 
-        final response = await http.post(
-          Uri.parse('http://20.162.113.208:5000/api/medallas'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: jsonEncode(<String, dynamic>{
-            'id_usuario': idUsuario,
-            'medalla': medalla,
-          }),
-        );
+        if (idUsuario != null) {
+          final response = await http.post(
+            Uri.parse('http://20.162.113.208:5000/api/medallas'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: jsonEncode(<String, dynamic>{
+              'id_usuario': idUsuario,
+              'medalla': medalla,
+            }),
+          );
 
-        if (response.statusCode == 201) {
-          // Medalla agregada correctamente
-          print('Medalla agregada correctamente');
-          _showVictoryDialog = true; // Mostrar el mensaje de victoria
-
+          if (response.statusCode == 201) {
+            // Medalla agregada correctamente
+            print('Medalla agregada correctamente');
+            _showVictoryDialog = true; // Mostrar el mensaje de victoria
+          } else {
+            // Error al agregar la medalla
+            print('Error al agregar la medalla: ${response.statusCode}');
+            print('medalla: $medalla');
+            print('user: $idUsuario');
+            _showVictoryDialog = true; // Mostrar el mensaje de victoria
+          }
         } else {
-          // Error al agregar la medalla
-          print('Error al agregar la medalla: ${response.statusCode}');
-          _showVictoryDialog = true; // Mostrar el mensaje de victoria
+          // Manejar el caso en que idUsuario es null
+          print('Error: idUsuario es null');
         }
       }
     }
@@ -117,17 +118,17 @@ class BattleEnemySide extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (_showVictoryDialog) {
-    // Si _showVictoryDialog es true, mostrar el diálogo de victoria
-    final data = _pokemonList.isNotEmpty ? _pokemonList.first : null;
-    if (data != null) {
-      final String medalla = data['medalla'];
-      final String nombreLider = data['nombre_lider'];
-      WidgetsBinding.instance?.addPostFrameCallback((_) {
-        showVictoryDialog(context, nombreLider, medalla);
-        _showVictoryDialog = false; // Restablecer la variable para futuros usos
-      });
+      // Si _showVictoryDialog es true, mostrar el diálogo de victoria
+      final data = _pokemonList.isNotEmpty ? _pokemonList.first : null;
+      if (data != null) {
+        final String medalla = data['medalla'];
+        final String nombreLider = data['nombre_lider'];
+        WidgetsBinding.instance?.addPostFrameCallback((_) {
+          showVictoryDialog(context, nombreLider, medalla);
+          _showVictoryDialog = false; // Restablecer la variable para futuros usos
+        });
+      }
     }
-  }
     return FutureBuilder<Map<String, dynamic>>(
       future: obtenerDatosLider(YourClass.idLiderGimnasio),
       builder: (context, snapshot) {
@@ -157,7 +158,8 @@ class BattleEnemySide extends StatelessWidget {
             child: Container(
               margin: EdgeInsets.only(left: 0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment
+.center,
                 children: <Widget>[
                   Stack(
                     children: <Widget>[

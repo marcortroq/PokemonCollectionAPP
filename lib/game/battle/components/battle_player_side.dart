@@ -7,6 +7,8 @@ import 'dart:convert';
 import 'package:pokemonapp/game/Pokemon_List.dart';
 import 'package:pokemonapp/game/main.dart';
 import 'package:pokemonapp/game/battle/components/battle_enemy_side.dart';
+import 'package:pokemonapp/usuario_provider.dart';
+import 'package:provider/provider.dart';
 
 class PokemonInfo {
   final int pokemonId;
@@ -36,7 +38,7 @@ class _BattlePlayerSideState extends State<BattlePlayerSide> {
 
   @override
   Widget build(BuildContext context) {
-    _enemySide ??= BattleEnemySide(); // Inicializa _enemySide si es nulo
+    _enemySide ??= BattleEnemySide(usuarioProvider: Provider.of<UsuarioProvider>(context)); // Inicializa _enemySide si es nulo
 
     return FutureBuilder(
       future: _pokemonDataLoaded ? null : _fetchPokemonData(),
