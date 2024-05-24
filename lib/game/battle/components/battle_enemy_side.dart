@@ -119,6 +119,22 @@ class BattleEnemySide extends StatelessWidget {
               }
             }
             // Navegar al menú
+            // Llamada adicional para incrementar sobres, XP y monedas
+            final incrementResponse = await http.post(
+              Uri.parse('http://20.162.113.208:5000/api/medallas/incrementar'),
+              headers: <String, String>{
+                'Content-Type': 'application/json; charset=UTF-8',
+              },
+              body: jsonEncode(<String, dynamic>{
+                'id_usuario': idUsuario,
+              }),
+            );
+
+            if (incrementResponse.statusCode == 200) {
+              print('Incrementos realizados correctamente');
+            } else {
+              print('Error al realizar los incrementos');
+            }
           }
           if (response.statusCode == 409) {
             // Medalla agregada correctamente
@@ -136,6 +152,22 @@ class BattleEnemySide extends StatelessWidget {
                       false; // Restablecer la variable para futuros usos
                 });
               }
+            }
+            // Llamada adicional para incrementar sobres, XP y monedas
+            final incrementResponse = await http.post(
+              Uri.parse('http://20.162.113.208:5000/api/medallas/incrementar'),
+              headers: <String, String>{
+                'Content-Type': 'application/json; charset=UTF-8',
+              },
+              body: jsonEncode(<String, dynamic>{
+                'id_usuario': idUsuario,
+              }),
+            );
+
+            if (incrementResponse.statusCode == 200) {
+              print('Incrementos realizados correctamente');
+            } else {
+              print('Error al realizar los incrementos');
             }
           } else {
             // Error al agregar la medalla
@@ -322,6 +354,8 @@ class BattleEnemySide extends StatelessWidget {
   void showVictoryDialog(
       BuildContext context, String nombreLider, String medalla) {
     showDialog(
+      barrierDismissible:
+          false, // El diálogo no se puede cerrar tocando fuera de él
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
