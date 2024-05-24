@@ -353,6 +353,12 @@ class _HomePageState extends State<HomePage> {
     [-1.75, -1.7000000000000002],
     [1.75, -1.7000000000000002],
     [1.0, 1.5499999999999998],
+    [0.75, 1.2999999999999998],
+    [0.75, 1.5499999999999998],
+    [1.0, 1.2999999999999998],
+    [-1.75, -1.9500000000000002],
+    [-1.5, -1.9500000000000002],
+    [-1.5, -1.7000000000000002],
   ];
 
   List<List<double>> noMansLandPinkHouse = [
@@ -1043,62 +1049,334 @@ class _HomePageState extends State<HomePage> {
   }
 
   void pressedA() async {
-  // Verificar la ubicación del jugador y ejecutar la acción correspondiente
-  if (currentLocation == 'littleroot') {
-    // Coordenadas de los personajes interactuables en Littleroot
-    final Map<String, List<double>> interactableCharacters = {
-      'giovanni': [0.0, 1.2999999999999998],
-      // Agrega más personajes y sus coordenadas aquí si es necesario
-    };
+    // Verificar la ubicación del jugador y ejecutar la acción correspondiente
+    if (currentLocation == 'littleroot') {
+      // Coordenadas de los personajes interactuables en Littleroot
+      final Map<String, List<double>> interactableCharacters = {
+        'giovanni': [0.0, 1.2999999999999998],
+        // Agrega más personajes y sus coordenadas aquí si es necesario
+      };
 
-    // Verificar si el jugador está cerca de algún personaje interactuable
-    interactableCharacters.forEach((character, coordinates) async {
-      double characterX = coordinates[0];
-      double characterY = coordinates[1];
+      // Verificar si el jugador está cerca de algún personaje interactuable
+      interactableCharacters.forEach((character, coordinates) async {
+        double characterX = coordinates[0];
+        double characterY = coordinates[1];
 
-      // Calcular la distancia entre el jugador y el personaje
-      double distance =
-          ((mapx - characterX).abs() + (mapy - characterY).abs()) / 2;
+        // Calcular la distancia entre el jugador y el personaje
+        double distance =
+            ((mapx - characterX).abs() + (mapy - characterY).abs()) / 2;
 
-      if (distance <= 0.1) {
-        // El jugador está cerca del personaje, almacenar el mensaje
-        setState(() {
-          interactionMessage = '¡Empieza la batalla contra $character!';
-        });
+        if (distance <= 0.1) {
+          // El jugador está cerca del personaje, almacenar el mensaje
+          setState(() {
+            interactionMessage = '¡Empieza la batalla contra $character!';
+          });
 
-        // Realizar la llamada a la API para obtener los líderes de gimnasio
-        try {
-          final response = await http.get(Uri.parse('http://20.162.113.208:5000/api/lideres_gimnasio'));
-          if (response.statusCode == 200) {
-            // Decodificar la respuesta JSON
-            final List<dynamic> data = json.decode(response.body);
-            // Buscar el líder de gimnasio con el mismo nombre que el personaje
-            for (var lider in data) {
-              if (lider['nombre_lider'].toLowerCase() == character.toLowerCase()) {
-                // Almacenar el ID del líder de gimnasio en una variable estática
-                // para acceder más tarde
-                YourClass.idLiderGimnasio = lider['id_lider'];
-                break; // Salir del bucle una vez encontrado el líder
+          // Realizar la llamada a la API para obtener los líderes de gimnasio
+          try {
+            final response = await http.get(
+                Uri.parse('http://20.162.113.208:5000/api/lideres_gimnasio'));
+            if (response.statusCode == 200) {
+              // Decodificar la respuesta JSON
+              final List<dynamic> data = json.decode(response.body);
+              // Buscar el líder de gimnasio con el mismo nombre que el personaje
+              for (var lider in data) {
+                if (lider['nombre_lider'].toLowerCase() ==
+                    character.toLowerCase()) {
+                  // Almacenar el ID del líder de gimnasio en una variable estática
+                  // para acceder más tarde
+                  YourClass.idLiderGimnasio = lider['id_lider'];
+                  break; // Salir del bucle una vez encontrado el líder
+                }
               }
+            } else {
+              throw Exception('Failed to load data');
             }
-          } else {
-            throw Exception('Failed to load data');
+          } catch (e) {
+            print('Error: $e');
           }
-        } catch (e) {
-          print('Error: $e');
+
+          // Navegar a PokemonList
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => PokemonList()),
+          );
         }
+      });
+    }
+    if (currentLocation == 'pokelab') {
+      // Coordenadas de los personajes interactuables en Littleroot
+      final Map<String, List<double>> interactableCharacters = {
+        'brock': [-1.25, -1.7000000000000002],
+        'LtSurge': [1.5, -1.7000000000000002],
+        'blaine': [0.5, 1.2999999999999998],
+        // Agrega más personajes y sus coordenadas aquí si es necesario
+      };
 
-        // Navegar a PokemonList
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => PokemonList()),
-        );
-      }
-    });
-  } 
-}
+      // Verificar si el jugador está cerca de algún personaje interactuable
+      interactableCharacters.forEach((character, coordinates) async {
+        double characterX = coordinates[0];
+        double characterY = coordinates[1];
 
+        // Calcular la distancia entre el jugador y el personaje
+        double distance =
+            ((lapMapx - characterX).abs() + (lapMapy - characterY).abs()) / 2;
 
+        if (distance <= 0.1) {
+          // El jugador está cerca del personaje, almacenar el mensaje
+          setState(() {
+            interactionMessage = '¡Empieza la batalla contra $character!';
+          });
+
+          // Realizar la llamada a la API para obtener los líderes de gimnasio
+          try {
+            final response = await http.get(
+                Uri.parse('http://20.162.113.208:5000/api/lideres_gimnasio'));
+            if (response.statusCode == 200) {
+              // Decodificar la respuesta JSON
+              final List<dynamic> data = json.decode(response.body);
+              // Buscar el líder de gimnasio con el mismo nombre que el personaje
+              for (var lider in data) {
+                if (lider['nombre_lider'].toLowerCase() ==
+                    character.toLowerCase()) {
+                  // Almacenar el ID del líder de gimnasio en una variable estática
+                  // para acceder más tarde
+                  YourClass.idLiderGimnasio = lider['id_lider'];
+                  break; // Salir del bucle una vez encontrado el líder
+                }
+              }
+            } else {
+              throw Exception('Failed to load data');
+            }
+          } catch (e) {
+            print('Error: $e');
+          }
+
+          // Navegar a PokemonList
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => PokemonList()),
+          );
+        }
+      });
+    }
+    if (currentLocation == 'bluehouse') {
+      // Coordenadas de los personajes interactuables en Littleroot
+      final Map<String, List<double>> interactableCharacters = {
+        'sabrina': [0.0, -0.9500000000000002],
+        // Agrega más personajes y sus coordenadas aquí si es necesario
+      };
+
+      // Verificar si el jugador está cerca de algún personaje interactuable
+      interactableCharacters.forEach((character, coordinates) async {
+        double characterX = coordinates[0];
+        double characterY = coordinates[1];
+
+        // Calcular la distancia entre el jugador y el personaje
+        double distance =
+            ((BluMapx - characterX).abs() + (BluMapy - characterY).abs()) / 2;
+
+        if (distance <= 0.1) {
+          // El jugador está cerca del personaje, almacenar el mensaje
+          setState(() {
+            interactionMessage = '¡Empieza la batalla contra $character!';
+          });
+
+          // Realizar la llamada a la API para obtener los líderes de gimnasio
+          try {
+            final response = await http.get(
+                Uri.parse('http://20.162.113.208:5000/api/lideres_gimnasio'));
+            if (response.statusCode == 200) {
+              // Decodificar la respuesta JSON
+              final List<dynamic> data = json.decode(response.body);
+              // Buscar el líder de gimnasio con el mismo nombre que el personaje
+              for (var lider in data) {
+                if (lider['nombre_lider'].toLowerCase() ==
+                    character.toLowerCase()) {
+                  // Almacenar el ID del líder de gimnasio en una variable estática
+                  // para acceder más tarde
+                  YourClass.idLiderGimnasio = lider['id_lider'];
+                  break; // Salir del bucle una vez encontrado el líder
+                }
+              }
+            } else {
+              throw Exception('Failed to load data');
+            }
+          } catch (e) {
+            print('Error: $e');
+          }
+
+          // Navegar a PokemonList
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => PokemonList()),
+          );
+        }
+      });
+    }
+    if (currentLocation == 'upbluehouse') {
+      // Coordenadas de los personajes interactuables en Littleroot
+      final Map<String, List<double>> interactableCharacters = {
+        'misty': [2.5, 0.2999999999999998],
+        // Agrega más personajes y sus coordenadas aquí si es necesario
+      };
+
+      // Verificar si el jugador está cerca de algún personaje interactuable
+      interactableCharacters.forEach((character, coordinates) async {
+        double characterX = coordinates[0];
+        double characterY = coordinates[1];
+
+        // Calcular la distancia entre el jugador y el personaje
+        double distance =
+            ((upBluMapx - characterX).abs() + (upBluMapy - characterY).abs()) / 2;
+
+        if (distance <= 0.1) {
+          // El jugador está cerca del personaje, almacenar el mensaje
+          setState(() {
+            interactionMessage = '¡Empieza la batalla contra $character!';
+          });
+
+          // Realizar la llamada a la API para obtener los líderes de gimnasio
+          try {
+            final response = await http.get(
+                Uri.parse('http://20.162.113.208:5000/api/lideres_gimnasio'));
+            if (response.statusCode == 200) {
+              // Decodificar la respuesta JSON
+              final List<dynamic> data = json.decode(response.body);
+              // Buscar el líder de gimnasio con el mismo nombre que el personaje
+              for (var lider in data) {
+                if (lider['nombre_lider'].toLowerCase() ==
+                    character.toLowerCase()) {
+                  // Almacenar el ID del líder de gimnasio en una variable estática
+                  // para acceder más tarde
+                  YourClass.idLiderGimnasio = lider['id_lider'];
+                  break; // Salir del bucle una vez encontrado el líder
+                }
+              }
+            } else {
+              throw Exception('Failed to load data');
+            }
+          } catch (e) {
+            print('Error: $e');
+          }
+
+          // Navegar a PokemonList
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => PokemonList()),
+          );
+        }
+      });
+    }
+    if (currentLocation == 'pinkhouse') {
+      // Coordenadas de los personajes interactuables en Littleroot
+      final Map<String, List<double>> interactableCharacters = {
+        'erika': [-1.5, -0.20000000000000018],
+        // Agrega más personajes y sus coordenadas aquí si es necesario
+      };
+
+      // Verificar si el jugador está cerca de algún personaje interactuable
+      interactableCharacters.forEach((character, coordinates) async {
+        double characterX = coordinates[0];
+        double characterY = coordinates[1];
+
+        // Calcular la distancia entre el jugador y el personaje
+        double distance =
+            ((PinkMapx - characterX).abs() + (PinkMapy - characterY).abs()) / 2;
+
+        if (distance <= 0.1) {
+          // El jugador está cerca del personaje, almacenar el mensaje
+          setState(() {
+            interactionMessage = '¡Empieza la batalla contra $character!';
+          });
+
+          // Realizar la llamada a la API para obtener los líderes de gimnasio
+          try {
+            final response = await http.get(
+                Uri.parse('http://20.162.113.208:5000/api/lideres_gimnasio'));
+            if (response.statusCode == 200) {
+              // Decodificar la respuesta JSON
+              final List<dynamic> data = json.decode(response.body);
+              // Buscar el líder de gimnasio con el mismo nombre que el personaje
+              for (var lider in data) {
+                if (lider['nombre_lider'].toLowerCase() ==
+                    character.toLowerCase()) {
+                  // Almacenar el ID del líder de gimnasio en una variable estática
+                  // para acceder más tarde
+                  YourClass.idLiderGimnasio = lider['id_lider'];
+                  break; // Salir del bucle una vez encontrado el líder
+                }
+              }
+            } else {
+              throw Exception('Failed to load data');
+            }
+          } catch (e) {
+            print('Error: $e');
+          }
+
+          // Navegar a PokemonList
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => PokemonList()),
+          );
+        }
+      });
+    }
+    if (currentLocation == 'uppinkhouse') {
+      // Coordenadas de los personajes interactuables en Littleroot
+      final Map<String, List<double>> interactableCharacters = {
+        'koga': [-2.0, 0.7999999999999998],
+        // Agrega más personajes y sus coordenadas aquí si es necesario
+      };
+
+      // Verificar si el jugador está cerca de algún personaje interactuable
+      interactableCharacters.forEach((character, coordinates) async {
+        double characterX = coordinates[0];
+        double characterY = coordinates[1];
+
+        // Calcular la distancia entre el jugador y el personaje
+        double distance =
+            ((upPinkMapx - characterX).abs() + (upPinkMapy - characterY).abs()) / 2;
+
+        if (distance <= 0.1) {
+          // El jugador está cerca del personaje, almacenar el mensaje
+          setState(() {
+            interactionMessage = '¡Empieza la batalla contra $character!';
+          });
+
+          // Realizar la llamada a la API para obtener los líderes de gimnasio
+          try {
+            final response = await http.get(
+                Uri.parse('http://20.162.113.208:5000/api/lideres_gimnasio'));
+            if (response.statusCode == 200) {
+              // Decodificar la respuesta JSON
+              final List<dynamic> data = json.decode(response.body);
+              // Buscar el líder de gimnasio con el mismo nombre que el personaje
+              for (var lider in data) {
+                if (lider['nombre_lider'].toLowerCase() ==
+                    character.toLowerCase()) {
+                  // Almacenar el ID del líder de gimnasio en una variable estática
+                  // para acceder más tarde
+                  YourClass.idLiderGimnasio = lider['id_lider'];
+                  break; // Salir del bucle una vez encontrado el líder
+                }
+              }
+            } else {
+              throw Exception('Failed to load data');
+            }
+          } catch (e) {
+            print('Error: $e');
+          }
+
+          // Navegar a PokemonList
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => PokemonList()),
+          );
+        }
+      });
+    }
+  }
 
   // Definir una variable en el estado para almacenar el mensaje
   String interactionMessage = '';
@@ -1128,18 +1406,12 @@ class _HomePageState extends State<HomePage> {
           });
         }
       });
-    } else {
-      // Mensaje de despedida
-      setState(() {
-        interactionMessage =
-            'Adiós, gracias por jugar a PokemonApp creado por PAU';
-      });
-    }
+    } else {}
   }
 
   void animateWalk() {
-    print('x: ' + mapx.toString());
-    print('y: ' + mapy.toString());
+    print('x: ' + upPinkMapx.toString());
+    print('y: ' + upPinkMapy.toString());
 
     Timer.periodic(Duration(milliseconds: 50), (timer) {
       setState(() {
@@ -1434,8 +1706,10 @@ class _HomePageState extends State<HomePage> {
                   ),
                   Text(
                     interactionMessage,
-                    style:
-                        TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
                   ),
                   Text(
                     'C R E A T E D   B Y  P A U',
@@ -1451,5 +1725,4 @@ class _HomePageState extends State<HomePage> {
   double cleanNum(double num) {
     return double.parse(num.toStringAsFixed(2));
   }
-  
 }

@@ -38,7 +38,9 @@ class _BattlePlayerSideState extends State<BattlePlayerSide> {
 
   @override
   Widget build(BuildContext context) {
-    _enemySide ??= BattleEnemySide(usuarioProvider: Provider.of<UsuarioProvider>(context)); // Inicializa _enemySide si es nulo
+    _enemySide ??= BattleEnemySide(
+        usuarioProvider: Provider.of<UsuarioProvider>(
+            context)); // Inicializa _enemySide si es nulo
 
     return FutureBuilder(
       future: _pokemonDataLoaded ? null : _fetchPokemonData(),
@@ -174,7 +176,7 @@ class _BattlePlayerSideState extends State<BattlePlayerSide> {
                             // Obtener el daño del ataque seleccionado
                             int damage = _attackDamages[i];
                             // Aplicar el daño al enemigo utilizando la función en BattleEnemySide
-                            _enemySide!.applyAttackDamage(damage);
+                            handleAttackDamage(damage, context);
                             // Restar vida al Pokémon
                             _subtractPokemonLife();
                           },
@@ -234,6 +236,10 @@ class _BattlePlayerSideState extends State<BattlePlayerSide> {
         }
       },
     );
+  }
+
+  void handleAttackDamage(int damage, BuildContext context) {
+    _enemySide!.applyAttackDamage(damage, context);
   }
 
   void _subtractPokemonLife() {

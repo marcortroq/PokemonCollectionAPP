@@ -1,9 +1,12 @@
+//import 'dart:js';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:pokemonapp/game/battle/components/battle_player_side.dart';
 import 'package:pokemonapp/game/main.dart';
+import 'package:pokemonapp/menu.dart';
 import 'package:pokemonapp/usuario_provider.dart';
 
 class YourClass {
@@ -11,9 +14,11 @@ class YourClass {
 }
 
 class BattleEnemySide extends StatelessWidget {
-  final UsuarioProvider usuarioProvider; // Agrega un campo para el UsuarioProvider
+  final UsuarioProvider
+      usuarioProvider; // Agrega un campo para el UsuarioProvider
 
-  BattleEnemySide({required this.usuarioProvider}); // Constructor que recibe el UsuarioProvider
+  BattleEnemySide(
+      {required this.usuarioProvider}); // Constructor que recibe el UsuarioProvider
 
   static int _pokemonEnemyDefense = 0;
   static int _currentEnemyPs = 0;
@@ -22,7 +27,8 @@ class BattleEnemySide extends StatelessWidget {
   static List<dynamic> _pokemonList = [];
   int _currentPokemonIndex = 0;
   BattlePlayerSide _battlePlayerSide = BattlePlayerSide();
-  bool _showVictoryDialog = false; // Variable para controlar la visibilidad del mensaje de victoria
+  static bool _showVictoryDialog =
+      false; // Variable para controlar la visibilidad del mensaje de victoria
 
   int get pokemonEnemyDefense => _pokemonEnemyDefense;
   set pokemonEnemyDefense(int value) {
@@ -54,7 +60,7 @@ class BattleEnemySide extends StatelessWidget {
 
   bool get pokemonEnemyDeath => _pokemonEnemyDeath;
 
-  Future<void> applyAttackDamage(int attackDamage) async {
+  Future<void> applyAttackDamage(int attackDamage, BuildContext context) async {
     print('Vida antes pelea del Pokémon enemigo: $currentEnemyPs');
     print('Defensa antes pelea del Pokémon enemigo: $pokemonEnemyDefense');
     print('Daño antes pelea del Pokémon enemigo: $attackDamage');
@@ -81,7 +87,8 @@ class BattleEnemySide extends StatelessWidget {
         final String nombreLider = dataLider['nombre_lider'];
 
         // Realizar la llamada a la API para agregar la medalla
-        final idUsuario = usuarioProvider.usuario?.idUsuario; // Obtén el idUsuario del UsuarioProvider
+        final idUsuario = usuarioProvider
+            .usuario?.idUsuario; // Obtén el idUsuario del UsuarioProvider
 
         if (idUsuario != null) {
           final response = await http.post(
@@ -99,6 +106,37 @@ class BattleEnemySide extends StatelessWidget {
             // Medalla agregada correctamente
             print('Medalla agregada correctamente');
             _showVictoryDialog = true; // Mostrar el mensaje de victoria
+            print('Medalla $_showVictoryDialog');
+            if (_showVictoryDialog) {
+              // Si _showVictoryDialog es true, mostrar el diálogo de victoria
+              final data = _pokemonList.isNotEmpty ? _pokemonList.first : null;
+              if (data != null) {
+                WidgetsBinding.instance?.addPostFrameCallback((_) {
+                  showVictoryDialog(context, nombreLider, medalla);
+                  _showVictoryDialog =
+                      false; // Restablecer la variable para futuros usos
+                });
+              }
+            }
+            // Navegar al menú
+          }
+          if (response.statusCode == 409) {
+            // Medalla agregada correctamente
+            print('Medalla ya obtenida');
+            _showVictoryDialog = true; // Mostrar el mensaje de victoria
+            print('Medalla $_showVictoryDialog');
+            // Navegar al menú
+            if (_showVictoryDialog) {
+              // Si _showVictoryDialog es true, mostrar el diálogo de victoria
+              final data = _pokemonList.isNotEmpty ? _pokemonList.first : null;
+              if (data != null) {
+                WidgetsBinding.instance?.addPostFrameCallback((_) {
+                  showVictoryDialog(context, nombreLider, medalla);
+                  _showVictoryDialog =
+                      false; // Restablecer la variable para futuros usos
+                });
+              }
+            }
           } else {
             // Error al agregar la medalla
             print('Error al agregar la medalla: ${response.statusCode}');
@@ -124,7 +162,8 @@ class BattleEnemySide extends StatelessWidget {
         final String nombreLider = data['nombre_lider'];
         WidgetsBinding.instance?.addPostFrameCallback((_) {
           showVictoryDialog(context, nombreLider, medalla);
-          _showVictoryDialog = false; // Restablecer la variable para futuros usos
+          _showVictoryDialog =
+              false; // Restablecer la variable para futuros usos
         });
       }
     }
@@ -157,8 +196,7 @@ class BattleEnemySide extends StatelessWidget {
             child: Container(
               margin: EdgeInsets.only(left: 0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment
-.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Stack(
                     children: <Widget>[
@@ -281,7 +319,8 @@ class BattleEnemySide extends StatelessWidget {
   }
 
   // Función para mostrar el diálogo de victoria
-  void showVictoryDialog(BuildContext context, String nombreLider, String medalla) {
+  void showVictoryDialog(
+      BuildContext context, String nombreLider, String medalla) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -300,9 +339,13 @@ class BattleEnemySide extends StatelessWidget {
             TextButton(
               onPressed: () {
                 // Código para continuar
-                Navigator.push(
+                Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => MyAppGame()),
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          Menu()), // Cambia MyAppGame por Menu
+                  (Route<dynamic> route) =>
+                      false, // Elimina todas las rutas anteriores
                 );
               },
               child: Text("Continuar"),
