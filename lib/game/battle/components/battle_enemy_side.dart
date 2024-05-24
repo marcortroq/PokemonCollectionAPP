@@ -6,7 +6,6 @@ import 'package:pokemonapp/game/battle/components/battle_player_side.dart';
 import 'package:pokemonapp/game/main.dart';
 import 'package:pokemonapp/usuario_provider.dart';
 
-
 class YourClass {
   static int idLiderGimnasio = 0;
 }
