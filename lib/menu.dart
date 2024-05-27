@@ -19,6 +19,7 @@ import 'package:provider/provider.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:pokemonapp/botonContador.dart';
 
 
 class RPSCustomPainter extends CustomPainter {
@@ -295,27 +296,8 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                                 Padding(
                                   padding: EdgeInsets.only(
                                       bottom: screenSize.height * 0.07),
-                                  child: Stack(
-                                    children: [
-                                      _buildButton(
-                                        countdownTimer.getSecondsRemaining() !=
-                                                0
-                                            ? "READY IN"
-                                            : "COLLECT",
-                                        countdownTimer.getSecondsRemaining() !=
-                                                0
-                                            ? "assets/incubadoraOFF.png"
-                                            : "assets/incubadora.png",
-                                        Incubadora(),
-                                        countdownTimer.getSecondsRemaining() !=
-                                                0
-                                            ? activate = false
-                                            : activate = true,
-                                        context,
-                                      ), // INCUBADORA
-                                      countdownTimer, // Contador de cuenta atrás de 12 horas
-                                    ],
-                                  ),
+                                  child: BotonContador(idUsuario: idusuario),
+                                
                                 ),
                                 Padding(
                                   padding: EdgeInsets.only(
@@ -418,7 +400,7 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                     left: (MediaQuery.of(context).size.width * 0.4) / 2,
                     top: (MediaQuery.of(context).size.height * 0.28) / 2,
                     child: FutureBuilder<List<Map<String, dynamic>>>(
-                      future: fetchMedallasByUserId(1),
+                      future: fetchMedallasByUserId(idusuario),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {

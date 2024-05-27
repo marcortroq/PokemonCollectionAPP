@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'package:pokemonapp/menu.dart';
 import 'package:pokemonapp/usuario_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:pokemonapp/prueba.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,8 +56,8 @@ class _StateIncubadora extends State<Incubadora> {
           // Navegar a otra pantalla cuando se hayan hecho clic en todas las imágenes
           Navigator.push(
             context,
+            //MaterialPageRoute(builder: (context) => MyApp()),
             MaterialPageRoute(builder: (context) => Menu()),
-            
           );
         } else {
           if (showOverlayImage) {
