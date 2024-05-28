@@ -9,17 +9,19 @@ class CustomNavBar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
 
-  CustomNavBar({required this.currentIndex, required this.onTap, required int coins});
+  CustomNavBar(
+      {required this.currentIndex, required this.onTap, required int coins});
 
   @override
   Widget build(BuildContext context) {
-    final usuarioProvider = Provider.of<UsuarioProvider>(context, listen: false);
+    final usuarioProvider =
+        Provider.of<UsuarioProvider>(context, listen: false);
     final usuario = usuarioProvider.usuario;
     int Usuarioxp = usuario?.xp ?? 0;
     double XpLevel = 100.0; // Inicialmente, el valor de XpLevel es 100.0
     double XpPer;
     int level = 1;
-      final int coins; // Agrega esta línea
+    final int coins; // Agrega esta línea
     int _currentIndex = 0;
 
     while (Usuarioxp >= XpLevel) {
@@ -97,7 +99,10 @@ class CustomNavBar extends StatelessWidget {
                             ),
                             Positioned(
                               top: screenSize.height * 0.053,
-                              left: screenSize.height * ((level.toString().length == 1) ? 0.0128 : 0.007),
+                              left: screenSize.height *
+                                  ((level.toString().length == 1)
+                                      ? 0.0128
+                                      : 0.007),
                               child: Text(
                                 level.toString(),
                                 style: TextStyle(
@@ -117,19 +122,18 @@ class CustomNavBar extends StatelessWidget {
             ),
             Positioned(
               top: screenSize.height * 0.005,
-              left: (screenSize.width - 00) / 2,
               child: Stack(
                 children: [
                   Image.asset(
                     'assets/barramoneda.png',
-                    width: screenSize.width * 0.3,
+                    width: screenSize.width * 0.27,
                     height: screenSize.height * 0.13,
                   ),
                   Positioned(
-                    top: screenSize.height*0.053,
-                    left: screenSize.height*0.065,
-                    child: FutureBuilder<int>(
-                      future: obtenerNumeroMonedas(
+                    top: screenSize.height * 0.055,
+                    left: screenSize.height * 0.055,
+                    child: FutureBuilder<Map<String, int>>(
+                      future: obtenerMonedas(
                           context), // Llama a la función asíncrona aquí
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
@@ -141,7 +145,7 @@ class CustomNavBar extends StatelessWidget {
                         } else {
                           // Aquí puedes devolver el Text widget con el valor obtenido
                           return Text(
-                            snapshot.data.toString(),
+                            snapshot.data!['monedasNormales'].toString(),
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -165,10 +169,10 @@ class CustomNavBar extends StatelessWidget {
                     height: screenSize.height * 0.13,
                   ),
                   Positioned(
-                    top: screenSize.height*0.055,
-                    left: screenSize.height*0.055,
-                    child: FutureBuilder<int>(
-                      future: obtenerNumeroMonedasPremium(
+                    top: screenSize.height * 0.055,
+                    left: screenSize.height * 0.055,
+                    child: FutureBuilder<Map<String, int>>(
+                      future: obtenerMonedas(
                           context), // Llama a la función asíncrona aquí
                       builder: (context, snapshot) {
                         if (snapshot.connectionState ==
@@ -180,7 +184,7 @@ class CustomNavBar extends StatelessWidget {
                         } else {
                           // Aquí puedes devolver el Text widget con el valor obtenido
                           return Text(
-                            snapshot.data.toString(),
+                            snapshot.data!['monedasEspeciales'].toString(),
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -200,7 +204,7 @@ class CustomNavBar extends StatelessWidget {
     );
   }
 
-  Future<int> obtenerNumeroMonedas(BuildContext context) async {
+  Future<Map<String, int>> obtenerMonedas(BuildContext context) async {
     final usuarioProvider =
         Provider.of<UsuarioProvider>(context, listen: false);
     final usuario = usuarioProvider.usuario;
@@ -209,26 +213,18 @@ class CustomNavBar extends StatelessWidget {
     try {
       Map<String, dynamic> data = await fetchUserCoins(idUsuario);
       int monedasNormales = data['monedas'] ?? 0;
-      return monedasNormales;
-    } catch (error) {
-      print(error);
-      return 0; // o lanzar una excepción, dependiendo del caso
-    }
-  }
-
-  Future<int> obtenerNumeroMonedasPremium(BuildContext context) async {
-    final usuarioProvider =
-        Provider.of<UsuarioProvider>(context, listen: false);
-    final usuario = usuarioProvider.usuario;
-    int idUsuario = usuario?.idUsuario ?? 0;
-
-    try {
-      Map<String, dynamic> data = await fetchUserCoins(idUsuario);
       int monedasEspeciales = data['cantidad_pokecoins'] ?? 0;
-      return monedasEspeciales;
+
+      return {
+        'monedasNormales': monedasNormales,
+        'monedasEspeciales': monedasEspeciales,
+      };
     } catch (error) {
       print(error);
-      return 0; // o lanzar una excepción, dependiendo del caso
+      return {
+        'monedasNormales': 0,
+        'monedasEspeciales': 0,
+      };
     }
   }
 
