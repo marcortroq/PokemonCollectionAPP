@@ -1712,7 +1712,7 @@ class _HomePageState extends State<HomePage> {
                         color: Colors.white),
                   ),
                   Text(
-                    'C R E A T E D   B Y  P A U',
+                    'C R E A T E D   B Y',
                     style: TextStyle(color: Colors.white),
                   )
                 ],
