@@ -15,4 +15,10 @@ class UsuarioProvider extends ChangeNotifier {
 
   // Método para verificar si hay un usuario autenticado
   bool estaAutenticado() => _usuario != null;
+
+  // Método para cerrar sesión
+  void logout() {
+    _usuario = null; // Establece el usuario como null
+    notifyListeners(); // Notificar a los oyentes que el estado ha cambiado
+  }
 }

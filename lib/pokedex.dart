@@ -10,11 +10,7 @@ import 'package:pokemonapp/usuario.dart';
 import 'usuario_provider.dart';
 import 'package:provider/provider.dart';
 
-void main() {
-  runApp(MaterialApp(
-    home: Pokedex(),
-  ));
-}
+
 class Pokedex extends StatefulWidget {
   @override
   _PokedexState createState() => _PokedexState();
@@ -247,11 +243,12 @@ class _PokedexState extends State<Pokedex> {
         child: FutureBuilder<List<dynamic>>(
           future: fetchUserCards(idUsuario), // Cambia 1 por el ID del usuario
           builder: (context, snapshot) {
+            print(snapshot.data);
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
-            } else if (snapshot.data == null) {
+            } else if (snapshot.data.toString() == "") {
               // Agregar verificación de nulidad aquí
               return Center(child: Text('No se encontraron cartas de usuario.'));
             } else {
@@ -338,13 +335,24 @@ class _PokedexState extends State<Pokedex> {
     int pokemon = 59;
     return FutureBuilder<List<dynamic>>(
       future: fetchDuplicateCards(idUsuario),
+     
       builder: (context, snapshot) {
+         print("ESTO ES LO QUE DEVUELVE " + snapshot.data.toString());
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (snapshot.data == null) {
-          return Center(child: Text('No se encontraron cartas duplicadas.'));
+        } else if (snapshot.data.toString() == "[]") {
+        return Center(
+          child: Text(
+            'No tienes cartas duplicadas.',
+            style: TextStyle(
+              color: Colors.black,
+              fontFamily: 'sarpanch',
+              fontSize: 18,
+            ),
+          ),
+        );
         } else {
           List<dynamic> duplicateCards = snapshot.data!;
           return GridView.builder(
@@ -413,56 +421,72 @@ class _PokedexState extends State<Pokedex> {
     );
   }
 
-  Future<List<dynamic>> fetchDuplicateCards(int userId) async {
-    final response = await http.get(Uri.parse(
-        'http://20.162.113.208:5000/api/cartas/usuario/dupes/$userId'));
-        if (response.statusCode == 200) {
-      // Decodificar la respuesta JSON
-      List<dynamic> jsonData = json.decode(response.body);
 
-      // Obtener la lista de cartas duplicadas
-      List<dynamic> duplicateCards = [];
-      for (var item in jsonData) {
-        for (var carta in item['cartas_repetidas']) {
-          duplicateCards.add({
-            'id_pokemon': carta['id_pokemon'],
-            'foto_carta': carta['foto_carta'],
-            'cantidad_repetidas': item['cantidad_repetidas'],
-          });
-        }
-      }
-      return duplicateCards;
-    } else {
-      throw Exception('Failed to load duplicate cards');
-    }
-  }
 
-  Future<List<dynamic>> fetchUserCards(int userId) async {
-    print("PRUEBA PARA SABER SI HACE LA LLAMADA");
-    final response = await http.get(
-        Uri.parse('http://20.162.113.208:5000/api/cartas/usuario/$userId'));
-    print("TIENE RESPUESTA");
-    if (response.statusCode == 200) {
-      print(json.decode(response.body));
-      List<dynamic> userCards = json.decode(response.body);
-      while (!json.encode(userCards).contains(']')) {
-        await Future.delayed(Duration(
-            seconds: 1)); // Esperar un segundo antes de verificar nuevamente
-        final updatedResponse = await http.get(
-            Uri.parse('http://20.162.113.208:5000/api/cartas/usuario/$userId'));
-        print("TIENE RESPUESTA");
-        if (updatedResponse.statusCode == 200) {
-          print(json.decode(updatedResponse.body));
-          userCards = json.decode(updatedResponse.body);
-        } else {
-          throw Exception('Failed to load user cards');
-        }
+Future<List<dynamic>> fetchDuplicateCards(int userId) async {
+  final response = await http.get(
+    Uri.parse('http://20.162.113.208:5000/api/cartas/usuario/dupes/$userId')
+  );
+  
+  if (response.statusCode == 200) {
+    // Decodificar la respuesta JSON
+    List<dynamic> jsonData = json.decode(response.body);
+
+    // Obtener la lista de cartas duplicadas
+    List<dynamic> duplicateCards = [];
+    for (var item in jsonData) {
+      for (var carta in item['cartas_repetidas']) {
+        duplicateCards.add({
+          'id_pokemon': carta['id_pokemon'],
+          'foto_carta': carta['foto_carta'],
+          'cantidad_repetidas': item['cantidad_repetidas'],
+        });
       }
-      return userCards;
-    } else {
-      throw Exception('Failed to load user cards');
     }
+    return duplicateCards;
+  } else if (response.statusCode == 404) {
+    print('No se encontraron cartas duplicadas para el usuario $userId');
+    return []; // Devuelve una lista vacía si el estado es 404
+  } else {
+    throw Exception('Failed to load duplicate cards');
   }
+}
+
+
+
+
+Future<List<dynamic>> fetchUserCards(int userId) async {
+  print("PRUEBA PARA SABER SI HACE LA LLAMADA");
+  
+  final response = await http.get(
+    Uri.parse('http://20.162.113.208:5000/api/cartas/usuario/$userId')
+  );
+  print("TIENE RESPUESTA");
+
+  if (response.statusCode == 200) {
+    print(json.decode(response.body));
+    List<dynamic> userCards = json.decode(response.body);
+    while (!json.encode(userCards).contains(']')) {
+      await Future.delayed(Duration(seconds: 1)); // Esperar un segundo antes de verificar nuevamente
+      final updatedResponse = await http.get(
+        Uri.parse('http://20.162.113.208:5000/api/cartas/usuario/$userId')
+      );
+      print("TIENE RESPUESTA");
+      if (updatedResponse.statusCode == 200) {
+        print(json.decode(updatedResponse.body));
+        userCards = json.decode(updatedResponse.body);
+      } else {
+        throw Exception('Failed to load user cards');
+      }
+    }
+    return userCards;
+  } else if (response.statusCode == 404) {
+    return []; // Devuelve una lista vacía si el estado es 404
+  } else {
+    throw Exception('Failed to load user cards');
+  }
+}
+
 
   Future<void> _showPopUp(
     BuildContext context,

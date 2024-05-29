@@ -14,9 +14,6 @@ void main() {
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []); // Oculta la barra de navegación
-  runApp(MaterialApp(
-    home: open_packNormal(),
-  ));
 }
 
 class open_packNormal extends StatefulWidget {
@@ -81,11 +78,11 @@ class _StateOpen_packNormal extends State<open_packNormal> {
               _buildIncubadora2('assets/SobreEspecial.png', 275, screenWidth, 0.5),
             if (showImages) _buildCardImages(screenWidth),
             if (showImages)
-              _buildOverlayImage('assets/SobreAperturaEspecial.png', 200, screenWidth, screenWidth * 1.2, screenWidth * 0.504, 0),
+              _buildOverlayImage('assets/SobreAperturaEspecial.png', 200, screenWidth, screenWidth * 1.2, screenWidth * 0.510, 0),
             if (showImages)
-              _buildOverlayImage2('assets/SobreAperturaEspecial.png', 200, screenWidth, screenWidth * 0.4, screenWidth * 0.24, 1),
+              _buildOverlayImage2('assets/SobreAperturaEspecial.png', 200, screenWidth, screenWidth * 0.4, screenWidth * 0.245, 1),
             if (showImages)
-              _buildOverlayImage3('assets/SobreAperturaEspecial.png', 200, screenWidth, screenWidth *1.2, screenWidth * 0.504, 2),
+              _buildOverlayImage3('assets/SobreAperturaEspecial.png', 200, screenWidth, screenWidth * 1.2, screenWidth * 0.534, 2),
             
           ],
         ),

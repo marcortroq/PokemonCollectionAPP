@@ -174,7 +174,7 @@ class _PacksState extends State<Packs> {
       PackData(
         title: 'PREMIUM PACKS',
         images: ['assets/sobrepremium.png', 'assets/sobrepremium.png'],
-        prices: ['550', '1000'],
+        prices: ['550', '1500'],
       ),
       PackData(
         title: 'BASICS PACKS',
@@ -386,7 +386,7 @@ class _PacksState extends State<Packs> {
                         ),
                         SizedBox(width: 5.0),
                         Text(
-                          'x4',
+                          (numero == 550.toString() || numero == 1000.toString()) ? "X3" : "X5",
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 24.0,
@@ -696,10 +696,4 @@ class PackData {
     required this.images,
     required this.prices,
   });
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: Packs(),
-  ));
 }

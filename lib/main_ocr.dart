@@ -6,10 +6,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'result_screen.dart';
 
 
-void main() {
-  runApp(const App());
-}
-
 class App extends StatelessWidget {
   const App({super.key});
 
@@ -71,74 +67,80 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _future,
-      builder: (context, snapshot) {
-        return Stack(
-          children: [
-            if (_isPermissionGranted)
-              FutureBuilder<List<CameraDescription>>(
-                future: availableCameras(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    _initCameraController(snapshot.data!);
-
-                    return Center(child: CameraPreview(_cameraController!));
-                  } else {
-                    return const LinearProgressIndicator();
-                  }
-                },
-              ),
-            Scaffold(
-              appBar: AppBar(
-                title: Center( // Envuelve el Texto con Center
-                  child: Text(
-                    'POKÉMON CAPTURE',
-                    style: TextStyle(
-                      fontFamily: 'Sarpanch', // Usa la tipografía Sarpanch
-                      fontSize: 20.0, // Tamaño del texto
-                      fontWeight: FontWeight.bold, // Negrita
-                      color: Colors.white, // Color del texto en blanco
-                    ),
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: PreferredSize(
+      preferredSize: Size.fromHeight(35.0), // Ajusta aquí el tamaño vertical del AppBar
+      child: AppBar(
+        title: Container(
+          margin: const EdgeInsets.only(bottom: 10.0), // Espacio inferior para el título
+          child: Text(
+            'POKÉMON CAPTURE',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: 'Sarpanch',
+              fontSize: 20.0,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
+        backgroundColor: Colors.black,
+        centerTitle: true,
+      ),
+    ),
+    backgroundColor: _isPermissionGranted ? Colors.transparent : null,
+    body: Stack(
+      children: [
+        if (_isPermissionGranted)
+          FutureBuilder<List<CameraDescription>>(
+            future: availableCameras(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                _initCameraController(snapshot.data!);
+                return Center(child: CameraPreview(_cameraController!));
+              } else {
+                return const LinearProgressIndicator();
+              }
+            },
+          ),
+        _isPermissionGranted
+            ? Column(
+                children: [
+                  Expanded(
+                    child: Container(),
                   ),
-                ),
-                backgroundColor: Colors.black, // Color de fondo negro
-              ),
-              backgroundColor: _isPermissionGranted ? Colors.transparent : null,
-              body: _isPermissionGranted
-                  ? Column(
-                      children: [
-                        Expanded(
-                          child: Container(),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.only(bottom: 30.0),
-                          child: Center(
-                            child: GestureDetector(
-                              onTap: _scanImage,
-                              child: Image.asset('assets/OcrButton.png'), // Ruta de la imagen
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  : Center(
-                      child: Container(
-                        padding: const EdgeInsets.only(left: 24.0, right: 24.0),
-                        child: const Text(
-                          'Camera permission denied',
-                          textAlign: TextAlign.center,
-                        ),
+                  Container(
+                    padding: const EdgeInsets.only(bottom: 30.0),
+                    child: Center(
+                      child: GestureDetector(
+                        onTap: _scanImage,
+                        child: Image.asset('assets/OcrButton.png'),
                       ),
                     ),
-            ),
-          ],
-        );
-      },
-    );
-  }
+                  ),
+                ],
+              )
+            : Center(
+                child: Container(
+                  padding: const EdgeInsets.only(left: 24.0, right: 24.0),
+                  child: const Text(
+                    'Camera permission denied',
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+      ],
+    ),
+  );
+}
+
+
+
+
+
+
 
   Future<void> _requestCameraPermission() async {
     final status = await Permission.camera.request();

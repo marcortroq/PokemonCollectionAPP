@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:pokemonapp/main.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:pokemonapp/menu.dart';
+import 'package:pokemonapp/usuario.dart';
+import 'usuario_provider.dart';
+import 'package:provider/provider.dart';
 
 class NavBar extends StatefulWidget {
   final Function(String) onProfileImageSelected;
@@ -171,6 +174,8 @@ class _NavBarState extends State<NavBar> {
   Widget build(BuildContext context) {
     double xpPer = widget.xpPer;
     int idusuario = widget.idusuario;
+    final usuarioProvider =
+        Provider.of<UsuarioProvider>(context, listen: false);
     return Drawer(
       child: Column(
         children: <Widget>[
@@ -558,6 +563,7 @@ class _NavBarState extends State<NavBar> {
               ],
             ),
             onTap: () {
+              usuarioProvider.logout();         // Llama al método logout del UsuarioProvider
               Navigator.pushReplacement(
                   context, MaterialPageRoute(builder: (context) => MyApp()));
             },
