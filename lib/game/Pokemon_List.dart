@@ -68,6 +68,7 @@ class _PokemonListState extends State<PokemonList> {
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
+                        fontFamily: 'Sarpanch'
                       ),
                     ),
                     SizedBox(height: 5),
@@ -77,6 +78,7 @@ class _PokemonListState extends State<PokemonList> {
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.white,
+                        fontFamily: 'Sarpanch'
                       ),
                     ),
                     SizedBox(height: 10),
@@ -85,30 +87,42 @@ class _PokemonListState extends State<PokemonList> {
               ),
             ),
           ),
-          Container(
-            color: Colors.black,
-            padding: EdgeInsets.all(8.0),
-            child: SizedBox(
-              height: 30,
-              child: Container(
-                child: TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.search, color: Colors.white),
-                    filled: true,
-                    fillColor: Colors.white.withOpacity(0.3),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  onChanged: (value) {
-                    setState(() {});
-                  },
-                ),
-              ),
-            ),
+Container(
+  color: Colors.black,
+  padding: EdgeInsets.all(8.0),
+  child: SizedBox(
+    height: 30,
+    child: Container(
+      child: TextField(
+        controller: _searchController,
+        decoration: InputDecoration(
+          prefixIcon: Icon(Icons.search, color: Colors.white),
+          filled: true,
+          fillColor: Colors.white.withOpacity(0.3),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+            borderSide: BorderSide.none,
           ),
+          // Establece el color del texto en blanco
+          hintStyle: TextStyle(color: Colors.white),
+          // Establece el color del texto en blanco cuando está seleccionado
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.white),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          // Centra el texto dentro del TextField
+          contentPadding: EdgeInsets.symmetric(vertical:), // Ajusta el padding vertical para centrar verticalmente el texto
+        ),
+        onChanged: (value) {
+          setState(() {});
+        },
+        style: TextStyle(color: Colors.white), // Color del texto en blanco
+      ),
+    ),
+  ),
+),
+
+
           Expanded(
             child: CustomPaint(
               painter: CustomContainerPainter(
@@ -132,7 +146,21 @@ class _PokemonListState extends State<PokemonList> {
                 onPressed: () {
                   _navigateToBattleScreen(context);
                 },
-                child: Text('→'),
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(const Color.fromRGBO(29, 30, 29, 1)), // Color de fondo del botón
+                ),
+                child: Container( // Envuelve el texto en un contenedor para aplicar alineación
+                  alignment: Alignment.center,
+                  child: Text(
+                    'COMENZAR BATALLA',
+                    textAlign: TextAlign.center, // Alinea el texto al centro
+                    style: TextStyle(
+                      fontSize: 18, // Tamaño del texto dentro del botón
+                      fontFamily: 'Sarpanch',
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ),
             ),
         ],
@@ -201,7 +229,7 @@ class _PokemonListState extends State<PokemonList> {
                       height: 72,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: isSelected ? Colors.yellow : Colors.white,
+                        color: isSelected ? const Color.fromRGBO(229, 166, 94, 1) : Colors.white,
                       ),
                       child: Center(
                         child: ClipOval(
@@ -219,8 +247,8 @@ class _PokemonListState extends State<PokemonList> {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        fontFamily: 'Pokemon-Solid',
-                        color: isSelected ? Colors.green : Colors.black,
+                        fontFamily: 'Sarpanch',
+                        color:  Colors.black,
                       ),
                     ),
                     SizedBox(height: 20),

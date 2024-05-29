@@ -14,9 +14,6 @@ void main() {
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []); // Oculta la barra de navegación
-  runApp(MaterialApp(
-    home: open_packPremium(),
-  ));
 }
 
 class open_packPremium extends StatefulWidget {
@@ -81,15 +78,15 @@ class _StateOpen_packPremium extends State<open_packPremium> {
               _buildIncubadora2('assets/SobreEspecial.png', 275, screenWidth, 0.5),
             if (showImages) _buildCardImages(screenWidth),
             if (showImages)
-              _buildOverlayImage('assets/SobreAperturaEspecial.png', 200, screenWidth, screenWidth * 0.2, screenWidth * 0.504, 0),
+              _buildOverlayImage('assets/SobreAperturaEspecial.png', 200, screenWidth, screenWidth * 0.2, screenWidth * 0.510, 0),
             if (showImages)
-              _buildOverlayImage2('assets/SobreAperturaEspecial.png', 200, screenWidth, screenWidth * 1.4, screenWidth * 0.504, 1),
+              _buildOverlayImage2('assets/SobreAperturaEspecial.png', 200, screenWidth, screenWidth * 1.4, screenWidth * 0.510, 1),
             if (showImages)
-              _buildOverlayImage3('assets/SobreAperturaEspecial.png', 200, screenWidth, screenWidth * 0.2, screenWidth * 0.504, 2),
+              _buildOverlayImage3('assets/SobreAperturaEspecial.png', 200, screenWidth, screenWidth * 0.2, screenWidth * 0.533, 2),
             if (showImages)
-              _buildOverlayImage4('assets/SobreAperturaEspecial.png', 200, screenWidth, screenWidth * 0.8, screenWidth * 0.24, 3),
+              _buildOverlayImage4('assets/SobreAperturaEspecial.png', 200, screenWidth, screenWidth * 0.8, screenWidth * 0.27, 3),
             if (showImages)
-              _buildOverlayImage5('assets/SobreAperturaEspecial.png', 200, screenWidth, screenWidth * 1.4, screenWidth * 0.504, 4),
+              _buildOverlayImage5('assets/SobreAperturaEspecial.png', 200, screenWidth, screenWidth * 1.4, screenWidth * 0.533, 4),
             
           ],
         ),

@@ -8,9 +8,6 @@ import 'menu.dart';
 import 'dart:convert';
 
 
-void main() {
-  runApp(const Register());
-}
 
 class Register extends StatelessWidget {
   const Register({Key? key}) : super(key: key);

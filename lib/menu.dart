@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:pokemonapp/bar.dart';
-import 'package:pokemonapp/countdown_timer.dart';
 import 'package:pokemonapp/incubadora.dart';
 import 'package:pokemonapp/main_ocr.dart';
 import 'package:pokemonapp/nav_bar.dart';
@@ -12,7 +11,6 @@ import 'package:pokemonapp/pokedex.dart';
 import 'dart:math' as math;
 import 'package:http/http.dart' as http;
 import 'package:pokemonapp/usuario.dart';
-import 'main.dart';
 import 'packs.dart';
 import 'usuario_provider.dart';
 import 'package:provider/provider.dart';
@@ -20,6 +18,7 @@ import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:pokemonapp/botonContador.dart';
+import 'package:pokemonapp/game/main.dart';
 
 class RPSCustomPainter extends CustomPainter {
   @override
@@ -110,7 +109,6 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
   late Size _screen;
   double _maxSlide = 200.0;
   double _startingPos = 0.0;
-  final countdownTimer = CountdownTimer();
 
   @override
   void initState() {
@@ -152,8 +150,6 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
     int Usuarioxp = usuario?.xp ?? 0;
     int idusuario = usuario?.idUsuario ?? 0;
     DateTime _fechaApertura = usuario?.fecha_apertura ?? DateTime.now();
-    print("la fecha de apertura del ultimo sobre fue:" +
-        _fechaApertura.toString());
 
     double XpLevel = 100.0; // Inicialmente, el valor de XpLevel es 100.0
     double XpPer;
@@ -556,10 +552,8 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
                   Positioned(
                     left: screenSize.width * 0.23,
                     top: screenSize.height * 0.58,
-                    child: _buildRectangularButton("NUEVO BOTÓN", () {
-                      print("Botón rectangular presionado");
-                    }),
-                  ),
+                    child: _buildRectangularButton(context, MyAppGame()),
+                    ),
                 ],
               );
             })));
@@ -673,12 +667,19 @@ class _MenuState extends State<Menu> with SingleTickerProviderStateMixin {
     );
   }
 
-  Widget _buildRectangularButton(String text, VoidCallback onPressed) {
+  Widget _buildRectangularButton(BuildContext context, Widget screen) {
     return SizedBox(
       width: 215,
       height: 60,
       child: ElevatedButton(
-        onPressed: onPressed,
+        onPressed: () {
+          // Navegar a la pantalla deseada
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => screen), // Llama a la pantalla aquí
+          );
+        },
         style: ElevatedButton.styleFrom(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(13.0),
@@ -779,8 +780,3 @@ Future<List<Map<String, dynamic>>> fetchMedallasByUserId(int userId) async {
   }
 }
 
-void main() {
-  runApp(MaterialApp(
-    home: Menu(),
-  ));
-}

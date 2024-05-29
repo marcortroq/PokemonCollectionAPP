@@ -25,10 +25,6 @@ import 'package:pokemonapp/game/maps/upbluehouse.dart';
 import 'package:pokemonapp/game/maps/uppinkhouse.dart';
 import 'package:pokemonapp/main.dart';
 
-void main() {
-  runApp(MyAppGame());
-}
-
 class MyAppGame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -1712,7 +1708,7 @@ class _HomePageState extends State<HomePage> {
                         color: Colors.white),
                   ),
                   Text(
-                    'C R E A T E D   B Y  P A U',
+                    'C R E A T E D   B Y   P M M P',
                     style: TextStyle(color: Colors.white),
                   )
                 ],

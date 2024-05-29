@@ -248,9 +248,5 @@ Future<DateTime> obtenerFechaApertura(int idUsuario) async {
 
 
 
-void main() {
-  runApp(MaterialApp(
-    home: Contador(),
-  ));
-}
+
 

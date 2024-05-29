@@ -29,10 +29,6 @@ class CustomNavBar extends StatelessWidget {
       XpLevel *= 2.25;
       level += 1;
     }
-    print("Siguiente Nivel: " +
-        XpLevel.toString() +
-        "Nivel Actual " +
-        level.toString());
 
 // Calculamos el progreso del usuario como un porcentaje
     XpPer = Usuarioxp / XpLevel;
@@ -101,7 +97,7 @@ class CustomNavBar extends StatelessWidget {
                               top: screenSize.height * 0.053,
                               left: screenSize.height *
                                   ((level.toString().length == 1)
-                                      ? 0.0128
+                                      ? 0.0108
                                       : 0.007),
                               child: Text(
                                 level.toString(),
@@ -130,8 +126,8 @@ class CustomNavBar extends StatelessWidget {
                     height: screenSize.height * 0.13,
                   ),
                   Positioned(
-                    top: screenSize.height * 0.055,
-                    left: screenSize.height * 0.055,
+                    top: screenSize.height * 0.053,
+                    left: screenSize.width * 0.109,
                     child: FutureBuilder<Map<String, int>>(
                       future: obtenerMonedas(
                           context), // Llama a la función asíncrona aquí
@@ -145,7 +141,7 @@ class CustomNavBar extends StatelessWidget {
                         } else {
                           // Aquí puedes devolver el Text widget con el valor obtenido
                           return Text(
-                            snapshot.data!['monedasNormales'].toString(),
+                            formatMonedasEspeciales(snapshot.data!['monedasNormales']),
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -170,7 +166,7 @@ class CustomNavBar extends StatelessWidget {
                   ),
                   Positioned(
                     top: screenSize.height * 0.055,
-                    left: screenSize.height * 0.055,
+                    left: screenSize.width * 0.103,
                     child: FutureBuilder<Map<String, int>>(
                       future: obtenerMonedas(
                           context), // Llama a la función asíncrona aquí
@@ -184,7 +180,7 @@ class CustomNavBar extends StatelessWidget {
                         } else {
                           // Aquí puedes devolver el Text widget con el valor obtenido
                           return Text(
-                            snapshot.data!['monedasEspeciales'].toString(),
+                            formatMonedasEspeciales(snapshot.data!['monedasEspeciales']),
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -227,6 +223,30 @@ class CustomNavBar extends StatelessWidget {
       };
     }
   }
+
+String formatMonedasEspeciales(int? monedas) {
+  if (monedas == null) {
+    return "0"; // O cualquier valor por defecto que prefieras
+  } else if (monedas >= 1000000) {
+    double mValue = monedas / 1000000;
+    return monedas >= 10000000 ? "${mValue.toStringAsFixed(0)}M" : "${mValue.toStringAsFixed(1)}M";
+  } else if (monedas >= 1000) {
+    double kValue = monedas / 1000;
+    return monedas >= 100000 ? "${kValue.toStringAsFixed(0)}k" : "${kValue.toStringAsFixed(1)}k";
+  } else {
+    return monedas.toString();
+  }
+}
+
+
+
+double calculateLeftPosition(int? monedas, double defaultLeft) {
+  if (monedas != null && monedas >= 10000) {
+    return defaultLeft + 10; // Ajusta este valor según tus necesidades
+  }
+  return defaultLeft;
+}
+
 
   Future<Map<String, dynamic>> fetchUserCoins(int userId) async {
     final response = await http
