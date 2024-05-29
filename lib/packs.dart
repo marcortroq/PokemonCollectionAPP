@@ -386,7 +386,7 @@ class _PacksState extends State<Packs> {
                         ),
                         SizedBox(width: 5.0),
                         Text(
-                          'x4',
+                          'x3',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 24.0,
