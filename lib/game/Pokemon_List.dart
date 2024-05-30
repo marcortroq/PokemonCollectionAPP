@@ -111,7 +111,7 @@ Container(
             borderRadius: BorderRadius.circular(10.0),
           ),
           // Centra el texto dentro del TextField
-          contentPadding: EdgeInsets.symmetric(vertical:), // Ajusta el padding vertical para centrar verticalmente el texto
+          contentPadding: EdgeInsets.symmetric(vertical:8.0), // Ajusta el padding vertical para centrar verticalmente el texto
         ),
         onChanged: (value) {
           setState(() {});
