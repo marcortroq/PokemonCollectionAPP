@@ -212,7 +212,7 @@ Widget build(BuildContext context) {
       final filteredText = recognizedText.text;
       final containsPokemon = filteredText.contains('Pokémon');
       final containsNintendo = filteredText.contains('Nintendo');
-      final contains2002PokemonNintendo = RegExp(r'2002\s*Pok[eé]mon\s*Nintendo|2002\s*Pok[eé]mon\s*/\s*Nintendo|2002\s*Pok[eé]mon\s*Nintendo|2002\s*Pok[eé]mon\s*Nintendo').hasMatch(filteredText);
+      final contains2002PokemonNintendo = RegExp(r'2008\s*Pok[eé]mon\s*Nintendo|2008\s*Pok[eé]mon\s*/\s*Nintendo|2008\s*Pok[eé]mon\s*Nintendo|2008\s*Pok[eé]mon\s*Nintendo').hasMatch(filteredText);
 
       // Imprimir el resultado de la verificación con la expresión regular
       print('Verificación de expresión regular: $contains2002PokemonNintendo');
