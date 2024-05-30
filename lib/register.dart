@@ -7,8 +7,6 @@ import 'package:pokemonapp/main_ocr.dart';
 import 'menu.dart';
 import 'dart:convert';
 
-
-
 class Register extends StatelessWidget {
   const Register({Key? key}) : super(key: key);
 
@@ -82,7 +80,8 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildAnimatedTitulo(String imagePath, bool isKeyboardVisible, double screenWidth) {
+  Widget _buildAnimatedTitulo(
+      String imagePath, bool isKeyboardVisible, double screenWidth) {
     return AnimatedOpacity(
       duration: Duration(milliseconds: 300),
       opacity: isKeyboardVisible ? 0.0 : 1.0,
@@ -99,18 +98,21 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget _buildLoginForm() {
     return Positioned(
       left: 0,
-      bottom: MediaQuery.of(context).viewInsets.top+10,
+      bottom: MediaQuery.of(context).viewInsets.top + 10,
       child: Column(
         children: [
-          _buildAnimatedTitulo('assets/title.png', _isKeyboardVisible, MediaQuery.of(context).size.width),
+          _buildAnimatedTitulo('assets/title.png', _isKeyboardVisible,
+              MediaQuery.of(context).size.width),
           SizedBox(height: 20),
           _buildTextField('Email Address', _emailController),
           SizedBox(height: 10),
           _buildTextField('Username', _usernameController),
           SizedBox(height: 10),
-          _buildTextFieldContrasena('Password', _passwordController, obscureText: _isObscure),
+          _buildTextFieldContrasena('Password', _passwordController,
+              obscureText: _isObscure),
           SizedBox(height: 10),
-          _buildTextFieldContrasena('Password', _RpasswordController, obscureText: _isObscure),
+          _buildTextFieldContrasena('Password', _RpasswordController,
+              obscureText: _isObscure),
           SizedBox(height: 20),
           _buildSignInButton(),
           SizedBox(height: 7),
@@ -142,6 +144,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+
   Widget _buildTextField1(String labelText, TextEditingController controller) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.85,
@@ -165,7 +168,8 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildTextFieldContrasena(String labelText, TextEditingController controller,
+  Widget _buildTextFieldContrasena(
+      String labelText, TextEditingController controller,
       {bool obscureText = false}) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.85,
@@ -186,30 +190,32 @@ class _MyHomePageState extends State<MyHomePage> {
           fillColor: Colors.white,
           labelText: labelText,
           suffixIcon: Padding(
-            padding: const EdgeInsets.only(right: 8.0), // Ajusta el espaciado a tu preferencia
+            padding: const EdgeInsets.only(
+                right: 8.0), // Ajusta el espaciado a tu preferencia
             child: obscureText
-              ? IconButton(
-                  icon: Icon(Icons.visibility),
-                  onPressed: () {
-                    setState(() {
-                      _isObscure = !_isObscure;
-                    });
-                  },
-                )
-              : IconButton(
-                  icon: Icon(Icons.visibility_off),
-                  onPressed: () {
-                    setState(() {
-                      _isObscure = !_isObscure;
-                    });
-                  }
-              ),            
+                ? IconButton(
+                    icon: Icon(Icons.visibility),
+                    onPressed: () {
+                      setState(() {
+                        _isObscure = !_isObscure;
+                      });
+                    },
+                  )
+                : IconButton(
+                    icon: Icon(Icons.visibility_off),
+                    onPressed: () {
+                      setState(() {
+                        _isObscure = !_isObscure;
+                      });
+                    }),
           ),
         ),
       ),
     );
   }
-  Widget _buildTextFieldContrasena1(String labelText, TextEditingController controller,
+
+  Widget _buildTextFieldContrasena1(
+      String labelText, TextEditingController controller,
       {bool obscureText = false}) {
     return SizedBox(
       width: MediaQuery.of(context).size.width * 0.85,
@@ -230,24 +236,24 @@ class _MyHomePageState extends State<MyHomePage> {
           fillColor: Colors.white,
           labelText: labelText,
           suffixIcon: Padding(
-            padding: const EdgeInsets.only(right: 8.0), // Ajusta el espaciado a tu preferencia
+            padding: const EdgeInsets.only(
+                right: 8.0), // Ajusta el espaciado a tu preferencia
             child: obscureText
-              ? IconButton(
-                  icon: Icon(Icons.visibility),
-                  onPressed: () {
-                    setState(() {
-                      _isObscure = !_isObscure;
-                    });
-                  },
-                )
-              : IconButton(
-                  icon: Icon(Icons.visibility_off),
-                  onPressed: () {
-                    setState(() {
-                      _isObscure = !_isObscure;
-                    });
-                  }
-              ),            
+                ? IconButton(
+                    icon: Icon(Icons.visibility),
+                    onPressed: () {
+                      setState(() {
+                        _isObscure = !_isObscure;
+                      });
+                    },
+                  )
+                : IconButton(
+                    icon: Icon(Icons.visibility_off),
+                    onPressed: () {
+                      setState(() {
+                        _isObscure = !_isObscure;
+                      });
+                    }),
           ),
         ),
       ),
@@ -347,11 +353,11 @@ class _MyHomePageState extends State<MyHomePage> {
     String contrasena = _passwordController.text;
 
     // Expresión regular para verificar el formato de correo electrónico
-  RegExp regExp = RegExp(
-    r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-    caseSensitive: false,
-    multiLine: false,
-  );
+    RegExp regExp = RegExp(
+      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+      caseSensitive: false,
+      multiLine: false,
+    );
 
     if (_emailController.text.isEmpty ||
         _usernameController.text.isEmpty ||
@@ -364,17 +370,29 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       );
       return;
-    }
-    else if (contrasena.length <= 5) {
+    } else if (contrasena.length <= 5) {
+      print(
+          "Longitud de la contraseña: ${contrasena.length}"); // Agregamos esta línea para imprimir la longitud de la contraseña
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('La contraseña debe tener más de 6 caracteres.'),
+          content: Text(
+              'La contraseña debe tener más de 6.'),
           duration: Duration(seconds: 2),
         ),
       );
       return;
-    }
-    else if(_passwordController.text != _RpasswordController.text){
+    } else if (!contrasena.contains(RegExp(r'[A-Z]')) ||
+        !contrasena.contains(RegExp(r'[a-z]')) ||
+        !contrasena.contains(RegExp(r'[0-9]'))) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              'La contraseña debe tener más de mayúsculas, números y letras.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    } else if (_passwordController.text != _RpasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Las contraseñas no coinciden.'),
@@ -382,21 +400,20 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       );
       return;
-    }
-    else if (!regExp.hasMatch(_emailController.text)) { // Verificar formato de correo electrónico
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('El correo electrónico no es válido.'),
-        duration: Duration(seconds: 2),
-      ),
-    );
-    return;
-  }
-
-    else{
+    } else if (!regExp.hasMatch(_emailController.text)) {
+      // Verificar formato de correo electrónico
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('El correo electrónico no es válido.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    } else {
       try {
         var response = await http.get(
-          Uri.parse('http://20.162.113.208:5000/api/usuario/nombre/$nombreUsuario'),
+          Uri.parse(
+              'http://20.162.113.208:5000/api/usuario/nombre/$nombreUsuario'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
           },
@@ -465,6 +482,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 }
+
 class TrianglePainter extends CustomPainter {
   final bool isKeyboardVisible;
 
