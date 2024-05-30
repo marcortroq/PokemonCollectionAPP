@@ -224,22 +224,111 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
       } else {
         // Si no contiene contains2002PokemonNintendo un ejemplo seria "2002 Pokemon/Nintendo", mostrar un mensaje de advertencia
         if (!contains2002PokemonNintendo) {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text('No es una carta de Pokémon de la edicion 151'),
-                content: Text('Por favor, escanea una carta de Pokémon de la edicion 151.'),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text('OK'),
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+          side: BorderSide(color: Colors.black, width: 1.0),
+        ),
+        backgroundColor: Colors.transparent,
+        contentPadding: EdgeInsets.zero,
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(10.0),
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10.0),
+                    topRight: Radius.circular(10.0),
                   ),
-                ],
-              );
-            },
-          );
-        } else {
+                ),
+                child: Text(
+                  'No es una carta de Pokémon de la edicion 151',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18.0,
+                    fontFamily: 'sarpanch',
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              SizedBox(height: 0), // Espaciado entre el título y el contenido
+              Container(
+                height: 160, // Ajusta la altura según sea necesario
+                width: 300,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(10.0),
+                    bottomRight: Radius.circular(10.0),
+                  ),
+                  color: Colors.white,
+                  border: Border.all(color: Colors.black, width: 1.0),
+                ),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: Container(
+                          padding: EdgeInsets.all(10.0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10.0),
+                            color: Color.fromRGBO(208, 56, 56, 1),
+                          ),
+                          child: Text(
+                            'Por favor, escanea una carta de Pokémon de la edicion 151.',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14.0,
+                              fontFamily: 'sarpanch',
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10.0), // Espaciado entre el mensaje y el botón
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10.0),
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.black,
+                                Colors.black54,
+                              ],
+                            ),
+                          ),
+                          child: Text(
+                            'CONTINUAR',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16.0,
+                              fontFamily: 'sarpanch',
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+ else {
           // Si no contiene "Pokémon" o "Nintendo", mostrar un mensaje de advertencia
           showDialog(
             context: context,
