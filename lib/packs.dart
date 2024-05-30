@@ -174,7 +174,7 @@ class _PacksState extends State<Packs> {
       PackData(
         title: 'PREMIUM PACKS',
         images: ['assets/sobrepremium.png', 'assets/sobrepremium.png'],
-        prices: ['550', '1500'],
+        prices: ['550', '150'],
       ),
       PackData(
         title: 'BASICS PACKS',

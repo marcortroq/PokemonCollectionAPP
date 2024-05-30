@@ -542,32 +542,7 @@ class _NavBarState extends State<NavBar> {
               ],
             ),
           ),
-          ListTile(
-            title: Row(
-              children: <Widget>[
-                Text(
-                  'Log out',
-                  style: TextStyle(
-                    color: Color.fromARGB(255, 0, 0, 0),
-                    fontSize: 19,
-                    fontFamily: "sarpanch",
-                  ),
-                ),
-                // Ajusta el espacio entre el texto y la imagen
-                Image.asset(
-                  'assets/logout_icon.png', // Ruta de la imagen de logout
-                  width:
-                      24, // Ajusta el tamaño de la imagen según sea necesario
-                  height: 24,
-                ),
-              ],
-            ),
-            onTap: () {
-              usuarioProvider.logout();         // Llama al método logout del UsuarioProvider
-              Navigator.pushReplacement(
-                  context, MaterialPageRoute(builder: (context) => MyApp()));
-            },
-          ),
+          
         ],
       ),
     );

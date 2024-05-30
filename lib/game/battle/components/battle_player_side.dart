@@ -256,21 +256,97 @@ class _BattlePlayerSideState extends State<BattlePlayerSide> {
         showDialog(
           context: context,
           builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Perdiste"),
-              actions: [
-                TextButton(
-                  onPressed: () {
+return AlertDialog(
+        backgroundColor: Colors.transparent,
+        content: Container(
+          width: 300.0,
+          height: 150.0, // Ajusta la altura total del AlertDialog
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20.0),
+            gradient: LinearGradient(
+              colors: [
+                const Color.fromRGBO(178, 168, 168, 1),
+                const Color.fromRGBO(255, 255, 255, 1),
+                const Color.fromRGBO(255, 255, 255, 1),
+              ],
+              stops: [0.0, 0.4, 1.0],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+            border: Border.all(color: Colors.black, width: 1.0),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                decoration: BoxDecoration(
+                  color: Color.fromRGBO(29, 30, 29, 1),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(15.0),
+                    topRight: Radius.circular(15.0),
+                  ),
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Color.fromRGBO(29, 30, 29, 1),
+                      width: 1.0,
+                    ),
+                  ),
+                ),
+                height: 60,
+                child: Center(
+                  child: Text(
+                    "¡Has sido Derrotado!",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24.0,
+                      fontFamily: 'sarpanch',
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 15.0),
+              Container(
+                width: 250,
+                child: TextButton(
+                  onPressed: () async {
                     // Código para continuar
-                    Navigator.push(
+                    Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (context) => MyAppGame()),
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              MyAppGame()), // Cambia MyAppGame por Menu
+                      (Route<dynamic> route) =>
+                          false, // Elimina todas las rutas anteriores
                     );
                   },
-                  child: Text("Continuar"),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        "TOCA PARA CONTINUAR",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20.0,
+                          fontFamily: 'sarpanch',
+                        ),
+                      ),
+                    ],
+                  ),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                      const Color.fromRGBO(29, 30, 29, 1),
+                    ),
+                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                      EdgeInsets.zero,
+                    ),
+                  ),
                 ),
-              ],
-            );
+              ),
+            ],
+          ),
+        ),
+        contentPadding: EdgeInsets.zero,
+      );
           },
         );
       }

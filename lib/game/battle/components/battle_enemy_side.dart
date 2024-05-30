@@ -193,6 +193,8 @@ class BattleEnemySide extends StatelessWidget {
         final String medalla = data['medalla'];
         final String nombreLider = data['nombre_lider'];
         WidgetsBinding.instance?.addPostFrameCallback((_) {
+
+
           showVictoryDialog(context, nombreLider, medalla);
           _showVictoryDialog =
               false; // Restablecer la variable para futuros usos
@@ -211,6 +213,7 @@ class BattleEnemySide extends StatelessWidget {
           final List<dynamic> pokemonDataList = data['pokemons'];
           final String medalla = data['medalla'];
           final String nombreLider = data['nombre_lider'];
+          final String medallaFoto = medalla.replaceAll(RegExp(r'\s+'), '');
 
           _pokemonList = pokemonDataList;
           final primerPokemon = _pokemonList[_currentPokemonIndex];
@@ -351,44 +354,177 @@ class BattleEnemySide extends StatelessWidget {
   }
 
   // Función para mostrar el diálogo de victoria
-  void showVictoryDialog(
-      BuildContext context, String nombreLider, String medalla) {
-    showDialog(
-      barrierDismissible:
-          false, // El diálogo no se puede cerrar tocando fuera de él
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("¡Has ganado!"),
-          content: Column(
+ // Función para mostrar el diálogo de victoria
+void showVictoryDialog(
+    BuildContext context, String nombreLider, String medalla) {
+
+    final String medallaFoto = medalla.replaceAll(RegExp(r'\s+'), '');
+          print("Este es el nombre " + medallaFoto);
+  showDialog(
+    barrierDismissible: false, // El diálogo no se puede cerrar tocando fuera de él
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: Colors.transparent,
+        content: Container(
+          width: 300.0,
+          height: 260.0, // Ajusta la altura total del AlertDialog
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20.0),
+            gradient: LinearGradient(
+              colors: [
+                const Color.fromRGBO(178, 168, 168, 1),
+                const Color.fromRGBO(255, 255, 255, 1),
+                const Color.fromRGBO(255, 255, 255, 1),
+              ],
+              stops: [0.0, 0.4, 1.0],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+            border: Border.all(color: Colors.black, width: 1.0),
+          ),
+          child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("¡Has ganado a $nombreLider!"),
-              SizedBox(height: 10),
-              Text("Has ganado la medalla $medalla"),
+            children: <Widget>[
+              Container(
+                decoration: BoxDecoration(
+                  color: Color.fromRGBO(29, 30, 29, 1),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(15.0),
+                    topRight: Radius.circular(15.0),
+                  ),
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Color.fromRGBO(29, 30, 29, 1),
+                      width: 1.0,
+                    ),
+                  ),
+                ),
+                height: 60,
+                child: Center(
+                  child: Text(
+                    "¡Venciste a $nombreLider!",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24.0,
+                      fontFamily: 'sarpanch',
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 15.0),
+              Container(
+                height: 110,
+                width: 240,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.0), // Bordes redondeados
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [
+                      const Color.fromRGBO(208, 56, 56, 1), // Color inicial
+                      const Color.fromRGBO(255, 91, 91, 1), // Color final
+                    ],
+                  ),
+                  border: Border.all(
+                      color: Colors.black, width: 1.0), // Borde negro
+                ),
+                child: Center(
+                  child: Column(
+                    children: <Widget>[
+                      // Texto
+                      Text(
+                        'Recibes:',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.0,
+                          fontFamily: 'sarpanch',
+                        ),
+                      ),
+                      // Espaciado entre el texto y las imágenes
+                      SizedBox(height: 5.0),
+                      // Fila de imágenes
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          SizedBox(
+                            height: 60,
+                            child: Image.asset(
+                              'assets/${medallaFoto}.png',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          SizedBox(width: 5.0),
+                          SizedBox(
+                            height: 60,
+                            child: Image.asset(
+                              'assets/moneda.png',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          SizedBox(width: 5.0),
+                          SizedBox(
+                            height: 60,
+                            width: 60,
+                            child: Image.asset(
+                              'assets/sobreEspecial.png',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+
+                ),
+              ),
+              SizedBox(height: 15.0), // Espacio adicional si es necesario
+              Container(
+                width: 250,
+                child: TextButton(
+                  onPressed: () async {
+                    // Código para continuar
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              Menu()), // Cambia MyAppGame por Menu
+                      (Route<dynamic> route) =>
+                          false, // Elimina todas las rutas anteriores
+                    );
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        "TOCA PARA CONTINUAR",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20.0,
+                          fontFamily: 'sarpanch',
+                        ),
+                      ),
+                    ],
+                  ),
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                      const Color.fromRGBO(29, 30, 29, 1),
+                    ),
+                    padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
+                      EdgeInsets.zero,
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                // Código para continuar
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          Menu()), // Cambia MyAppGame por Menu
-                  (Route<dynamic> route) =>
-                      false, // Elimina todas las rutas anteriores
-                );
-              },
-              child: Text("Continuar"),
-            ),
-          ],
-        );
-      },
-    );
-  }
+        ),
+        contentPadding: EdgeInsets.zero,
+      );
+    },
+  );
+}
+
 
   Future<Map<String, dynamic>> obtenerDatosLider(int idLider) async {
     print('ID del líder de gimnasio: $idLider');
