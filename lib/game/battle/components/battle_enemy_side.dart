@@ -463,14 +463,6 @@ void showVictoryDialog(
                             ),
                           ),
                           SizedBox(width: 5.0),
-                          SizedBox(
-                            height: 60,
-                            width: 60,
-                            child: Image.asset(
-                              'assets/sobreEspecial.png',
-                              fit: BoxFit.cover,
-                            ),
-                          ),
                         ],
                       ),
                     ],
