@@ -5,6 +5,9 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 import 'package:permission_handler/permission_handler.dart';
 import 'result_screen.dart';
 
+void main() {
+  runApp(const App());
+}
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -67,80 +70,73 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
     }
   }
 
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: PreferredSize(
-      preferredSize: Size.fromHeight(35.0), // Ajusta aquí el tamaño vertical del AppBar
-      child: AppBar(
-        title: Container(
-          margin: const EdgeInsets.only(bottom: 10.0), // Espacio inferior para el título
-          child: Text(
-            'POKÉMON CAPTURE',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: 'Sarpanch',
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-        ),
-        backgroundColor: Colors.black,
-        centerTitle: true,
-      ),
-    ),
-    backgroundColor: _isPermissionGranted ? Colors.transparent : null,
-    body: Stack(
-      children: [
-        if (_isPermissionGranted)
-          FutureBuilder<List<CameraDescription>>(
-            future: availableCameras(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                _initCameraController(snapshot.data!);
-                return Center(child: CameraPreview(_cameraController!));
-              } else {
-                return const LinearProgressIndicator();
-              }
-            },
-          ),
-        _isPermissionGranted
-            ? Column(
-                children: [
-                  Expanded(
-                    child: Container(),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.only(bottom: 30.0),
-                    child: Center(
-                      child: GestureDetector(
-                        onTap: _scanImage,
-                        child: Image.asset('assets/OcrButton.png'),
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            : Center(
-                child: Container(
-                  padding: const EdgeInsets.only(left: 24.0, right: 24.0),
-                  child: const Text(
-                    'Camera permission denied',
-                    textAlign: TextAlign.center,
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: _future,
+      builder: (context, snapshot) {
+        return Stack(
+          children: [
+            if (_isPermissionGranted)
+              FutureBuilder<List<CameraDescription>>(
+                future: availableCameras(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    _initCameraController(snapshot.data!);
+
+                    return Center(child: CameraPreview(_cameraController!));
+                  } else {
+                    return const LinearProgressIndicator();
+                  }
+                },
+              ),
+            Scaffold(
+              appBar: AppBar(
+                title: const Text(
+                  'POKÉMON CAPTURE',
+                  style: TextStyle(
+                    fontFamily: 'Sarpanch', // Usa la tipografía Sarpanch
+                    fontSize: 20.0, // Tamaño del texto
+                    fontWeight: FontWeight.bold, // Negrita
+                    color: Colors.white, // Color del texto en blanco
                   ),
                 ),
+                centerTitle: true, // Asegura que el título esté centrado
+                backgroundColor: Colors.black, // Color de fondo negro
               ),
-      ],
-    ),
-  );
-}
-
-
-
-
-
-
+              backgroundColor: _isPermissionGranted ? Colors.transparent : null,
+              body: _isPermissionGranted
+                  ? Column(
+                      children: [
+                        Expanded(
+                          child: Container(),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.only(bottom: 30.0),
+                          child: Center(
+                            child: GestureDetector(
+                              onTap: _scanImage,
+                              child: Image.asset('assets/OcrButton.png'), // Ruta de la imagen
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : Center(
+                      child: Container(
+                        padding: const EdgeInsets.only(left: 24.0, right: 24.0),
+                        child: const Text(
+                          'Camera permission denied',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   Future<void> _requestCameraPermission() async {
     final status = await Permission.camera.request();
@@ -228,22 +224,111 @@ Widget build(BuildContext context) {
       } else {
         // Si no contiene contains2002PokemonNintendo un ejemplo seria "2002 Pokemon/Nintendo", mostrar un mensaje de advertencia
         if (!contains2002PokemonNintendo) {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text('No es una carta de Pokémon de la edicion 151'),
-                content: Text('Por favor, escanea una carta de Pokémon de la edicion 151.'),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text('OK'),
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+          side: BorderSide(color: Colors.black, width: 1.0),
+        ),
+        backgroundColor: Colors.transparent,
+        contentPadding: EdgeInsets.zero,
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(10.0),
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(10.0),
+                    topRight: Radius.circular(10.0),
                   ),
-                ],
-              );
-            },
-          );
-        } else {
+                ),
+                child: Text(
+                  'No es una carta de Pokémon de la edicion 151',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18.0,
+                    fontFamily: 'sarpanch',
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              SizedBox(height: 0), // Espaciado entre el título y el contenido
+              Container(
+                height: 160, // Ajusta la altura según sea necesario
+                width: 300,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(10.0),
+                    bottomRight: Radius.circular(10.0),
+                  ),
+                  color: Colors.white,
+                  border: Border.all(color: Colors.black, width: 1.0),
+                ),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: Container(
+                          padding: EdgeInsets.all(10.0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10.0),
+                            color: Color.fromRGBO(208, 56, 56, 1),
+                          ),
+                          child: Text(
+                            'Por favor, escanea una carta de Pokémon de la edicion 151.',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14.0,
+                              fontFamily: 'sarpanch',
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10.0), // Espaciado entre el mensaje y el botón
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10.0),
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.black,
+                                Colors.black54,
+                              ],
+                            ),
+                          ),
+                          child: Text(
+                            'CONTINUAR',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16.0,
+                              fontFamily: 'sarpanch',
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+ else {
           // Si no contiene "Pokémon" o "Nintendo", mostrar un mensaje de advertencia
           showDialog(
             context: context,
@@ -270,5 +355,4 @@ Widget build(BuildContext context) {
       );
     }
   }
-
 }
